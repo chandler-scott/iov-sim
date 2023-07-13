@@ -1,6 +1,6 @@
-# iov-sim #
+# IoV Federated Learning #
 
-Simulation to implement federated deep reinforcement learning in IoV clusters.
+Implementing federated deep reinforcement learning to enable cluster based communication in IoV.
 
 ## Supported program versions ##
 

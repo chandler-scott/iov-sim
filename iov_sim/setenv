@@ -22,10 +22,10 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-# Check if called from iov-sim directory
+# Check if called from IoV Federated Learning directory
 test -f print-iov_sim-version >/dev/null 2>&1
 if [ "$?" -ne 0 ]; then
-	echo 'Error: current working directory does not look like a iov-sim root directory. Aborting.' >&2
+	echo 'Error: current working directory does not look like a IoV Federated Learning root directory. Aborting.' >&2
 	return 1
 fi
 
