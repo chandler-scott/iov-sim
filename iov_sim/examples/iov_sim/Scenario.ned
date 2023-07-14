@@ -21,8 +21,13 @@
 //
 
 package iov_sim.examples.iov_sim;
+import org.car2x.veins.nodes.RSU;
+
 
 network Scenario extends org.car2x.veins.nodes.Scenario
 {
     submodules:
+        rsu[1]: RSU {
+            @display("p=150,140;i=veins/sign/yellowdiamond;is=vs");
+        }
 }

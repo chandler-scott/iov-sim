@@ -20,26 +20,31 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/ApplicationLayerTest.h"
+#include "iov_sim/applications/ApplicationLayerTest2.h"
 
-#include "iov_sim/ApplicationLayerTestMessage_m.h"
+#include "iov_sim/messages/ApplicationLayerTestMessage_m.h"
 
 using namespace veins;
 using namespace iov_sim;
+using namespace std;
 
-Define_Module(iov_sim::ApplicationLayerTest);
 
-void ApplicationLayerTest::initialize(int stage)
+Define_Module(iov_sim::ApplicationLayerTest2);
+
+void ApplicationLayerTest2::initialize(int stage)
 {
+    std::cout << "Initializing ApplicationLayerTest2" << endl;
+
     DemoBaseApplLayer::initialize(stage);
     if (stage == 0) {
+        std::cout << "Initializing ApplicationLayerTest2: Stage 0" << endl;
         sentMessage = false;
         lastDroveAt = simTime();
         currentSubscribedServiceId = -1;
     }
 }
 
-void ApplicationLayerTest::onWSA(DemoServiceAdvertisment* wsa)
+void ApplicationLayerTest2::onWSA(DemoServiceAdvertisment* wsa)
 {
     if (currentSubscribedServiceId == -1) {
         mac->changeServiceChannel(static_cast<Channel>(wsa->getTargetChannel()));
@@ -51,7 +56,7 @@ void ApplicationLayerTest::onWSA(DemoServiceAdvertisment* wsa)
     }
 }
 
-void ApplicationLayerTest::onWSM(BaseFrame1609_4* frame)
+void ApplicationLayerTest2::onWSM(BaseFrame1609_4* frame)
 {
     ApplicationLayerTestMessage* wsm = check_and_cast<ApplicationLayerTestMessage*>(frame);
 
@@ -67,7 +72,7 @@ void ApplicationLayerTest::onWSM(BaseFrame1609_4* frame)
     }
 }
 
-void ApplicationLayerTest::handleSelfMsg(cMessage* msg)
+void ApplicationLayerTest2::handleSelfMsg(cMessage* msg)
 {
     if (ApplicationLayerTestMessage* wsm = dynamic_cast<ApplicationLayerTestMessage*>(msg)) {
         // send this message on the service channel until the counter is 3 or higher.
@@ -88,7 +93,7 @@ void ApplicationLayerTest::handleSelfMsg(cMessage* msg)
     }
 }
 
-void ApplicationLayerTest::handlePositionUpdate(cObject* obj)
+void ApplicationLayerTest2::handlePositionUpdate(cObject* obj)
 {
     DemoBaseApplLayer::handlePositionUpdate(obj);
 

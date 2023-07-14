@@ -20,11 +20,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package org.car2x.veins.subprojects.iov_sim;
+package org.car2x.veins.subprojects.iov_sim.applications;
 import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
 
-simple ApplicationLayerTest extends DemoBaseApplLayer
+simple ApplicationLayerTest2 extends DemoBaseApplLayer
 {
-    @class(iov_sim::ApplicationLayerTest);
+    @class(iov_sim::ApplicationLayerTest2);
     @display("i=block/app2");
 }
