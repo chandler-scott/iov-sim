@@ -22,7 +22,11 @@
 
 #include "iov_sim/util/PythonWrapper.h"
 
+#include <iostream>
+
 PythonWrapper PythonWrapper::instance;
+
+using namespace std;
 
 PythonWrapper& PythonWrapper::getInstance() {
     return instance;
@@ -38,29 +42,33 @@ PythonWrapper::~PythonWrapper() {
 
 void PythonWrapper::initializePython() {
     Py_Initialize();
-    // Set up Python system path and import modules as needed
 }
+
 
 void PythonWrapper::finalizePython() {
     Py_Finalize();
 }
 
-void PythonWrapper::runPythonFunction(const char* moduleName, const char* functionName, const char* arg) {
-    PyObject* module = PyImport_ImportModule(moduleName);
+
+PyObject* PythonWrapper::runPythonFunction(PyObject* module, const char* functionName, const char* arg) {
+    cout << "Running Python Function:" << endl;
+
     if (module) {
         PyObject* function = PyObject_GetAttrString(module, functionName);
         if (function && PyCallable_Check(function)) {
             PyObject* result = PyObject_CallObject(function, NULL);
             // Process the result or perform error handling
-            Py_XDECREF(result);
             Py_DECREF(function);
+            return result;
         }
         else {
             // Handle function access error
         }
-        Py_DECREF(module);
     }
     else {
-        // Handle module import error
+        // Handle invalid module object
     }
+
+    // Return nullptr in case of error
+    return nullptr;
 }

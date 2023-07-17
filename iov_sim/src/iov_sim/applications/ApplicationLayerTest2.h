@@ -23,7 +23,6 @@
 #pragma once
 
 #include "iov_sim/iov_sim.h"
-#include <Python.h>
 #include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
 
 namespace iov_sim {

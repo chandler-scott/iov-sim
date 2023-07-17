@@ -17,7 +17,11 @@ public:
     PythonWrapper(const PythonWrapper&) = delete;
     PythonWrapper& operator=(const PythonWrapper&) = delete;
 
-    void runPythonFunction(const char* moduleName, const char* functionName, const char* arg = "");
+    PyObject* runPythonFunction(PyObject* module, const char* functionName, const char* arg = "");
+
+    PyObject* ppoModule;
+
+
 
 private:
     PythonWrapper();
