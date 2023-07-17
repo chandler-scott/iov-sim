@@ -21,9 +21,10 @@
 //
 
 #pragma once
-
+#include <omnetpp.h>
 #include "iov_sim/iov_sim.h"
-#include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
+#include "iov_sim/util/PythonWrapper.h"
+
 
 namespace iov_sim {
 
@@ -41,21 +42,13 @@ namespace iov_sim {
  *
  */
 
-class IOV_SIM_API ApplicationLayerTest : public veins::DemoBaseApplLayer {
+class IOV_SIM_API PythonLifecycle : public cSimpleModule{
 public:
-    void initialize(int stage) override;
+    PythonLifecycle();
 
-protected:
-    simtime_t lastDroveAt;
-    bool sentMessage;
-    int currentSubscribedServiceId;
+private:
+    ~PythonLifecycle();
 
-protected:
-    void onWSM(veins::BaseFrame1609_4* wsm) override;
-    void onWSA(veins::DemoServiceAdvertisment* wsa) override;
-
-    void handleSelfMsg(cMessage* msg) override;
-    void handlePositionUpdate(cObject* obj) override;
 };
 
 } // namespace iov_sim

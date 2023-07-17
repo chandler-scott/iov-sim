@@ -21,7 +21,7 @@
 //
 
 #include "iov_sim/util/PythonWrapper.h"
-
+#include <unistd.h>
 #include <iostream>
 
 PythonWrapper PythonWrapper::instance;
@@ -41,12 +41,27 @@ PythonWrapper::~PythonWrapper() {
 }
 
 void PythonWrapper::initializePython() {
+    std::cout << "Initializing Python interpreter!" << std::endl;
     Py_Initialize();
+
+    char cwd[256];  // Buffer to hold the current working directory
+
+     if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+         std::cout << "Current working directory: " << cwd << std::endl;
+     } else {
+         std::cout << "Failed to get the current working directory." << std::endl;
+     }
+
 }
 
 
 void PythonWrapper::finalizePython() {
+    std::cout << "Closing Python interpreter!" << std::endl;
     Py_Finalize();
+}
+
+void PythonWrapper::destroyInstance() {
+    instance.~PythonWrapper();  // Destruct the instance
 }
 
 

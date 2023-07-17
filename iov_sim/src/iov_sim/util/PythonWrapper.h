@@ -13,6 +13,8 @@
 class PythonWrapper {
 public:
     static PythonWrapper& getInstance();
+    static void destroyInstance();
+
 
     PythonWrapper(const PythonWrapper&) = delete;
     PythonWrapper& operator=(const PythonWrapper&) = delete;

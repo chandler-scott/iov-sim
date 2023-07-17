@@ -35,10 +35,12 @@ void RSUAggregationApplication::initialize(int stage)
         EV_INFO << "RSUAggregationApplication::Initializing RSUAggregationApplication: Stage 0" << endl;
         PythonWrapper& wrapper = PythonWrapper::getInstance();
 
-        PyObject *pModule = PyImport_ImportModule("ppo");
+        //PyObject *pModule = PyImport_ImportModule("ppo");
+        //Py_DECREF(pModule);
 
            // Check if the module was imported successfully
-           if (pModule != NULL)
+        /*
+       if (pModule != NULL)
            {
                // Get the 'get_hello' function from the module
                PyObject *pFunction = PyObject_GetAttrString(pModule, "get_hello");
@@ -63,11 +65,14 @@ void RSUAggregationApplication::initialize(int stage)
                    // Release the function object
                    Py_DECREF(pFunction);
                }
+
+               // Release the module object
            }
            else
            {
-               std::cout << "PPO not found.." << endl;
+               std::cout << "PPO module not found." << endl;
            }
+           */
     }
 }
 

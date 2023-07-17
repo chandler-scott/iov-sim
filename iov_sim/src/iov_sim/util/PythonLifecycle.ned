@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 Christoph Sommer <sommer@ccs-labs.org>
+// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,18 +20,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package iov_sim.examples.iov_sim;
-import org.car2x.veins.nodes.RSU;
-import org.car2x.veins.subprojects.iov_sim.util.PythonLifecycle;
+package org.car2x.veins.subprojects.iov_sim.util;
 
-
-network Scenario extends org.car2x.veins.nodes.Scenario
+simple PythonLifecycle
 {
-    submodules:
-        rsu[1]: RSU {
-            @display("p=150,140;i=veins/sign/yellowdiamond;is=vs");
-        }
-        MySimulationModule: PythonLifecycle {
-            @display("p=100,100;i=block/green");
-        }
+    @class(iov_sim::PythonLifecycle);
+    @display("i=block/app2");
 }

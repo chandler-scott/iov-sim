@@ -1,1 +1,10 @@
-1. create RSUAggregationApplication
+1. RSUAggregationApplication -> load model on initialize, save model on close
+2. RSUAggregationApplication -> log the onWSM, onWSA methods..
+3. Create CHAggregationApplication
+    - only current CH runs this
+    - when elected, rcv model from RSU and distribute to members
+    - rcv members' trained models, aggregate and disseminate
+4. Create CHSelectionTrainingApplication
+    - every node is always running this
+    - select CH based on weighted function
+    - evaluate and reward self on outcome
