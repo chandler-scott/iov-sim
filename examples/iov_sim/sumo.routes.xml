@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="veh_passenger" vClass="passenger"/>
+    <trip id="veh0" type="veh_passenger" depart="0.00" departLane="best" departSpeed="max" from="19657384" to="-192457124#2"/>
+    <trip id="veh1" type="veh_passenger" depart="0.44" departLane="best" from="-19663829#1" to="-19665043"/>
+    <trip id="veh2" type="veh_passenger" depart="0.88" departLane="best" from="19662527#6" to="19662572#5"/>
+    <trip id="veh3" type="veh_passenger" depart="1.32" departLane="best" from="346964443#1" to="-19657100#0"/>
+    <trip id="veh4" type="veh_passenger" depart="1.76" departLane="best" from="-558031357#0" to="-19425737#1"/>
+    <trip id="veh5" type="veh_passenger" depart="2.20" departLane="best" from="-19661292#0" to="19654323#1"/>
+    <trip id="veh6" type="veh_passenger" depart="2.64" departLane="best" from="-162082396#1" to="-19663783#0"/>
+    <trip id="veh7" type="veh_passenger" depart="3.08" departLane="best" from="19657800#0" to="19656546#2"/>
+</routes>

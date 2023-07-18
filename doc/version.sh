@@ -1,6 +1,7 @@
+#!/bin/bash
 
 #
-# Copyright (C) 2017 Rudolf Hornig <rudi@omnetpp.org>
+# Copyright (C) 2019 Julian Heinovski <heinovski@ccs-labs.org>
 #
 # Documentation for these modules is at http://veins.car2x.org/
 #
@@ -21,21 +22,18 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+# Generates the version number used for the doxygen documentation
+# by using git describe to analyze the current HEAD of the repository.
 #
-# on windows we have to link with the ws2_32 (winsock2) library as it is no longer added to the omnetpp system libraries by default (as of OMNeT++ 5.1)
-# copied from INET Framework (inet-3.6.0) makefrag
+# Example: veins-5a1-16-gd81b4a14a0
+# The current HEAD points at the commit d81b4a14a0, which is 16 commits
+# newer than the tag veins-5a1 it is based on.
 #
-ifeq ($(PLATFORM),win32.x86_64)
-  LIBS += -lws2_32
-  DEFINES += -DIOV_SIM_EXPORT
-  ENABLE_AUTO_IMPORT=-Wl,--enable-auto-import
-  LDFLAGS := $(filter-out $(ENABLE_AUTO_IMPORT), $(LDFLAGS))
-endif
+# In case git describe fails, the version is empty.
 
-IOV_SIM_NEED_MSG6 := $(shell echo ${OMNETPP_VERSION} | grep "^5" >/dev/null 2>&1; echo $$?)
-ifeq ($(IOV_SIM_NEED_MSG6),0)
-  MSGCOPTS += --msg6
-endif
-
-INCLUDE_PATH += -I/usr/include/python3.8 
-LIBS += -lpython3.8
+TAG=$(git describe --tags --always 2> /dev/null)
+if [[ ($? -eq 0) && ($TAG =~ ^veins-) ]]; then
+    echo $TAG | sed -n 's/^veins-\(.*\)$/\1/p'
+else
+    echo ""
+fi

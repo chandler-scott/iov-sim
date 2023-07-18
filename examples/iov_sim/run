@@ -1,6 +1,7 @@
+#!/bin/sh
 
 #
-# Copyright (C) 2017 Rudolf Hornig <rudi@omnetpp.org>
+# Copyright (C) 2011 Christoph Sommer <sommer@ccs-labs.org>
 #
 # Documentation for these modules is at http://veins.car2x.org/
 #
@@ -21,21 +22,4 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-#
-# on windows we have to link with the ws2_32 (winsock2) library as it is no longer added to the omnetpp system libraries by default (as of OMNeT++ 5.1)
-# copied from INET Framework (inet-3.6.0) makefrag
-#
-ifeq ($(PLATFORM),win32.x86_64)
-  LIBS += -lws2_32
-  DEFINES += -DIOV_SIM_EXPORT
-  ENABLE_AUTO_IMPORT=-Wl,--enable-auto-import
-  LDFLAGS := $(filter-out $(ENABLE_AUTO_IMPORT), $(LDFLAGS))
-endif
-
-IOV_SIM_NEED_MSG6 := $(shell echo ${OMNETPP_VERSION} | grep "^5" >/dev/null 2>&1; echo $$?)
-ifeq ($(IOV_SIM_NEED_MSG6),0)
-  MSGCOPTS += --msg6
-endif
-
-INCLUDE_PATH += -I/usr/include/python3.8 
-LIBS += -lpython3.8
+exec ../../bin/iov_sim_run "$@"
