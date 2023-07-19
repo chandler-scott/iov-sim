@@ -21,8 +21,19 @@
 //
 
 package iov_sim.examples.iov_sim;
+import org.car2x.veins.nodes.RSU;
+import org.car2x.veins.subprojects.iov_sim.util.PythonLifecycle;
+
 
 network Scenario extends org.car2x.veins.nodes.Scenario
 {
+    parameters:
+        int n = default(1);
     submodules:
+        rsu[n]: RSU {
+            @display("i=veins/sign/yellowdiamond;is=vs");
+        }
+        MySimulationModule: PythonLifecycle {
+            @display("p=100,100;i=block/green");
+        }
 }

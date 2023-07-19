@@ -156,8 +156,7 @@
                 <type id="tourism.artwork" db-per-cut="9" db-per-meter="0.4" />
                 <type id="tourism.attraction" db-per-cut="9" db-per-meter="0.4" />
                 <type id="tourism.hotel" db-per-cut="9" db-per-meter="0.4" />
-                <type id="tourism.gallery" db-per-cut="9" db-per-meter="0.4" />
-                
+                <type id="tourism.gallery" db-per-cut="9" db-per-meter="0.4" /> 
             </obstacles>
         </AnalogueModel>
     </AnalogueModels>

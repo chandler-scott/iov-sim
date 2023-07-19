@@ -20,14 +20,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-import veins.base.utils.Coord;
 import veins.modules.messages.BaseFrame1609_4;
-import veins.base.utils.SimpleAddress;
+
 
 namespace iov_sim;
 
-packet ApplicationLayerTestMessage extends veins::BaseFrame1609_4 {
-    string demoData;
+packet VehicleInitMessage extends veins::BaseFrame1609_4 {
+    string data;
     veins::LAddress::L2Type senderAddress = -1;
     int serial = 0;
 }

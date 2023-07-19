@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for $(LIB_PREFIX)iov_sim
 #
 # This file was generated with the command:
-#  opp_makemake --make-so -f --deep -o iov_sim -O out -pIOV_SIM -KVEINS_PROJ=../../../../veins-framework/src/veins -DVEINS_IMPORT -I. -I$$\(VEINS_PROJ\)/src -I. -L$$\(VEINS_PROJ\)/src -lveins$$\(D\)
+#  opp_makemake --make-so -f --deep -o iov_sim -O out -pIOV_SIM -KVEINS_PROJ=../../veins -DVEINS_IMPORT -I. -I$$\(VEINS_PROJ\)/src -I. -L$$\(VEINS_PROJ\)/src -lveins$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -28,17 +28,24 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/iov_sim/ApplicationLayerTest.o $O/iov_sim/ApplicationLayerTestMessage_m.o
+OBJS = \
+    $O/iov_sim/applications/ApplicationLayerTest.o \
+    $O/iov_sim/applications/RSUApplication.o \
+    $O/iov_sim/util/PythonLifecycle.o \
+    $O/iov_sim/util/PythonWrapper.o \
+    $O/iov_sim/messages/RSUInitMessage_m.o \
+    $O/iov_sim/messages/VehicleInitMessage_m.o
 
 # Message files
 MSGFILES = \
-    iov_sim/ApplicationLayerTestMessage.msg
+    iov_sim/messages/RSUInitMessage.msg \
+    iov_sim/messages/VehicleInitMessage.msg
 
 # SM files
 SMFILES =
 
 # Other makefile variables (-K)
-VEINS_PROJ=../../../../veins-framework/src/veins
+VEINS_PROJ=../../veins
 
 #------------------------------------------------------------------------------
 

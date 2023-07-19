@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/ApplicationLayerTestMessage.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/VehicleInitMessage.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "ApplicationLayerTestMessage_m.h"
+#include "VehicleInitMessage_m.h"
 
 namespace omnetpp {
 
@@ -152,22 +152,22 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 namespace iov_sim {
 
-Register_Class(ApplicationLayerTestMessage)
+Register_Class(VehicleInitMessage)
 
-ApplicationLayerTestMessage::ApplicationLayerTestMessage(const char *name, short kind) : ::veins::BaseFrame1609_4(name, kind)
+VehicleInitMessage::VehicleInitMessage(const char *name, short kind) : ::veins::BaseFrame1609_4(name, kind)
 {
 }
 
-ApplicationLayerTestMessage::ApplicationLayerTestMessage(const ApplicationLayerTestMessage& other) : ::veins::BaseFrame1609_4(other)
+VehicleInitMessage::VehicleInitMessage(const VehicleInitMessage& other) : ::veins::BaseFrame1609_4(other)
 {
     copy(other);
 }
 
-ApplicationLayerTestMessage::~ApplicationLayerTestMessage()
+VehicleInitMessage::~VehicleInitMessage()
 {
 }
 
-ApplicationLayerTestMessage& ApplicationLayerTestMessage::operator=(const ApplicationLayerTestMessage& other)
+VehicleInitMessage& VehicleInitMessage::operator=(const VehicleInitMessage& other)
 {
     if (this == &other) return *this;
     ::veins::BaseFrame1609_4::operator=(other);
@@ -175,71 +175,71 @@ ApplicationLayerTestMessage& ApplicationLayerTestMessage::operator=(const Applic
     return *this;
 }
 
-void ApplicationLayerTestMessage::copy(const ApplicationLayerTestMessage& other)
+void VehicleInitMessage::copy(const VehicleInitMessage& other)
 {
-    this->demoData = other.demoData;
+    this->data = other.data;
     this->senderAddress = other.senderAddress;
     this->serial = other.serial;
 }
 
-void ApplicationLayerTestMessage::parsimPack(omnetpp::cCommBuffer *b) const
+void VehicleInitMessage::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::veins::BaseFrame1609_4::parsimPack(b);
-    doParsimPacking(b,this->demoData);
+    doParsimPacking(b,this->data);
     doParsimPacking(b,this->senderAddress);
     doParsimPacking(b,this->serial);
 }
 
-void ApplicationLayerTestMessage::parsimUnpack(omnetpp::cCommBuffer *b)
+void VehicleInitMessage::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::veins::BaseFrame1609_4::parsimUnpack(b);
-    doParsimUnpacking(b,this->demoData);
+    doParsimUnpacking(b,this->data);
     doParsimUnpacking(b,this->senderAddress);
     doParsimUnpacking(b,this->serial);
 }
 
-const char * ApplicationLayerTestMessage::getDemoData() const
+const char * VehicleInitMessage::getData() const
 {
-    return this->demoData.c_str();
+    return this->data.c_str();
 }
 
-void ApplicationLayerTestMessage::setDemoData(const char * demoData)
+void VehicleInitMessage::setData(const char * data)
 {
-    this->demoData = demoData;
+    this->data = data;
 }
 
-const ::veins::LAddress::L2Type& ApplicationLayerTestMessage::getSenderAddress() const
+const ::veins::LAddress::L2Type& VehicleInitMessage::getSenderAddress() const
 {
     return this->senderAddress;
 }
 
-void ApplicationLayerTestMessage::setSenderAddress(const ::veins::LAddress::L2Type& senderAddress)
+void VehicleInitMessage::setSenderAddress(const ::veins::LAddress::L2Type& senderAddress)
 {
     this->senderAddress = senderAddress;
 }
 
-int ApplicationLayerTestMessage::getSerial() const
+int VehicleInitMessage::getSerial() const
 {
     return this->serial;
 }
 
-void ApplicationLayerTestMessage::setSerial(int serial)
+void VehicleInitMessage::setSerial(int serial)
 {
     this->serial = serial;
 }
 
-class ApplicationLayerTestMessageDescriptor : public omnetpp::cClassDescriptor
+class VehicleInitMessageDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_demoData,
+        FIELD_data,
         FIELD_senderAddress,
         FIELD_serial,
     };
   public:
-    ApplicationLayerTestMessageDescriptor();
-    virtual ~ApplicationLayerTestMessageDescriptor();
+    VehicleInitMessageDescriptor();
+    virtual ~VehicleInitMessageDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -265,24 +265,24 @@ class ApplicationLayerTestMessageDescriptor : public omnetpp::cClassDescriptor
     virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
-Register_ClassDescriptor(ApplicationLayerTestMessageDescriptor)
+Register_ClassDescriptor(VehicleInitMessageDescriptor)
 
-ApplicationLayerTestMessageDescriptor::ApplicationLayerTestMessageDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(iov_sim::ApplicationLayerTestMessage)), "veins::BaseFrame1609_4")
+VehicleInitMessageDescriptor::VehicleInitMessageDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(iov_sim::VehicleInitMessage)), "veins::BaseFrame1609_4")
 {
     propertyNames = nullptr;
 }
 
-ApplicationLayerTestMessageDescriptor::~ApplicationLayerTestMessageDescriptor()
+VehicleInitMessageDescriptor::~VehicleInitMessageDescriptor()
 {
     delete[] propertyNames;
 }
 
-bool ApplicationLayerTestMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool VehicleInitMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<ApplicationLayerTestMessage *>(obj)!=nullptr;
+    return dynamic_cast<VehicleInitMessage *>(obj)!=nullptr;
 }
 
-const char **ApplicationLayerTestMessageDescriptor::getPropertyNames() const
+const char **VehicleInitMessageDescriptor::getPropertyNames() const
 {
     if (!propertyNames) {
         static const char *names[] = {  nullptr };
@@ -293,19 +293,19 @@ const char **ApplicationLayerTestMessageDescriptor::getPropertyNames() const
     return propertyNames;
 }
 
-const char *ApplicationLayerTestMessageDescriptor::getProperty(const char *propertyName) const
+const char *VehicleInitMessageDescriptor::getProperty(const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? base->getProperty(propertyName) : nullptr;
 }
 
-int ApplicationLayerTestMessageDescriptor::getFieldCount() const
+int VehicleInitMessageDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? 3+base->getFieldCount() : 3;
 }
 
-unsigned int ApplicationLayerTestMessageDescriptor::getFieldTypeFlags(int field) const
+unsigned int VehicleInitMessageDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -314,14 +314,14 @@ unsigned int ApplicationLayerTestMessageDescriptor::getFieldTypeFlags(int field)
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_demoData
+        FD_ISEDITABLE,    // FIELD_data
         0,    // FIELD_senderAddress
         FD_ISEDITABLE,    // FIELD_serial
     };
     return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
 
-const char *ApplicationLayerTestMessageDescriptor::getFieldName(int field) const
+const char *VehicleInitMessageDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -330,24 +330,24 @@ const char *ApplicationLayerTestMessageDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "demoData",
+        "data",
         "senderAddress",
         "serial",
     };
     return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
 }
 
-int ApplicationLayerTestMessageDescriptor::findField(const char *fieldName) const
+int VehicleInitMessageDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "demoData") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "data") == 0) return baseIndex + 0;
     if (strcmp(fieldName, "senderAddress") == 0) return baseIndex + 1;
     if (strcmp(fieldName, "serial") == 0) return baseIndex + 2;
     return base ? base->findField(fieldName) : -1;
 }
 
-const char *ApplicationLayerTestMessageDescriptor::getFieldTypeString(int field) const
+const char *VehicleInitMessageDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -356,14 +356,14 @@ const char *ApplicationLayerTestMessageDescriptor::getFieldTypeString(int field)
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "string",    // FIELD_demoData
+        "string",    // FIELD_data
         "veins::LAddress::L2Type",    // FIELD_senderAddress
         "int",    // FIELD_serial
     };
     return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **ApplicationLayerTestMessageDescriptor::getFieldPropertyNames(int field) const
+const char **VehicleInitMessageDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -376,7 +376,7 @@ const char **ApplicationLayerTestMessageDescriptor::getFieldPropertyNames(int fi
     }
 }
 
-const char *ApplicationLayerTestMessageDescriptor::getFieldProperty(int field, const char *propertyName) const
+const char *VehicleInitMessageDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -389,7 +389,7 @@ const char *ApplicationLayerTestMessageDescriptor::getFieldProperty(int field, c
     }
 }
 
-int ApplicationLayerTestMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+int VehicleInitMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -397,13 +397,13 @@ int ApplicationLayerTestMessageDescriptor::getFieldArraySize(omnetpp::any_ptr ob
             return base->getFieldArraySize(object, field);
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-void ApplicationLayerTestMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+void VehicleInitMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -413,13 +413,13 @@ void ApplicationLayerTestMessageDescriptor::setFieldArraySize(omnetpp::any_ptr o
         }
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'ApplicationLayerTestMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'VehicleInitMessage'", field);
     }
 }
 
-const char *ApplicationLayerTestMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+const char *VehicleInitMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -427,13 +427,13 @@ const char *ApplicationLayerTestMessageDescriptor::getFieldDynamicTypeString(omn
             return base->getFieldDynamicTypeString(object,field,i);
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string ApplicationLayerTestMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+std::string VehicleInitMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -441,16 +441,16 @@ std::string ApplicationLayerTestMessageDescriptor::getFieldValueAsString(omnetpp
             return base->getFieldValueAsString(object,field,i);
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_demoData: return oppstring2string(pp->getDemoData());
+        case FIELD_data: return oppstring2string(pp->getData());
         case FIELD_senderAddress: return "";
         case FIELD_serial: return long2string(pp->getSerial());
         default: return "";
     }
 }
 
-void ApplicationLayerTestMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+void VehicleInitMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -460,15 +460,15 @@ void ApplicationLayerTestMessageDescriptor::setFieldValueAsString(omnetpp::any_p
         }
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_demoData: pp->setDemoData((value)); break;
+        case FIELD_data: pp->setData((value)); break;
         case FIELD_serial: pp->setSerial(string2long(value)); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ApplicationLayerTestMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'VehicleInitMessage'", field);
     }
 }
 
-omnetpp::cValue ApplicationLayerTestMessageDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+omnetpp::cValue VehicleInitMessageDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -476,16 +476,16 @@ omnetpp::cValue ApplicationLayerTestMessageDescriptor::getFieldValue(omnetpp::an
             return base->getFieldValue(object,field,i);
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_demoData: return pp->getDemoData();
+        case FIELD_data: return pp->getData();
         case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
         case FIELD_serial: return pp->getSerial();
-        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'ApplicationLayerTestMessage' as cValue -- field index out of range?", field);
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'VehicleInitMessage' as cValue -- field index out of range?", field);
     }
 }
 
-void ApplicationLayerTestMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+void VehicleInitMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -495,15 +495,15 @@ void ApplicationLayerTestMessageDescriptor::setFieldValue(omnetpp::any_ptr objec
         }
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_demoData: pp->setDemoData(value.stringValue()); break;
+        case FIELD_data: pp->setData(value.stringValue()); break;
         case FIELD_serial: pp->setSerial(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ApplicationLayerTestMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'VehicleInitMessage'", field);
     }
 }
 
-const char *ApplicationLayerTestMessageDescriptor::getFieldStructName(int field) const
+const char *VehicleInitMessageDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -516,7 +516,7 @@ const char *ApplicationLayerTestMessageDescriptor::getFieldStructName(int field)
     };
 }
 
-omnetpp::any_ptr ApplicationLayerTestMessageDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+omnetpp::any_ptr VehicleInitMessageDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -524,14 +524,14 @@ omnetpp::any_ptr ApplicationLayerTestMessageDescriptor::getFieldStructValuePoint
             return base->getFieldStructValuePointer(object, field, i);
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
         case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
         default: return omnetpp::any_ptr(nullptr);
     }
 }
 
-void ApplicationLayerTestMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+void VehicleInitMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -541,9 +541,9 @@ void ApplicationLayerTestMessageDescriptor::setFieldStructValuePointer(omnetpp::
         }
         field -= base->getFieldCount();
     }
-    ApplicationLayerTestMessage *pp = omnetpp::fromAnyPtr<ApplicationLayerTestMessage>(object); (void)pp;
+    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ApplicationLayerTestMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'VehicleInitMessage'", field);
     }
 }
 

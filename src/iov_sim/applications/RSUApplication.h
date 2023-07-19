@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
+// Copyright (C) 2016 David Eckhoff <david.eckhoff@fau.de>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,11 +20,27 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package org.car2x.veins.subprojects.iov_sim;
-import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
+#pragma once
 
-simple ApplicationLayerTest extends DemoBaseApplLayer
-{
-    @class(iov_sim::ApplicationLayerTest);
-    @display("i=block/app2");
-}
+#include "iov_sim/iov_sim.h"
+#include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
+#include "iov_sim/util/PythonWrapper.h"
+#include "iov_sim/messages/VehicleInitMessage_m.h"
+#include "iov_sim/messages/RSUInitMessage_m.h"
+
+
+using namespace veins;
+namespace iov_sim {
+
+
+class IOV_SIM_API RSUApplication : public DemoBaseApplLayer {
+public:
+    void initialize(int stage) override;
+
+protected:
+    void onBSM(DemoSafetyMessage* bsm) override;
+    void onWSM(BaseFrame1609_4* wsm) override;
+    void onWSA(DemoServiceAdvertisment* wsa) override;
+};
+
+} // namespace veins

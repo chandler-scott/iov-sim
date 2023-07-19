@@ -1,7 +1,7 @@
-# iov-sim {#manual}
+# IoV Federated Learning {#manual}
 
 [TOC]
 
-Welcome to the iov-sim user manual.
-This page is the starting point for additional documentation of the iov-sim project.
+Welcome to the IoV Federated Learning user manual.
+This page is the starting point for additional documentation of the IoV Federated Learning project.
 

@@ -1,32 +1,92 @@
-
 #
-# Copyright (C) 2019 Christoph Sommer <sommer@ccs-labs.org>
+# OMNeT++/OMNEST Makefile for iov_sim
 #
-# Documentation for these modules is at http://veins.car2x.org/
-#
-# SPDX-License-Identifier: GPL-2.0-or-later
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# This file was generated with the command:
+#  opp_makemake --nolink -f --deep -O out -KVEINS_PROJ=../veins -DVEINS_IMPORT -DIOV_SIM_IMPORT -I. -I$$\(VEINS_PROJ\)/src -Isrc -L$$\(VEINS_PROJ\)/src -Lout/$$\(CONFIGNAME\)/src -lveins$$\(D\) -d src -X.
 #
 
-.PHONY: all clean
+# Output directory
+PROJECT_OUTPUT_DIR = out
+PROJECTRELATIVE_PATH =
+O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
-all:
-	$(MAKE) -C veins all
-	$(MAKE) -C iov_sim all
+# Other makefile variables (-K)
+VEINS_PROJ=../veins
+
+#------------------------------------------------------------------------------
+
+# Pull in OMNeT++ configuration (Makefile.inc)
+
+ifneq ("$(OMNETPP_CONFIGFILE)","")
+CONFIGFILE = $(OMNETPP_CONFIGFILE)
+else
+CONFIGFILE = $(shell opp_configfilepath)
+endif
+
+ifeq ("$(wildcard $(CONFIGFILE))","")
+$(error Config file '$(CONFIGFILE)' does not exist -- add the OMNeT++ bin directory to the path so that opp_configfilepath can be found, or set the OMNETPP_CONFIGFILE variable to point to Makefile.inc)
+endif
+
+include $(CONFIGFILE)
+
+# we want to recompile everything if COPTS changes,
+# so we store COPTS into $COPTS_FILE (if COPTS has changed since last build)
+# and make the object files depend on it
+COPTS_FILE = $O/.last-copts
+ifneq ("$(COPTS)","$(shell cat $(COPTS_FILE) 2>/dev/null || echo '')")
+  $(shell $(MKPATH) "$O")
+  $(file >$(COPTS_FILE),$(COPTS))
+endif
+
+#------------------------------------------------------------------------------
+# User-supplied makefile fragment(s)
+-include makefrag
+
+#------------------------------------------------------------------------------
+
+# Main target
+
+$(TARGET_DIR)/% :: $O/%
+	@mkdir -p $(TARGET_DIR)
+	$(Q)$(LN) $< $@
+ifeq ($(TOOLCHAIN_NAME),clang-msabi)
+	-$(Q)-$(LN) $(<:%.dll=%.lib) $(@:%.dll=%.lib) 2>/dev/null
+
+$O/$(TARGET_NAME).pdb: $O/$(TARGET)
+endif
+
+all:  submakedirs Makefile $(CONFIGFILE)
+	@# Do nothing
+
+submakedirs:  src_dir
+
+.PHONY: all clean cleanall depend msgheaders smheaders  src
+src: src_dir
+
+src_dir:
+	cd src && $(MAKE) all
+
+msgheaders:
+	$(Q)cd src && $(MAKE) msgheaders
+
+smheaders:
+	$(Q)cd src && $(MAKE) smheaders
 
 clean:
-	$(MAKE) -C veins clean
-	$(MAKE) -C iov_sim clean
+	$(qecho) Cleaning $(TARGET)
+	$(Q)-rm -rf $O
+	$(Q)-rm -f $(call opp_rwildcard, . , *_m.cc *_m.h *_sm.cc *_sm.h)
+	-$(Q)cd src && $(MAKE) clean
+
+cleanall:
+	$(Q)$(CLEANALL_COMMAND)
+	$(Q)-rm -rf $(PROJECT_OUTPUT_DIR)
+
+help:
+	@echo "$$HELP_SYNOPSYS"
+	@echo "$$HELP_TARGETS"
+	@echo "$$HELP_VARIABLES"
+	@echo "$$HELP_EXAMPLES"
+
+# include all dependencies
+-include $(OBJS:%=%.d) $(MSGFILES:%.msg=$O/%_m.h.d)
