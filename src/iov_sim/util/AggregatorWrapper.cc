@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2011 David Eckhoff <eckhoff@cs.fau.de>
+// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,11 +20,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-import veins.modules.messages.BaseFrame1609_4;
+#include "iov_sim/util/AggregatorWrapper.h"
 
+AggregatorWrapper::AggregatorWrapper()
+    : wrapper(PythonWrapper::getInstance())
+{
+}
 
-namespace iov_sim;
-
-packet VehicleInitMessage extends veins::BaseFrame1609_4 {
-    string data;
+AggregatorWrapper::~AggregatorWrapper()
+{
+    PythonWrapper::destroyInstance(); // Destruct the singleton
 }

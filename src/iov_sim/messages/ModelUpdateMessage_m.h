@@ -1,9 +1,9 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/RSUInitMessage.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/ModelUpdateMessage.msg.
 //
 
-#ifndef __IOV_SIM_RSUINITMESSAGE_M_H
-#define __IOV_SIM_RSUINITMESSAGE_M_H
+#ifndef __IOV_SIM_MODELUPDATEMESSAGE_M_H
+#define __IOV_SIM_MODELUPDATEMESSAGE_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -30,7 +30,7 @@
 
 namespace iov_sim {
 
-class RSUInitMessage;
+class ModelUpdateMessage;
 
 }  // namespace iov_sim
 
@@ -40,9 +40,9 @@ class RSUInitMessage;
 namespace iov_sim {
 
 /**
- * Class generated from <tt>iov_sim/messages/RSUInitMessage.msg:28</tt> by opp_msgtool.
+ * Class generated from <tt>iov_sim/messages/ModelUpdateMessage.msg:28</tt> by opp_msgtool.
  * <pre>
- * packet RSUInitMessage extends veins::BaseFrame1609_4
+ * packet ModelUpdateMessage extends veins::BaseFrame1609_4
  * {
  *     string data;
  *     veins::LAddress::L2Type senderAddress = -1;
@@ -50,7 +50,7 @@ namespace iov_sim {
  * }
  * </pre>
  */
-class IOV_SIM_API RSUInitMessage : public ::veins::BaseFrame1609_4
+class IOV_SIM_API ModelUpdateMessage : public ::veins::BaseFrame1609_4
 {
   protected:
     ::omnetpp::opp_string data;
@@ -58,17 +58,17 @@ class IOV_SIM_API RSUInitMessage : public ::veins::BaseFrame1609_4
     int serial = 0;
 
   private:
-    void copy(const RSUInitMessage& other);
+    void copy(const ModelUpdateMessage& other);
 
   protected:
-    bool operator==(const RSUInitMessage&) = delete;
+    bool operator==(const ModelUpdateMessage&) = delete;
 
   public:
-    RSUInitMessage(const char *name=nullptr, short kind=0);
-    RSUInitMessage(const RSUInitMessage& other);
-    virtual ~RSUInitMessage();
-    RSUInitMessage& operator=(const RSUInitMessage& other);
-    virtual RSUInitMessage *dup() const override {return new RSUInitMessage(*this);}
+    ModelUpdateMessage(const char *name=nullptr, short kind=0);
+    ModelUpdateMessage(const ModelUpdateMessage& other);
+    virtual ~ModelUpdateMessage();
+    ModelUpdateMessage& operator=(const ModelUpdateMessage& other);
+    virtual ModelUpdateMessage *dup() const override {return new ModelUpdateMessage(*this);}
     virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
@@ -76,15 +76,15 @@ class IOV_SIM_API RSUInitMessage : public ::veins::BaseFrame1609_4
     virtual void setData(const char * data);
 
     virtual const ::veins::LAddress::L2Type& getSenderAddress() const;
-    virtual ::veins::LAddress::L2Type& getSenderAddressForUpdate() { return const_cast<::veins::LAddress::L2Type&>(const_cast<RSUInitMessage*>(this)->getSenderAddress());}
+    virtual ::veins::LAddress::L2Type& getSenderAddressForUpdate() { return const_cast<::veins::LAddress::L2Type&>(const_cast<ModelUpdateMessage*>(this)->getSenderAddress());}
     virtual void setSenderAddress(const ::veins::LAddress::L2Type& senderAddress);
 
     virtual int getSerial() const;
     virtual void setSerial(int serial);
 };
 
-inline void doParsimPacking(omnetpp::cCommBuffer *b, const RSUInitMessage& obj) {obj.parsimPack(b);}
-inline void doParsimUnpacking(omnetpp::cCommBuffer *b, RSUInitMessage& obj) {obj.parsimUnpack(b);}
+inline void doParsimPacking(omnetpp::cCommBuffer *b, const ModelUpdateMessage& obj) {obj.parsimPack(b);}
+inline void doParsimUnpacking(omnetpp::cCommBuffer *b, ModelUpdateMessage& obj) {obj.parsimUnpack(b);}
 
 
 }  // namespace iov_sim
@@ -92,9 +92,9 @@ inline void doParsimUnpacking(omnetpp::cCommBuffer *b, RSUInitMessage& obj) {obj
 
 namespace omnetpp {
 
-template<> inline iov_sim::RSUInitMessage *fromAnyPtr(any_ptr ptr) { return check_and_cast<iov_sim::RSUInitMessage*>(ptr.get<cObject>()); }
+template<> inline iov_sim::ModelUpdateMessage *fromAnyPtr(any_ptr ptr) { return check_and_cast<iov_sim::ModelUpdateMessage*>(ptr.get<cObject>()); }
 
 }  // namespace omnetpp
 
-#endif // ifndef __IOV_SIM_RSUINITMESSAGE_M_H
+#endif // ifndef __IOV_SIM_MODELUPDATEMESSAGE_M_H
 

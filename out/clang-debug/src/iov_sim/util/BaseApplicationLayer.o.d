@@ -1,8 +1,7 @@
-../out/clang-debug/src/iov_sim/applications/ApplicationLayerTest.o: \
-  iov_sim/applications/ApplicationLayerTest.cc \
-  iov_sim/applications/ApplicationLayerTest.h iov_sim/iov_sim.h \
+../out/clang-debug/src/iov_sim/util/BaseApplicationLayer.o: \
+  iov_sim/util/BaseApplicationLayer.cc \
+  iov_sim/util/BaseApplicationLayer.h iov_sim/iov_sim.h \
   ../../veins/src/veins/veins.h /home/chandler/omnetpp/include/omnetpp.h \
-  iov_sim/util/BaseApplicationLayer.h \
   ../../veins/src/veins/base/modules/BaseApplLayer.h \
   ../../veins/src/veins/base/modules/BaseLayer.h \
   ../../veins/src/veins/base/modules/BatteryAccess.h \
@@ -52,19 +51,15 @@
   ../../veins/src/veins/modules/mobility/traci/TraCIRegionOfInterest.h \
   ../../veins/src/veins/modules/mobility/traci/TraCICommandInterface.h \
   ../../veins/src/veins/modules/world/traci/trafficLight/TraCITrafficLightProgram.h \
-  iov_sim/messages/VehicleInitMessage_m.h \
-  iov_sim/messages/ModelUpdateMessage_m.h \
-  ../../veins/src/veins/modules/application/traci/TraCIDemo11pMessage_m.h
+  iov_sim/messages/VehicleInitMessage_m.h
 
-iov_sim/applications/ApplicationLayerTest.h:
+iov_sim/util/BaseApplicationLayer.h:
 
 iov_sim/iov_sim.h:
 
 ../../veins/src/veins/veins.h:
 
 /home/chandler/omnetpp/include/omnetpp.h:
-
-iov_sim/util/BaseApplicationLayer.h:
 
 ../../veins/src/veins/base/modules/BaseApplLayer.h:
 
@@ -165,7 +160,3 @@ iov_sim/util/BaseApplicationLayer.h:
 ../../veins/src/veins/modules/world/traci/trafficLight/TraCITrafficLightProgram.h:
 
 iov_sim/messages/VehicleInitMessage_m.h:
-
-iov_sim/messages/ModelUpdateMessage_m.h:
-
-../../veins/src/veins/modules/application/traci/TraCIDemo11pMessage_m.h:

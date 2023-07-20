@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
+// Copyright (C) 2011 David Eckhoff <eckhoff@cs.fau.de>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,11 +20,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package org.car2x.veins.subprojects.iov_sim.applications;
-import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
+import veins.modules.messages.BaseFrame1609_4;
 
-simple RSUAggregationApplication extends DemoBaseApplLayer
-{
-    @class(iov_sim::RSUAggregationApplication);
-    @display("i=block/app2");
+
+namespace iov_sim;
+
+packet ModelUpdateMessage extends veins::BaseFrame1609_4 {
+    string data;
+    veins::LAddress::L2Type senderAddress = -1;
+    int serial = 0;
 }

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/RSUInitMessage.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/ModelUpdateMessage.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "RSUInitMessage_m.h"
+#include "ModelUpdateMessage_m.h"
 
 namespace omnetpp {
 
@@ -152,22 +152,22 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 namespace iov_sim {
 
-Register_Class(RSUInitMessage)
+Register_Class(ModelUpdateMessage)
 
-RSUInitMessage::RSUInitMessage(const char *name, short kind) : ::veins::BaseFrame1609_4(name, kind)
+ModelUpdateMessage::ModelUpdateMessage(const char *name, short kind) : ::veins::BaseFrame1609_4(name, kind)
 {
 }
 
-RSUInitMessage::RSUInitMessage(const RSUInitMessage& other) : ::veins::BaseFrame1609_4(other)
+ModelUpdateMessage::ModelUpdateMessage(const ModelUpdateMessage& other) : ::veins::BaseFrame1609_4(other)
 {
     copy(other);
 }
 
-RSUInitMessage::~RSUInitMessage()
+ModelUpdateMessage::~ModelUpdateMessage()
 {
 }
 
-RSUInitMessage& RSUInitMessage::operator=(const RSUInitMessage& other)
+ModelUpdateMessage& ModelUpdateMessage::operator=(const ModelUpdateMessage& other)
 {
     if (this == &other) return *this;
     ::veins::BaseFrame1609_4::operator=(other);
@@ -175,14 +175,14 @@ RSUInitMessage& RSUInitMessage::operator=(const RSUInitMessage& other)
     return *this;
 }
 
-void RSUInitMessage::copy(const RSUInitMessage& other)
+void ModelUpdateMessage::copy(const ModelUpdateMessage& other)
 {
     this->data = other.data;
     this->senderAddress = other.senderAddress;
     this->serial = other.serial;
 }
 
-void RSUInitMessage::parsimPack(omnetpp::cCommBuffer *b) const
+void ModelUpdateMessage::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::veins::BaseFrame1609_4::parsimPack(b);
     doParsimPacking(b,this->data);
@@ -190,7 +190,7 @@ void RSUInitMessage::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->serial);
 }
 
-void RSUInitMessage::parsimUnpack(omnetpp::cCommBuffer *b)
+void ModelUpdateMessage::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::veins::BaseFrame1609_4::parsimUnpack(b);
     doParsimUnpacking(b,this->data);
@@ -198,37 +198,37 @@ void RSUInitMessage::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->serial);
 }
 
-const char * RSUInitMessage::getData() const
+const char * ModelUpdateMessage::getData() const
 {
     return this->data.c_str();
 }
 
-void RSUInitMessage::setData(const char * data)
+void ModelUpdateMessage::setData(const char * data)
 {
     this->data = data;
 }
 
-const ::veins::LAddress::L2Type& RSUInitMessage::getSenderAddress() const
+const ::veins::LAddress::L2Type& ModelUpdateMessage::getSenderAddress() const
 {
     return this->senderAddress;
 }
 
-void RSUInitMessage::setSenderAddress(const ::veins::LAddress::L2Type& senderAddress)
+void ModelUpdateMessage::setSenderAddress(const ::veins::LAddress::L2Type& senderAddress)
 {
     this->senderAddress = senderAddress;
 }
 
-int RSUInitMessage::getSerial() const
+int ModelUpdateMessage::getSerial() const
 {
     return this->serial;
 }
 
-void RSUInitMessage::setSerial(int serial)
+void ModelUpdateMessage::setSerial(int serial)
 {
     this->serial = serial;
 }
 
-class RSUInitMessageDescriptor : public omnetpp::cClassDescriptor
+class ModelUpdateMessageDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
@@ -238,8 +238,8 @@ class RSUInitMessageDescriptor : public omnetpp::cClassDescriptor
         FIELD_serial,
     };
   public:
-    RSUInitMessageDescriptor();
-    virtual ~RSUInitMessageDescriptor();
+    ModelUpdateMessageDescriptor();
+    virtual ~ModelUpdateMessageDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -265,24 +265,24 @@ class RSUInitMessageDescriptor : public omnetpp::cClassDescriptor
     virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
-Register_ClassDescriptor(RSUInitMessageDescriptor)
+Register_ClassDescriptor(ModelUpdateMessageDescriptor)
 
-RSUInitMessageDescriptor::RSUInitMessageDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(iov_sim::RSUInitMessage)), "veins::BaseFrame1609_4")
+ModelUpdateMessageDescriptor::ModelUpdateMessageDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(iov_sim::ModelUpdateMessage)), "veins::BaseFrame1609_4")
 {
     propertyNames = nullptr;
 }
 
-RSUInitMessageDescriptor::~RSUInitMessageDescriptor()
+ModelUpdateMessageDescriptor::~ModelUpdateMessageDescriptor()
 {
     delete[] propertyNames;
 }
 
-bool RSUInitMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool ModelUpdateMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<RSUInitMessage *>(obj)!=nullptr;
+    return dynamic_cast<ModelUpdateMessage *>(obj)!=nullptr;
 }
 
-const char **RSUInitMessageDescriptor::getPropertyNames() const
+const char **ModelUpdateMessageDescriptor::getPropertyNames() const
 {
     if (!propertyNames) {
         static const char *names[] = {  nullptr };
@@ -293,19 +293,19 @@ const char **RSUInitMessageDescriptor::getPropertyNames() const
     return propertyNames;
 }
 
-const char *RSUInitMessageDescriptor::getProperty(const char *propertyName) const
+const char *ModelUpdateMessageDescriptor::getProperty(const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? base->getProperty(propertyName) : nullptr;
 }
 
-int RSUInitMessageDescriptor::getFieldCount() const
+int ModelUpdateMessageDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? 3+base->getFieldCount() : 3;
 }
 
-unsigned int RSUInitMessageDescriptor::getFieldTypeFlags(int field) const
+unsigned int ModelUpdateMessageDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -321,7 +321,7 @@ unsigned int RSUInitMessageDescriptor::getFieldTypeFlags(int field) const
     return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
 
-const char *RSUInitMessageDescriptor::getFieldName(int field) const
+const char *ModelUpdateMessageDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -337,7 +337,7 @@ const char *RSUInitMessageDescriptor::getFieldName(int field) const
     return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
 }
 
-int RSUInitMessageDescriptor::findField(const char *fieldName) const
+int ModelUpdateMessageDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
@@ -347,7 +347,7 @@ int RSUInitMessageDescriptor::findField(const char *fieldName) const
     return base ? base->findField(fieldName) : -1;
 }
 
-const char *RSUInitMessageDescriptor::getFieldTypeString(int field) const
+const char *ModelUpdateMessageDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -363,7 +363,7 @@ const char *RSUInitMessageDescriptor::getFieldTypeString(int field) const
     return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **RSUInitMessageDescriptor::getFieldPropertyNames(int field) const
+const char **ModelUpdateMessageDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -376,7 +376,7 @@ const char **RSUInitMessageDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *RSUInitMessageDescriptor::getFieldProperty(int field, const char *propertyName) const
+const char *ModelUpdateMessageDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -389,7 +389,7 @@ const char *RSUInitMessageDescriptor::getFieldProperty(int field, const char *pr
     }
 }
 
-int RSUInitMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+int ModelUpdateMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -397,13 +397,13 @@ int RSUInitMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int fie
             return base->getFieldArraySize(object, field);
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-void RSUInitMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+void ModelUpdateMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -413,13 +413,13 @@ void RSUInitMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int fi
         }
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'RSUInitMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'ModelUpdateMessage'", field);
     }
 }
 
-const char *RSUInitMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+const char *ModelUpdateMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -427,13 +427,13 @@ const char *RSUInitMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr
             return base->getFieldDynamicTypeString(object,field,i);
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string RSUInitMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+std::string ModelUpdateMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -441,7 +441,7 @@ std::string RSUInitMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr obj
             return base->getFieldValueAsString(object,field,i);
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         case FIELD_data: return oppstring2string(pp->getData());
         case FIELD_senderAddress: return "";
@@ -450,7 +450,7 @@ std::string RSUInitMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr obj
     }
 }
 
-void RSUInitMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+void ModelUpdateMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -460,15 +460,15 @@ void RSUInitMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, in
         }
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         case FIELD_data: pp->setData((value)); break;
         case FIELD_serial: pp->setSerial(string2long(value)); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'RSUInitMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
 }
 
-omnetpp::cValue RSUInitMessageDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+omnetpp::cValue ModelUpdateMessageDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -476,16 +476,16 @@ omnetpp::cValue RSUInitMessageDescriptor::getFieldValue(omnetpp::any_ptr object,
             return base->getFieldValue(object,field,i);
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         case FIELD_data: return pp->getData();
         case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
         case FIELD_serial: return pp->getSerial();
-        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'RSUInitMessage' as cValue -- field index out of range?", field);
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'ModelUpdateMessage' as cValue -- field index out of range?", field);
     }
 }
 
-void RSUInitMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+void ModelUpdateMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -495,15 +495,15 @@ void RSUInitMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field,
         }
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         case FIELD_data: pp->setData(value.stringValue()); break;
         case FIELD_serial: pp->setSerial(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'RSUInitMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
 }
 
-const char *RSUInitMessageDescriptor::getFieldStructName(int field) const
+const char *ModelUpdateMessageDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -516,7 +516,7 @@ const char *RSUInitMessageDescriptor::getFieldStructName(int field) const
     };
 }
 
-omnetpp::any_ptr RSUInitMessageDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+omnetpp::any_ptr ModelUpdateMessageDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -524,14 +524,14 @@ omnetpp::any_ptr RSUInitMessageDescriptor::getFieldStructValuePointer(omnetpp::a
             return base->getFieldStructValuePointer(object, field, i);
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
         default: return omnetpp::any_ptr(nullptr);
     }
 }
 
-void RSUInitMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+void ModelUpdateMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -541,9 +541,9 @@ void RSUInitMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr objec
         }
         field -= base->getFieldCount();
     }
-    RSUInitMessage *pp = omnetpp::fromAnyPtr<RSUInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'RSUInitMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
 }
 

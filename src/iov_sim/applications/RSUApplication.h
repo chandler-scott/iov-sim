@@ -23,22 +23,21 @@
 #pragma once
 
 #include "iov_sim/iov_sim.h"
-#include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
+#include "iov_sim/util/BaseApplicationLayer.h"
 #include "iov_sim/util/PythonWrapper.h"
 #include "iov_sim/messages/VehicleInitMessage_m.h"
-#include "iov_sim/messages/RSUInitMessage_m.h"
 
 
 using namespace veins;
 namespace iov_sim {
 
 
-class IOV_SIM_API RSUApplication : public DemoBaseApplLayer {
+class IOV_SIM_API RSUApplication : public BaseApplicationLayer {
 public:
     void initialize(int stage) override;
 
 protected:
-    void onBSM(DemoSafetyMessage* bsm) override;
+    void onBSM(BaseFrame1609_4* bsm) override;
     void onWSM(BaseFrame1609_4* wsm) override;
     void onWSA(DemoServiceAdvertisment* wsa) override;
 };

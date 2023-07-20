@@ -31,14 +31,16 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 OBJS = \
     $O/iov_sim/applications/ApplicationLayerTest.o \
     $O/iov_sim/applications/RSUApplication.o \
+    $O/iov_sim/util/AggregatorWrapper.o \
+    $O/iov_sim/util/BaseApplicationLayer.o \
     $O/iov_sim/util/PythonLifecycle.o \
     $O/iov_sim/util/PythonWrapper.o \
-    $O/iov_sim/messages/RSUInitMessage_m.o \
+    $O/iov_sim/messages/ModelUpdateMessage_m.o \
     $O/iov_sim/messages/VehicleInitMessage_m.o
 
 # Message files
 MSGFILES = \
-    iov_sim/messages/RSUInitMessage.msg \
+    iov_sim/messages/ModelUpdateMessage.msg \
     iov_sim/messages/VehicleInitMessage.msg
 
 # SM files

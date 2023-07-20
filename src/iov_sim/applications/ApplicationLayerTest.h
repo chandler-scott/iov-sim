@@ -23,9 +23,9 @@
 #pragma once
 
 #include "iov_sim/iov_sim.h"
-#include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
+#include "iov_sim/util/BaseApplicationLayer.h"
 #include "iov_sim/messages/VehicleInitMessage_m.h"
-#include "iov_sim/messages/RSUInitMessage_m.h"
+#include "iov_sim/messages/ModelUpdateMessage_m.h"
 
 
 using namespace veins;
@@ -46,7 +46,7 @@ namespace iov_sim {
  *
  */
 
-class IOV_SIM_API ApplicationLayerTest : public veins::DemoBaseApplLayer {
+class IOV_SIM_API ApplicationLayerTest : public iov_sim::BaseApplicationLayer {
 public:
     void initialize(int stage) override;
     void finish() override;
@@ -58,7 +58,7 @@ protected:
     int currentSubscribedServiceId;
 
 protected:
-    void onBSM(DemoSafetyMessage* bsm) override;
+    void onBSM(BaseFrame1609_4* bsm) override;
     // to handle when the application receives a data message from another car or RSU
     void onWSM(veins::BaseFrame1609_4* wsm) override;
     void onWSA(veins::DemoServiceAdvertisment* wsa) override;
