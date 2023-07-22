@@ -1,4 +1,3 @@
-1. Create Aggregator Wrapper C++
-2. RSU: load model and send
-3. Create Agent Wrapper C++
-4. Create Env Python
+1. serialize/deserialize state_dict...
+2. Create Agent Wrapper C++
+3. Create Env Python

@@ -23,6 +23,7 @@
 #include "iov_sim/applications/ApplicationLayerTest.h"
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
 #include "veins/modules/messages/BaseFrame1609_4_m.h"
+#include "iov_sim/util/SerializeUtil.h"
 
 using namespace veins;
 using namespace iov_sim;
@@ -84,7 +85,22 @@ void ApplicationLayerTest::onWSM(BaseFrame1609_4* frame)
             // Handle AnotherMessageType
             ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
             findHost()->getDisplayString().setTagArg("i", 1, "green");
-            std::cout << "--" << appMessage->getData() << std::endl;
+
+            string data = appMessage->getData();
+
+            std::cout << data << std::endl;
+
+            std::unordered_map<std::string, PyObject*> neuralNetwork =
+            SerializeUtil::deserializeMapFromString(data);
+
+            // print for debugging
+            for (const auto& entry : neuralNetwork) {
+                 std::string key = entry.first;
+                 PyObject* value = entry.second;
+
+                 std::string valueStr = SerializeUtil::getPyObjectString(value);
+                 std::cout << "Key: " << key << ", Value: " << valueStr << std::endl;
+            }
         }
         else {
             // Handle other message types here...

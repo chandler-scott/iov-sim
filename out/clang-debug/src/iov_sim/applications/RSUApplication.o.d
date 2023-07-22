@@ -118,6 +118,7 @@
   /usr/include/python3.8/fileutils.h /usr/include/python3.8/pyfpe.h \
   /usr/include/python3.8/tracemalloc.h \
   iov_sim/messages/VehicleInitMessage_m.h \
+  iov_sim/util/AggregatorWrapper.h iov_sim/util/SerializeUtil.h \
   iov_sim/messages/ModelUpdateMessage_m.h
 
 iov_sim/applications/RSUApplication.h:
@@ -405,5 +406,9 @@ iov_sim/util/PythonWrapper.h:
 /usr/include/python3.8/tracemalloc.h:
 
 iov_sim/messages/VehicleInitMessage_m.h:
+
+iov_sim/util/AggregatorWrapper.h:
+
+iov_sim/util/SerializeUtil.h:
 
 iov_sim/messages/ModelUpdateMessage_m.h:

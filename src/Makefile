@@ -35,6 +35,7 @@ OBJS = \
     $O/iov_sim/util/BaseApplicationLayer.o \
     $O/iov_sim/util/PythonLifecycle.o \
     $O/iov_sim/util/PythonWrapper.o \
+    $O/iov_sim/util/SerializeUtil.o \
     $O/iov_sim/messages/ModelUpdateMessage_m.o \
     $O/iov_sim/messages/VehicleInitMessage_m.o
 

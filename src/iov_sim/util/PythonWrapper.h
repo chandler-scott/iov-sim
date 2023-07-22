@@ -9,21 +9,26 @@
 #define IOV_SIM_UTIL_PYTHONWRAPPER_H_
 
 #include <Python.h>
+#include <iostream>
+
+using namespace std;
 
 class PythonWrapper {
 public:
     static PythonWrapper& getInstance();
     static void destroyInstance();
 
-
     PythonWrapper(const PythonWrapper&) = delete;
     PythonWrapper& operator=(const PythonWrapper&) = delete;
 
-    PyObject* runPythonFunction(PyObject* module, const char* functionName, const char* arg = "");
+    PyObject* callZerosBoxSpace(int box_size, double lower_bound = -1, double upper_bound = 1);
+    void loadPythonModule(const char* moduleName, PyObject*& module);
+
+    std::string serializeStateDict(PyObject* stateDictObject);
+    PyObject* deserializeStateDict(std::string stateDictString);
 
     PyObject* ppoModule;
-
-
+    PyObject* utilModule;
 
 private:
     PythonWrapper();
@@ -34,6 +39,5 @@ private:
 
     static PythonWrapper instance;
 };
-
 
 #endif /* IOV_SIM_UTIL_PYTHONWRAPPER_H_ */

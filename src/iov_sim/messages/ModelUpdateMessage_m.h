@@ -40,7 +40,7 @@ class ModelUpdateMessage;
 namespace iov_sim {
 
 /**
- * Class generated from <tt>iov_sim/messages/ModelUpdateMessage.msg:28</tt> by opp_msgtool.
+ * Class generated from <tt>iov_sim/messages/ModelUpdateMessage.msg:27</tt> by opp_msgtool.
  * <pre>
  * packet ModelUpdateMessage extends veins::BaseFrame1609_4
  * {

@@ -27,4 +27,9 @@ simple RSUApplication extends DemoBaseApplLayer
 {
     @class(iov_sim::RSUApplication);
     @display("i=block/app2");
+    string policyLoad = default("fed_p");
+    string policySave = default("fed_p");
+    string valueLoad = default("fed_v");
+    string valueSave = default("fed_v");
+    
 }

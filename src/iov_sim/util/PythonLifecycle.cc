@@ -31,9 +31,8 @@ using namespace veins;
 Define_Module(iov_sim::PythonLifecycle);
 
 PythonLifecycle::PythonLifecycle() {
-    PythonWrapper::getInstance();  // Initialize the singleton
+
 }
 
 PythonLifecycle::~PythonLifecycle() {
-    PythonWrapper::destroyInstance();  // Destruct the singleton
 }

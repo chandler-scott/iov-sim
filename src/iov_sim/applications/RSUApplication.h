@@ -26,20 +26,31 @@
 #include "iov_sim/util/BaseApplicationLayer.h"
 #include "iov_sim/util/PythonWrapper.h"
 #include "iov_sim/messages/VehicleInitMessage_m.h"
-
+#include "iov_sim/util/AggregatorWrapper.h"
+#include "iov_sim/util/SerializeUtil.h"
 
 using namespace veins;
 namespace iov_sim {
 
-
 class IOV_SIM_API RSUApplication : public BaseApplicationLayer {
 public:
+    RSUApplication();
+
     void initialize(int stage) override;
+    void finish() override;
+
 
 protected:
     void onBSM(BaseFrame1609_4* bsm) override;
     void onWSM(BaseFrame1609_4* wsm) override;
     void onWSA(DemoServiceAdvertisment* wsa) override;
+
+private:
+    AggregatorWrapper aggregator;
+    std::string policyLoad;
+    std::string valueLoad;
+    std::string policySave;
+    std::string valueSave;
 };
 
-} // namespace veins
+} // namespace iov_sim

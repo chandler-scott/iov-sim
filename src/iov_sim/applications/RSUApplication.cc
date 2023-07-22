@@ -22,19 +22,41 @@
 
 #include "iov_sim/applications/RSUApplication.h"
 #include "iov_sim/messages/ModelUpdateMessage_m.h"
+#include "iov_sim/util/SerializeUtil.h"
 
 using namespace veins;
+using namespace std;
 using namespace iov_sim;
 
 Define_Module(iov_sim::RSUApplication);
+
+RSUApplication::RSUApplication()
+    : aggregator()
+{
+}
 
 void RSUApplication::initialize(int stage)
 {
     BaseApplicationLayer::initialize(stage);
     if (stage == 0) {
         EV_INFO << "RSUAggregationApplication::Initializing RSUAggregationApplication: Stage 0" << endl;
-        PythonWrapper& wrapper = PythonWrapper::getInstance();
+        policyLoad = par("policyLoad").stringValue();
+        valueLoad = par("valueLoad").stringValue();
+        policySave = par("policySave").stringValue();
+        valueSave = par("valueSave").stringValue();
+
+
+        std::cout << "args: " << policyLoad <<
+                valueLoad << policySave << valueSave << std::endl;
+
+        aggregator.loadStateDict(policyLoad, valueLoad);
     }
+}
+
+void RSUApplication::finish()
+{
+    BaseApplicationLayer::finish();
+    aggregator.saveStateDict(policySave, valueSave);
 }
 
 void RSUApplication::onBSM(BaseFrame1609_4* bsm)
@@ -46,7 +68,12 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
         // respond with ModelUpdateMessage (message containing up-to-date AI model)
         ModelUpdateMessage* msg = new ModelUpdateMessage();
         populateWSM(msg);
-        msg->setData("Model will go here..");
+
+
+        string data = SerializeUtil::serializeMapToString(aggregator.getStateDicts());
+
+
+        msg->setData(data.c_str());
 
         // this rsu repeats the received traffic update in 2 seconds plus some random delay
         sendDelayedDown(msg->dup(), 2 + uniform(0.01, 0.2));

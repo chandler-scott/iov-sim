@@ -64,7 +64,21 @@
   /usr/include/python3.8/pyctype.h /usr/include/python3.8/pystrtod.h \
   /usr/include/python3.8/pystrcmp.h /usr/include/python3.8/dtoa.h \
   /usr/include/python3.8/fileutils.h /usr/include/python3.8/pyfpe.h \
-  /usr/include/python3.8/tracemalloc.h
+  /usr/include/python3.8/tracemalloc.h \
+  /usr/include/python3.8/numpy/arrayobject.h \
+  /usr/include/python3.8/numpy/ndarrayobject.h \
+  /usr/include/python3.8/numpy/ndarraytypes.h \
+  /usr/include/python3.8/numpy/npy_common.h \
+  /usr/include/python3.8/numpy/numpyconfig.h \
+  /usr/include/python3.8/numpy/_numpyconfig.h \
+  /usr/include/python3.8/numpy/npy_endian.h \
+  /usr/include/python3.8/numpy/npy_cpu.h \
+  /usr/include/python3.8/numpy/utils.h \
+  /usr/include/python3.8/numpy/_neighborhood_iterator_imp.h \
+  /usr/include/python3.8/numpy/npy_1_7_deprecated_api.h \
+  /usr/include/python3.8/numpy/old_defines.h \
+  /usr/include/python3.8/numpy/__multiarray_api.h \
+  /usr/include/python3.8/numpy/npy_interrupt.h
 
 iov_sim/util/AggregatorWrapper.h:
 
@@ -243,3 +257,31 @@ iov_sim/util/PythonWrapper.h:
 /usr/include/python3.8/pyfpe.h:
 
 /usr/include/python3.8/tracemalloc.h:
+
+/usr/include/python3.8/numpy/arrayobject.h:
+
+/usr/include/python3.8/numpy/ndarrayobject.h:
+
+/usr/include/python3.8/numpy/ndarraytypes.h:
+
+/usr/include/python3.8/numpy/npy_common.h:
+
+/usr/include/python3.8/numpy/numpyconfig.h:
+
+/usr/include/python3.8/numpy/_numpyconfig.h:
+
+/usr/include/python3.8/numpy/npy_endian.h:
+
+/usr/include/python3.8/numpy/npy_cpu.h:
+
+/usr/include/python3.8/numpy/utils.h:
+
+/usr/include/python3.8/numpy/_neighborhood_iterator_imp.h:
+
+/usr/include/python3.8/numpy/npy_1_7_deprecated_api.h:
+
+/usr/include/python3.8/numpy/old_defines.h:
+
+/usr/include/python3.8/numpy/__multiarray_api.h:
+
+/usr/include/python3.8/numpy/npy_interrupt.h:

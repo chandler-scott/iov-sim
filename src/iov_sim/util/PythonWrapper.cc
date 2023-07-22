@@ -23,67 +23,179 @@
 #include "iov_sim/util/PythonWrapper.h"
 #include <unistd.h>
 #include <iostream>
+#include <dlfcn.h>
 
 PythonWrapper PythonWrapper::instance;
 
 using namespace std;
 
-PythonWrapper& PythonWrapper::getInstance() {
+PythonWrapper& PythonWrapper::getInstance()
+{
     return instance;
 }
 
-PythonWrapper::PythonWrapper() {
+PythonWrapper::PythonWrapper()
+{
     initializePython();
+    loadPythonModule("ppo", ppoModule);
+    loadPythonModule("util", utilModule);
 }
 
-PythonWrapper::~PythonWrapper() {
+PythonWrapper::~PythonWrapper()
+{
+    Py_DECREF(ppoModule);
+    Py_DECREF(utilModule);
     finalizePython();
 }
 
-void PythonWrapper::initializePython() {
+void PythonWrapper::initializePython()
+{
     std::cout << "Initializing Python interpreter!" << std::endl;
     Py_Initialize();
 
-    char cwd[256];  // Buffer to hold the current working directory
+    char cwd[256]; // Buffer to hold the current working directory
 
-     if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-         std::cout << "Current working directory: " << cwd << std::endl;
-     } else {
-         std::cout << "Failed to get the current working directory." << std::endl;
-     }
-
+    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+        std::cout << "Current working directory: " << cwd << std::endl;
+    }
+    else {
+        std::cout << "Failed to get the current working directory." << std::endl;
+    }
 }
 
-
-void PythonWrapper::finalizePython() {
+void PythonWrapper::finalizePython()
+{
     std::cout << "Closing Python interpreter!" << std::endl;
     Py_Finalize();
 }
 
-void PythonWrapper::destroyInstance() {
-    instance.~PythonWrapper();  // Destruct the instance
+void PythonWrapper::destroyInstance()
+{
+    instance.~PythonWrapper(); // Destruct the instance
+}
+
+void PythonWrapper::loadPythonModule(const char* moduleName, PyObject*& module)
+{
+    // Load the Python module using PyImport_ImportModule
+    dlopen("libpython3.8.so", RTLD_LAZY | RTLD_GLOBAL);
+    module = PyImport_ImportModule(moduleName);
+    if (module == nullptr) {
+        PyErr_Print();
+        std::cerr << "Failed to load Python module - " << moduleName << std::endl;
+    }
+}
+
+PyObject* PythonWrapper::callZerosBoxSpace(int box_size, double lower_bound, double upper_bound)
+{
+    // Convert C++ integers and doubles to Python objects
+    PyObject* py_box_size = PyLong_FromLong(box_size);
+    PyObject* py_lower_bound = PyFloat_FromDouble(lower_bound);
+    PyObject* py_upper_bound = PyFloat_FromDouble(upper_bound);
+
+    // Get the function object from the module
+    PyObject* pFunc = PyObject_GetAttrString(utilModule, "zeros_box_space");
+
+    if (pFunc && PyCallable_Check(pFunc)) {
+        // Call the Python function with the provided arguments
+
+        PyObject* pArgs = PyTuple_Pack(3, py_box_size, py_lower_bound, py_upper_bound);
+
+        PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+
+        Py_DECREF(pArgs);
+
+        // Decrease the reference count of the function object
+        Py_XDECREF(pFunc);
+
+        // Return the result of the Python function call
+        return pResult;
+    }
+    else {
+        if (PyErr_Occurred())
+            PyErr_Print();
+        fprintf(stderr, "Cannot find function 'zeros_box_space'.\n");
+    }
+
+    // If there was an error, return nullptr
+    return nullptr;
 }
 
 
-PyObject* PythonWrapper::runPythonFunction(PyObject* module, const char* functionName, const char* arg) {
-    cout << "Running Python Function:" << endl;
 
-    if (module) {
-        PyObject* function = PyObject_GetAttrString(module, functionName);
-        if (function && PyCallable_Check(function)) {
-            PyObject* result = PyObject_CallObject(function, NULL);
-            // Process the result or perform error handling
-            Py_DECREF(function);
+std::string PythonWrapper::serializeStateDict(PyObject* stateDictObject)
+{
+    PyObject* pFunc = PyObject_GetAttrString(utilModule, "serialize_state_dict");
+    if (pFunc && PyCallable_Check(pFunc)) {
+            // Call the Python function with the provided arguments
+
+            PyObject* pArgs = PyTuple_Pack(1, stateDictObject);
+
+            PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+
+            Py_DECREF(pArgs);
+
+            // Decrease the reference count of the function object
+            Py_XDECREF(pFunc);
+
+            // Return the result of the Python function call
+            std::string result = PyBytes_AsString(pResult);
+            Py_DECREF(pResult);
+
             return result;
         }
         else {
-            // Handle function access error
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function 'zeros_box_space'.\n");
         }
-    }
-    else {
-        // Handle invalid module object
-    }
 
-    // Return nullptr in case of error
-    return nullptr;
+        // If there was an error, return nullptr
+        return nullptr;
+
+}
+
+
+
+PyObject* PythonWrapper::deserializeStateDict(std::string stateDictString)
+{
+    std::cout << "1" << std::endl;
+
+    PyObject* pFunc = PyObject_GetAttrString(utilModule, "bytes_to_state_dict");
+    if (pFunc && PyCallable_Check(pFunc)) {
+            // Call the Python function with the provided arguments
+
+            std::cout << "2" << std::endl;
+            PyObject* pyString =
+                    PyBytes_FromStringAndSize(stateDictString.c_str(), stateDictString.size());
+            const char* cString = PyBytes_AsString(pyString);
+
+            std::cout << cString << std::endl;
+
+            if (pyString != NULL) {
+                PyObject* pArgs = PyTuple_Pack(1, pyString);
+                std::cout << "3" << std::endl;
+                PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+                std::cout << "4" << std::endl;
+                Py_DECREF(pArgs);
+
+                // Decrease the reference count of the function object
+                Py_XDECREF(pFunc);
+
+                // Return the result of the Python function call
+                return pResult;
+            }
+            else
+            {
+                PyErr_Print();
+            }
+        }
+        else {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function 'zeros_box_space'.\n");
+        }
+
+        // If there was an error, return nullptr
+        return nullptr;
+
 }

@@ -22,7 +22,6 @@
 
 import veins.modules.messages.BaseFrame1609_4;
 
-
 namespace iov_sim;
 
 packet ModelUpdateMessage extends veins::BaseFrame1609_4 {
