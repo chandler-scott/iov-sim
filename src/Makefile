@@ -31,6 +31,7 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 OBJS = \
     $O/iov_sim/applications/ApplicationLayerTest.o \
     $O/iov_sim/applications/RSUApplication.o \
+    $O/iov_sim/util/AgentWrapper.o \
     $O/iov_sim/util/AggregatorWrapper.o \
     $O/iov_sim/util/BaseApplicationLayer.o \
     $O/iov_sim/util/PythonLifecycle.o \

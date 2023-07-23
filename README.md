@@ -2,6 +2,10 @@
 
 Implementing federated deep reinforcement learning to enable cluster based communication in IoV.
 
+## Notes ##
+If you change the dimensions of a neural network for the vehicle application, you must change the dimensions of the RSU to match, or vice versa.
+
+
 ## Supported program versions ##
 
 - Veins 5.2 (see <http://veins.car2x.org/>)
@@ -21,4 +25,6 @@ do not include license text shall be assumed to allow the Creative Commons
 "Attribution-ShareAlike 4.0 International License" as an additional option
 (SPDX-License-Identifier: GPL-2.0-or-later OR CC-BY-SA-4.0). Full license texts
 are available with the source distribution.
+
+
 

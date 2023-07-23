@@ -18,17 +18,16 @@ class AggregatorWrapper {
 public:
     AggregatorWrapper();
     ~AggregatorWrapper();
-    std::unordered_map<std::string, PyObject*> getStateDicts();
+    
+    std::pair<PyObject*, PyObject*> getStateDictsAsBytes();
+    std::unordered_map<std::string, PyObject*> getStateDictsFromBytes(PyObject* pBytes, PyObject* vBytes);
+
     void saveStateDict(const std::string& policySave, const std::string& valueSave);
     void loadStateDict(const std::string& policyLoad, const std::string& valueLoad);
 
-
-
 private:
-    PyObject* pModule;
-    PyObject* pAggregator;
-    PyObject* pClass;
     PythonWrapper& wrapper;
+    PyObject* pAggregator;
 
     // neural network parameters
     int obs_size = 4;

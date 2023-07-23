@@ -31,9 +31,7 @@ using namespace iov_sim;
 Define_Module(iov_sim::RSUApplication);
 
 RSUApplication::RSUApplication()
-    : aggregator()
-{
-}
+    : aggregator() { }
 
 void RSUApplication::initialize(int stage)
 {
@@ -44,10 +42,6 @@ void RSUApplication::initialize(int stage)
         valueLoad = par("valueLoad").stringValue();
         policySave = par("policySave").stringValue();
         valueSave = par("valueSave").stringValue();
-
-
-        std::cout << "args: " << policyLoad <<
-                valueLoad << policySave << valueSave << std::endl;
 
         aggregator.loadStateDict(policyLoad, valueLoad);
     }
@@ -69,14 +63,18 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
         ModelUpdateMessage* msg = new ModelUpdateMessage();
         populateWSM(msg);
 
+        auto [pJson, vJson] = aggregator.getStateDictsAsBytes();
+        PyObject* pStrObj = PyObject_Str(pJson);
+        PyObject* vStrObj = PyObject_Str(vJson);
 
-        string data = SerializeUtil::serializeMapToString(aggregator.getStateDicts());
+        const char* pNet = PyUnicode_AsUTF8(pStrObj);
+        const char* vNet = PyUnicode_AsUTF8(vStrObj);
 
-
-        msg->setData(data.c_str());
+        msg->setPStateDict(pNet);
+        msg->setVStateDict(vNet);
 
         // this rsu repeats the received traffic update in 2 seconds plus some random delay
-        sendDelayedDown(msg->dup(), 2 + uniform(0.01, 0.2));
+        sendDelayedDown(msg->dup(), 1 + uniform(0.01, 0.2));
         std::cout << "RSU: response sent!" << std::endl;
     }
     else {
@@ -98,14 +96,15 @@ void RSUApplication::onWSM(BaseFrame1609_4* frame)
 
     // Your application has received a data message from another car or RSU
 
-    VehicleInitMessage* appMessage = check_and_cast<VehicleInitMessage*>(frame);
+    ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
 
-    std::cout << appMessage->getData() << std::endl;
+    std::cout << appMessage->getPStateDict() << std::endl;
 
     ModelUpdateMessage* msg = new ModelUpdateMessage();
     populateWSM(msg);
-    msg->setData("A crafty response!");
-
+    msg->setPStateDict("rsu:p_net");
+    msg->setVStateDict("rsu:v_net");
     // this rsu repeats the received traffic update in 2 seconds plus some random delay
     sendDelayedDown(msg->dup(), 2 + uniform(0.01, 0.2));
+    delete msg;
 }

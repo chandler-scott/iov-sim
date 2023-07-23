@@ -20,22 +20,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/util/AggregatorWrapper.h"
-#include <Python.h>
-#include <numpy/arrayobject.h> // Include the NumPy header for C API
+#include "iov_sim/util/AgentWrapper.h"
 #include <iostream>
+#include <Python.h>
 
-using namespace std;
-
-AggregatorWrapper::AggregatorWrapper()
+AgentWrapper::AgentWrapper()
     : wrapper(PythonWrapper::getInstance())
 {
 
     // Access the Aggregator class from the Python module
     PyObject* pModule = wrapper.ppoModule;
-    PyObject* pClass = PyObject_GetAttrString(pModule, "Aggregator");
-    std::cout << "Initialized the Aggregator Wrapper Class!\n"
-              << "--now trying to init Aggregator class" << std::endl;
+    PyObject* pClass = PyObject_GetAttrString(pModule, "Agent");
+    std::cout << "Initialized the Agent Wrapper Class!\n"
+              << "--now trying to init Agent class" << std::endl;
 
     PyObject* obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject* actDim = wrapper.callZerosBoxSpace(act_size);
@@ -43,17 +40,17 @@ AggregatorWrapper::AggregatorWrapper()
     PyObject* args = PyTuple_Pack(2, obsDim, actDim);
     // // Create an instance of the Aggregator class
     try {
-        pAggregator = PyObject_CallObject(pClass, args);
+        pAgent = PyObject_CallObject(pClass, args);
         Py_DECREF(args);
 
         // Check for exceptions raised during the function call
-        if (pAggregator == nullptr) {
+        if (pAgent == nullptr) {
             // Handle the exception here
             PyErr_Print();
-            std::cerr << "Error creating Aggregator instance!" << std::endl;
+            std::cerr << "Error creating Agent instance!" << std::endl;
         }
         else {
-            std::cout << "Successfully initialized the Aggregator!" << std::endl;
+            std::cout << "Successfully initialized the Agent!" << std::endl;
         }
     }
     catch (const std::exception& e) {
@@ -66,11 +63,35 @@ AggregatorWrapper::AggregatorWrapper()
     }
 }
 
-std::pair<PyObject*, PyObject*> AggregatorWrapper::getStateDictsAsBytes()
+void AgentWrapper::loadStateDicts(std::unordered_map<std::string, PyObject*> stateDicts)
 {
-    if (pAggregator) {
+    if (pAgent) {
+        auto pStateDict = stateDicts["p_net"];
+        auto vStateDict = stateDicts["v_net"];
+        PyObject* args = PyTuple_Pack(2, pStateDict, vStateDict);
+
+        PyObject* pFunc = PyObject_GetAttrString(pAgent, "load_state_dicts");
+        PyObject* result = PyObject_CallObject(pFunc, args);
+        if (result == nullptr) {
+            PyErr_Print();
+        }
+        else {
+            Py_DECREF(result);
+            std::cout << "state dict loaded!" << std::endl;
+        }
+    }
+    else {
+        PyErr_Print();
+    }
+}
+
+std::pair<PyObject*, PyObject*> AgentWrapper::getStateDictsAsBytes()
+{
+    std::unordered_map<std::string, PyObject*> stateDictsBytes;
+
+    if (pAgent) {
         PyObject* args = PyTuple_Pack(0);
-        PyObject* pFunc = PyObject_GetAttrString(pAggregator, "state_dicts_to_json");
+        PyObject* pFunc = PyObject_GetAttrString(pAgent, "state_dicts_to_bytes");
 
         PyObject* result = PyObject_CallObject(pFunc, args);
         if (result == nullptr) {
@@ -82,6 +103,15 @@ std::pair<PyObject*, PyObject*> AggregatorWrapper::getStateDictsAsBytes()
                 PyObject* firstElement = PyTuple_GetItem(result, 0);
                 PyObject* secondElement = PyTuple_GetItem(result, 1);
 
+                if (PyBytes_Check(firstElement)) {
+                    // debug check
+                    std::cout << "ok1" << std::endl;
+                }
+                if (PyBytes_Check(secondElement)) {
+                    // debug check
+                    std::cout << "ok" << std::endl;
+                }
+
                 return std::make_pair(firstElement, secondElement);
 
             }
@@ -92,36 +122,32 @@ std::pair<PyObject*, PyObject*> AggregatorWrapper::getStateDictsAsBytes()
     }
     else {
         PyErr_Print();
-    }  
+    }
 
 }
 
-std::unordered_map<std::string, PyObject*> AggregatorWrapper::getStateDictsFromBytes(PyObject* pBytes, PyObject* vBytes)
+std::unordered_map<std::string, PyObject*> AgentWrapper::getStateDictsFromBytes(PyObject* pBytes, PyObject* vBytes)
 {
     std::unordered_map<std::string, PyObject*> stateDicts;
 
-    if (PyBytes_Check(pBytes)) {
-        // debug check
-        // std::cout << "pBytes cool" << std::endl;
-    }
-    if (PyBytes_Check(vBytes)) {
-        // debug check
-        // std::cout << "vBytes cool" << std::endl;
-    }
-
-    if (pAggregator) {
+    if (pAgent) {
+        std::cout << "V11" << std::endl;
         PyObject* args = PyTuple_Pack(2, pBytes, vBytes);
+        std::cout << "V102" << std::endl;
+
         if (!args) {
             PyErr_Print();
             return stateDicts; // Return an empty map to signal the error
         }
 
-        PyObject* pFunc = PyObject_GetAttrString(pAggregator, "bytes_to_state_dicts");
+        std::cout << "V12" << std::endl;
+        PyObject* pFunc = PyObject_GetAttrString(pAgent, "json_to_state_dicts");
         if (!pFunc) {
             PyErr_Print();
             Py_DECREF(args); // Properly release the reference
             return stateDicts; // Return an empty map to signal the error
         }
+        std::cout << "V13" << std::endl;
         PyObject* result = PyObject_CallObject(pFunc, args);
         Py_DECREF(args); // Release the reference to the args tuple
 
@@ -129,6 +155,7 @@ std::unordered_map<std::string, PyObject*> AggregatorWrapper::getStateDictsFromB
             PyErr_Print();
         }
         else {
+            std::cout << "V14" << std::endl;
 
             // Assuming the result is a tuple with two elements
             if (PyTuple_Check(result) && PyTuple_Size(result) == 2) {
@@ -155,35 +182,63 @@ std::unordered_map<std::string, PyObject*> AggregatorWrapper::getStateDictsFromB
     return stateDicts;
 }
 
-
-void AggregatorWrapper::saveStateDict(const std::string& policySave, const std::string& valueSave)
+PyObject* AgentWrapper::stringToPyDict(const char *jsonString)
 {
-    if (pAggregator) {
-        // Convert C++ strings to Python objects (PyObjects)
-        PyObject* pSaveArgObj = PyUnicode_FromString(policySave.c_str());
-        PyObject* vSaveArgObj = PyUnicode_FromString(valueSave.c_str());
+       PyObject* jsonModule = PyImport_ImportModule("json");
+       if (jsonModule == NULL) {
+           PyErr_SetString(PyExc_ImportError, "Failed to import 'json' module.");
+           return NULL;
+       }
 
-        if (pSaveArgObj == nullptr || vSaveArgObj == nullptr) {
-            // Error handling: Failed to convert C++ strings to Python objects
-            PyErr_Print();
-            // Don't proceed with the method call if conversion failed
-            return;
-        }
+       PyObject* jsonLoadsFunc = PyObject_GetAttrString(jsonModule, "loads");
+       if (jsonLoadsFunc == NULL) {
+           Py_DECREF(jsonModule);
+           PyErr_SetString(PyExc_AttributeError, "Failed to get 'loads' function from 'json' module.");
+           return NULL;
+       }
 
-        PyObject* args = PyTuple_Pack(2, pSaveArgObj, vSaveArgObj);
+       PyObject* pyJsonString = PyUnicode_FromString(jsonString);
+       if (pyJsonString == NULL) {
+           Py_DECREF(jsonModule);
+           Py_DECREF(jsonLoadsFunc);
+           PyErr_SetString(PyExc_TypeError, "Failed to convert C-string to PyObject.");
+           return NULL;
+       }
 
-        // Use the state_dict() method to get the state dictionaries of the neural networks
-        std::cout << "saving model..." << std::endl;
-        PyObject* pFunc = PyObject_GetAttrString(pAggregator, "save_aggregate");
+       PyObject* pyDict = PyObject_CallFunctionObjArgs(jsonLoadsFunc, pyJsonString, NULL);
+       if (pyDict == NULL) {
+           Py_DECREF(jsonModule);
+           Py_DECREF(jsonLoadsFunc);
+           Py_DECREF(pyJsonString);
+           PyErr_SetString(PyExc_RuntimeError, "Failed to convert JSON string to Python dictionary.");
+           return NULL;
+       }
+
+       Py_DECREF(jsonModule);
+       Py_DECREF(jsonLoadsFunc);
+       Py_DECREF(pyJsonString);
+
+       return pyDict;
+}
+
+
+void AgentWrapper::step()
+{
+}
+
+void AgentWrapper::learn()
+{
+    if (pAgent) {
+        PyObject* args = PyTuple_Pack(0);
+        PyObject* pFunc = PyObject_GetAttrString(pAgent, "learn");
+
         PyObject* result = PyObject_CallObject(pFunc, args);
-
         if (result == nullptr) {
-
             PyErr_Print();
         }
         else {
             Py_DECREF(result);
-            std::cout << "model saved!" << std::endl;
+            std::cout << "agent successfully learned!" << std::endl;
         }
     }
     else {
@@ -191,35 +246,25 @@ void AggregatorWrapper::saveStateDict(const std::string& policySave, const std::
     }
 }
 
-void AggregatorWrapper::loadStateDict(const std::string& policyLoad, const std::string& valueLoad)
+void AgentWrapper::bufferStoreTransition()
 {
-    if (pAggregator) {
+}
 
-        // Convert C++ strings to Python objects (PyObjects)
-        PyObject* pLoadArgObj = PyUnicode_FromString(policyLoad.c_str());
-        PyObject* vLoadArgObj = PyUnicode_FromString(valueLoad.c_str());
+void AgentWrapper::bufferFinishPath()
+{
+    if (pAgent) {
+        PyObject* pBuffer = PyObject_GetAttrString(pAgent, "buffer");
 
-        if (pLoadArgObj == nullptr || vLoadArgObj == nullptr) {
-            // Error handling: Failed to convert C++ strings to Python objects
-            PyErr_Print();
-            // Don't proceed with the method call if conversion failed
-            return;
-        }
-
-        PyObject* args = PyTuple_Pack(2, pLoadArgObj, vLoadArgObj);
-
-        // Use the state_dict() method to get the state dictionaries of the neural networks
-        std::cout << "loading model..." << std::endl;
-        PyObject* pFunc = PyObject_GetAttrString(pAggregator, "load");
+        PyObject* args = PyTuple_Pack(0);
+        PyObject* pFunc = PyObject_GetAttrString(pBuffer, "finish_path");
 
         PyObject* result = PyObject_CallObject(pFunc, args);
         if (result == nullptr) {
-
             PyErr_Print();
         }
         else {
             Py_DECREF(result);
-            std::cout << "model loaded!" << std::endl;
+            std::cout << "Finish path successful." << std::endl;
         }
     }
     else {
@@ -227,8 +272,7 @@ void AggregatorWrapper::loadStateDict(const std::string& policyLoad, const std::
     }
 }
 
-AggregatorWrapper::~AggregatorWrapper()
+AgentWrapper::~AgentWrapper()
 {
-
-    Py_DECREF(pAggregator);
+    Py_DECREF(pAgent);
 }

@@ -18,6 +18,9 @@ public:
     static PythonWrapper& getInstance();
     static void destroyInstance();
 
+    void printPyObjectType(PyObject* pyObject);
+
+
     PythonWrapper(const PythonWrapper&) = delete;
     PythonWrapper& operator=(const PythonWrapper&) = delete;
 

@@ -177,7 +177,8 @@ ModelUpdateMessage& ModelUpdateMessage::operator=(const ModelUpdateMessage& othe
 
 void ModelUpdateMessage::copy(const ModelUpdateMessage& other)
 {
-    this->data = other.data;
+    this->pStateDict = other.pStateDict;
+    this->vStateDict = other.vStateDict;
     this->senderAddress = other.senderAddress;
     this->serial = other.serial;
 }
@@ -185,7 +186,8 @@ void ModelUpdateMessage::copy(const ModelUpdateMessage& other)
 void ModelUpdateMessage::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::veins::BaseFrame1609_4::parsimPack(b);
-    doParsimPacking(b,this->data);
+    doParsimPacking(b,this->pStateDict);
+    doParsimPacking(b,this->vStateDict);
     doParsimPacking(b,this->senderAddress);
     doParsimPacking(b,this->serial);
 }
@@ -193,19 +195,30 @@ void ModelUpdateMessage::parsimPack(omnetpp::cCommBuffer *b) const
 void ModelUpdateMessage::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::veins::BaseFrame1609_4::parsimUnpack(b);
-    doParsimUnpacking(b,this->data);
+    doParsimUnpacking(b,this->pStateDict);
+    doParsimUnpacking(b,this->vStateDict);
     doParsimUnpacking(b,this->senderAddress);
     doParsimUnpacking(b,this->serial);
 }
 
-const char * ModelUpdateMessage::getData() const
+const char * ModelUpdateMessage::getPStateDict() const
 {
-    return this->data.c_str();
+    return this->pStateDict.c_str();
 }
 
-void ModelUpdateMessage::setData(const char * data)
+void ModelUpdateMessage::setPStateDict(const char * pStateDict)
 {
-    this->data = data;
+    this->pStateDict = pStateDict;
+}
+
+const char * ModelUpdateMessage::getVStateDict() const
+{
+    return this->vStateDict.c_str();
+}
+
+void ModelUpdateMessage::setVStateDict(const char * vStateDict)
+{
+    this->vStateDict = vStateDict;
 }
 
 const ::veins::LAddress::L2Type& ModelUpdateMessage::getSenderAddress() const
@@ -233,7 +246,8 @@ class ModelUpdateMessageDescriptor : public omnetpp::cClassDescriptor
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_data,
+        FIELD_pStateDict,
+        FIELD_vStateDict,
         FIELD_senderAddress,
         FIELD_serial,
     };
@@ -302,7 +316,7 @@ const char *ModelUpdateMessageDescriptor::getProperty(const char *propertyName) 
 int ModelUpdateMessageDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 3+base->getFieldCount() : 3;
+    return base ? 4+base->getFieldCount() : 4;
 }
 
 unsigned int ModelUpdateMessageDescriptor::getFieldTypeFlags(int field) const
@@ -314,11 +328,12 @@ unsigned int ModelUpdateMessageDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_data
+        FD_ISEDITABLE,    // FIELD_pStateDict
+        FD_ISEDITABLE,    // FIELD_vStateDict
         0,    // FIELD_senderAddress
         FD_ISEDITABLE,    // FIELD_serial
     };
-    return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *ModelUpdateMessageDescriptor::getFieldName(int field) const
@@ -330,20 +345,22 @@ const char *ModelUpdateMessageDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "data",
+        "pStateDict",
+        "vStateDict",
         "senderAddress",
         "serial",
     };
-    return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 4) ? fieldNames[field] : nullptr;
 }
 
 int ModelUpdateMessageDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "data") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "senderAddress") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "serial") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "pStateDict") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "vStateDict") == 0) return baseIndex + 1;
+    if (strcmp(fieldName, "senderAddress") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "serial") == 0) return baseIndex + 3;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -356,11 +373,12 @@ const char *ModelUpdateMessageDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "string",    // FIELD_data
+        "string",    // FIELD_pStateDict
+        "string",    // FIELD_vStateDict
         "veins::LAddress::L2Type",    // FIELD_senderAddress
         "int",    // FIELD_serial
     };
-    return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 4) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **ModelUpdateMessageDescriptor::getFieldPropertyNames(int field) const
@@ -443,7 +461,8 @@ std::string ModelUpdateMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr
     }
     ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: return oppstring2string(pp->getData());
+        case FIELD_pStateDict: return oppstring2string(pp->getPStateDict());
+        case FIELD_vStateDict: return oppstring2string(pp->getVStateDict());
         case FIELD_senderAddress: return "";
         case FIELD_serial: return long2string(pp->getSerial());
         default: return "";
@@ -462,7 +481,8 @@ void ModelUpdateMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object
     }
     ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: pp->setData((value)); break;
+        case FIELD_pStateDict: pp->setPStateDict((value)); break;
+        case FIELD_vStateDict: pp->setVStateDict((value)); break;
         case FIELD_serial: pp->setSerial(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
@@ -478,7 +498,8 @@ omnetpp::cValue ModelUpdateMessageDescriptor::getFieldValue(omnetpp::any_ptr obj
     }
     ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: return pp->getData();
+        case FIELD_pStateDict: return pp->getPStateDict();
+        case FIELD_vStateDict: return pp->getVStateDict();
         case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
         case FIELD_serial: return pp->getSerial();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'ModelUpdateMessage' as cValue -- field index out of range?", field);
@@ -497,7 +518,8 @@ void ModelUpdateMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int fi
     }
     ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: pp->setData(value.stringValue()); break;
+        case FIELD_pStateDict: pp->setPStateDict(value.stringValue()); break;
+        case FIELD_vStateDict: pp->setVStateDict(value.stringValue()); break;
         case FIELD_serial: pp->setSerial(omnetpp::checked_int_cast<int>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }

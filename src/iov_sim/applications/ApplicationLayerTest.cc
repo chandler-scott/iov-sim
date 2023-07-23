@@ -30,6 +30,9 @@ using namespace iov_sim;
 
 Define_Module(iov_sim::ApplicationLayerTest);
 
+ApplicationLayerTest::ApplicationLayerTest ()
+     : agent() { }
+
 void ApplicationLayerTest::initialize(int stage)
 {
     BaseApplicationLayer::initialize(stage);
@@ -86,21 +89,27 @@ void ApplicationLayerTest::onWSM(BaseFrame1609_4* frame)
             ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
             findHost()->getDisplayString().setTagArg("i", 1, "green");
 
-            string data = appMessage->getData();
+            auto pNetJson = appMessage->getPStateDict();
+            auto vNetJson = appMessage->getVStateDict();
 
-            std::cout << data << std::endl;
+            std::cout << pNetJson << std::endl;
+            std::cout << vNetJson << std::endl;
 
-            std::unordered_map<std::string, PyObject*> neuralNetwork =
-            SerializeUtil::deserializeMapFromString(data);
+            auto pNet = agent.stringToPyDict(pNetJson);
+            auto vNet = agent.stringToPyDict(vNetJson);
 
-            // print for debugging
-            for (const auto& entry : neuralNetwork) {
-                 std::string key = entry.first;
-                 PyObject* value = entry.second;
+            std::cout << "V2" << std::endl;
 
-                 std::string valueStr = SerializeUtil::getPyObjectString(value);
-                 std::cout << "Key: " << key << ", Value: " << valueStr << std::endl;
-            }
+            auto stateDicts = agent.getStateDictsFromBytes(pNet, vNet);
+            std::cout << "V3" << std::endl;
+
+            agent.loadStateDicts(stateDicts);
+            std::cout << "V4" << std::endl;
+
+
+            std::cout << "received and set with no errors..." << std::endl;
+
+
         }
         else {
             // Handle other message types here...

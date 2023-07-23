@@ -70,13 +70,7 @@ std::string SerializeUtil::serializeMapToString(const std::unordered_map<std::st
     for (const auto& entry : map) {
 
         std::string keyStr = entry.first;
-        //PyObject* objectsRepresentation = PyObject_Repr(entry.first);
-        PyObject* strObj = PyObject_Str(entry.second);
-        const char* cStr = PyUnicode_AsUTF8(strObj);
-        std::string valueStr(cStr);
-
-
-
+        std::string valueStr = "placeholder";
 
         serializedString += keyStr + "\n" + valueStr + "\n|\n";
 

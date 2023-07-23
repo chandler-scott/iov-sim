@@ -74,6 +74,23 @@ void PythonWrapper::destroyInstance()
     instance.~PythonWrapper(); // Destruct the instance
 }
 
+void PythonWrapper::printPyObjectType(PyObject* pyObject) {
+    PyObject* strObject = PyObject_Str(pyObject);
+    if (strObject) {
+        const char* str = PyUnicode_AsUTF8(strObject);
+        if (str) {
+            std::cout << "Type of pyObject: " << str << std::endl;
+        }
+        else {
+            std::cerr << "Error: Unable to convert PyObject to string." << std::endl;
+        }
+        Py_DECREF(strObject);
+    }
+    else {
+        std::cerr << "Error: Unable to convert PyObject to string." << std::endl;
+    }
+}
+
 void PythonWrapper::loadPythonModule(const char* moduleName, PyObject*& module)
 {
     // Load the Python module using PyImport_ImportModule

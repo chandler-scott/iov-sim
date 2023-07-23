@@ -44,7 +44,8 @@ namespace iov_sim {
  * <pre>
  * packet ModelUpdateMessage extends veins::BaseFrame1609_4
  * {
- *     string data;
+ *     string pStateDict;
+ *     string vStateDict;
  *     veins::LAddress::L2Type senderAddress = -1;
  *     int serial = 0;
  * }
@@ -53,7 +54,8 @@ namespace iov_sim {
 class IOV_SIM_API ModelUpdateMessage : public ::veins::BaseFrame1609_4
 {
   protected:
-    ::omnetpp::opp_string data;
+    ::omnetpp::opp_string pStateDict;
+    ::omnetpp::opp_string vStateDict;
     ::veins::LAddress::L2Type senderAddress = -1;
     int serial = 0;
 
@@ -72,8 +74,11 @@ class IOV_SIM_API ModelUpdateMessage : public ::veins::BaseFrame1609_4
     virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
-    virtual const char * getData() const;
-    virtual void setData(const char * data);
+    virtual const char * getPStateDict() const;
+    virtual void setPStateDict(const char * pStateDict);
+
+    virtual const char * getVStateDict() const;
+    virtual void setVStateDict(const char * vStateDict);
 
     virtual const ::veins::LAddress::L2Type& getSenderAddress() const;
     virtual ::veins::LAddress::L2Type& getSenderAddressForUpdate() { return const_cast<::veins::LAddress::L2Type&>(const_cast<ModelUpdateMessage*>(this)->getSenderAddress());}

@@ -24,6 +24,7 @@
 
 #include "iov_sim/iov_sim.h"
 #include "iov_sim/util/BaseApplicationLayer.h"
+#include "iov_sim/util/AgentWrapper.h"
 #include "iov_sim/messages/VehicleInitMessage_m.h"
 #include "iov_sim/messages/ModelUpdateMessage_m.h"
 
@@ -48,6 +49,8 @@ namespace iov_sim {
 
 class IOV_SIM_API ApplicationLayerTest : public iov_sim::BaseApplicationLayer {
 public:
+    ApplicationLayerTest();
+
     void initialize(int stage) override;
     void finish() override;
 
@@ -65,6 +68,10 @@ protected:
 
     void handleSelfMsg(cMessage* msg) override;
     void handlePositionUpdate(cObject* obj) override;
+
+private:
+    AgentWrapper agent;
+
 };
 
 } // namespace iov_sim
