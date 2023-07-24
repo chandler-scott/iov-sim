@@ -22,7 +22,6 @@
 
 #include "iov_sim/applications/RSUApplication.h"
 #include "iov_sim/messages/ModelUpdateMessage_m.h"
-#include "iov_sim/util/SerializeUtil.h"
 
 using namespace veins;
 using namespace std;
@@ -63,18 +62,18 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
         ModelUpdateMessage* msg = new ModelUpdateMessage();
         populateWSM(msg);
 
-        auto [pJson, vJson] = aggregator.getStateDictsAsBytes();
-        PyObject* pStrObj = PyObject_Str(pJson);
-        PyObject* vStrObj = PyObject_Str(vJson);
+        auto [pJson, vJson] = aggregator.getStateDictsAsJson();
 
-        const char* pNet = PyUnicode_AsUTF8(pStrObj);
-        const char* vNet = PyUnicode_AsUTF8(vStrObj);
+        auto pNet = aggregator.PyObjectToChar(pJson);
+        auto vNet = aggregator.PyObjectToChar(vJson);
+
 
         msg->setPStateDict(pNet);
         msg->setVStateDict(vNet);
 
         // this rsu repeats the received traffic update in 2 seconds plus some random delay
         sendDelayedDown(msg->dup(), 1 + uniform(0.01, 0.2));
+        delete msg;
         std::cout << "RSU: response sent!" << std::endl;
     }
     else {
@@ -95,16 +94,20 @@ void RSUApplication::onWSM(BaseFrame1609_4* frame)
     std::cout << "RSUApplication: successfully received a data message" << std::endl;
 
     // Your application has received a data message from another car or RSU
-
-    ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
-
-    std::cout << appMessage->getPStateDict() << std::endl;
-
     ModelUpdateMessage* msg = new ModelUpdateMessage();
     populateWSM(msg);
-    msg->setPStateDict("rsu:p_net");
-    msg->setVStateDict("rsu:v_net");
+
+    auto [pJson, vJson] = aggregator.getStateDictsAsJson();
+
+    auto pNet = aggregator.PyObjectToChar(pJson);
+    auto vNet = aggregator.PyObjectToChar(vJson);
+
+
+    msg->setPStateDict(pNet);
+    msg->setVStateDict(vNet);
+
     // this rsu repeats the received traffic update in 2 seconds plus some random delay
-    sendDelayedDown(msg->dup(), 2 + uniform(0.01, 0.2));
+    sendDelayedDown(msg->dup(), 1 + uniform(0.01, 0.2));
+    std::cout << "RSU: response sent!" << std::endl;
     delete msg;
 }

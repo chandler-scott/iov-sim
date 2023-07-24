@@ -27,7 +27,6 @@
 #include "iov_sim/util/PythonWrapper.h"
 #include "iov_sim/messages/VehicleInitMessage_m.h"
 #include "iov_sim/util/AggregatorWrapper.h"
-#include "iov_sim/util/SerializeUtil.h"
 
 using namespace veins;
 namespace iov_sim {

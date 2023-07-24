@@ -9,22 +9,22 @@
 #define IOV_SIM_UTIL_AGENTWRAPPER_H_
 
 #include "iov_sim/util/PythonWrapper.h"
+#include "iov_sim/util/BaseWrapper.h"
 #include <unordered_map>
 #include <string>
 
 using namespace std;
 
-class AgentWrapper {
+class AgentWrapper : public BaseWrapper
+{
 public:
     AgentWrapper();
     ~AgentWrapper();
 
-    void loadStateDicts(std::unordered_map<std::string, PyObject*> stateDicts);
+    void loadStateDicts(PyObject *pStateDict, PyObject *vStateDict);
 
-    std::pair<PyObject*, PyObject*> getStateDictsAsBytes();
-    std::unordered_map<std::string, PyObject*> getStateDictsFromBytes(PyObject* pBytes, PyObject* vBytes);
-
-    PyObject* stringToPyDict(const char *value);
+    std::pair<PyObject *, PyObject *> getStateDictsAsJson();
+    std::pair<PyObject *, PyObject *> getStateDictsFromJson(const char* pJson, const char* vJson);
 
     void step();
     void learn();
@@ -32,17 +32,9 @@ public:
     void bufferStoreTransition();
     void bufferFinishPath();
 
-private:
-    PyObject* pModule;
-    PyObject* pAgent;
-    PyObject* pClass;
-    PythonWrapper& wrapper;
 
-    // neural network parameters
-    int obs_size = 4;
-    int act_size = 3;
-    double lower_bound = -1.0;
-    double upper_bound = 1.0;
+private:
+    PyObject *pAgent;
 };
 
 #endif /* IOV_SIM_UTIL_AGENTWRAPPER_H_ */

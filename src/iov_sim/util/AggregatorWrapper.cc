@@ -27,8 +27,7 @@
 
 using namespace std;
 
-AggregatorWrapper::AggregatorWrapper()
-    : wrapper(PythonWrapper::getInstance())
+AggregatorWrapper::AggregatorWrapper() : BaseWrapper()
 {
 
     // Access the Aggregator class from the Python module
@@ -66,93 +65,34 @@ AggregatorWrapper::AggregatorWrapper()
     }
 }
 
-std::pair<PyObject*, PyObject*> AggregatorWrapper::getStateDictsAsBytes()
+std::pair<PyObject*, PyObject*> AggregatorWrapper::getStateDictsAsJson()
 {
-    if (pAggregator) {
-        PyObject* args = PyTuple_Pack(0);
-        PyObject* pFunc = PyObject_GetAttrString(pAggregator, "state_dicts_to_json");
-
-        PyObject* result = PyObject_CallObject(pFunc, args);
-        if (result == nullptr) {
-            PyErr_Print();
-        }
-        else {
-            // Assuming the result is a tuple with two elements
-            if (PyTuple_Check(result) && PyTuple_Size(result) == 2) {
-                PyObject* firstElement = PyTuple_GetItem(result, 0);
-                PyObject* secondElement = PyTuple_GetItem(result, 1);
-
-                return std::make_pair(firstElement, secondElement);
-
-            }
-            else {
-                std::cerr << "Error: Unexpected return value from Python function." << std::endl;
-            }
-        }
+    if (pAggregator)
+    {
+        return BaseWrapper::getStateDictsAsJson(pAggregator);
     }
     else {
         PyErr_Print();
     }  
 
+    return std::make_pair(nullptr, nullptr);
 }
 
-std::unordered_map<std::string, PyObject*> AggregatorWrapper::getStateDictsFromBytes(PyObject* pBytes, PyObject* vBytes)
+std::pair<PyObject *, PyObject *> AggregatorWrapper::getStateDictsFromJson(const char* pJson, const char* vJson)
 {
-    std::unordered_map<std::string, PyObject*> stateDicts;
+    if (pAggregator)
+    {
+        auto pNet = BaseWrapper::CharToPyObject(pJson);
+        auto vNet = BaseWrapper::CharToPyObject(vJson);
 
-    if (PyBytes_Check(pBytes)) {
-        // debug check
-        // std::cout << "pBytes cool" << std::endl;
+        return BaseWrapper::getStateDictsFromJson(pAggregator, pNet, vNet);
     }
-    if (PyBytes_Check(vBytes)) {
-        // debug check
-        // std::cout << "vBytes cool" << std::endl;
-    }
-
-    if (pAggregator) {
-        PyObject* args = PyTuple_Pack(2, pBytes, vBytes);
-        if (!args) {
-            PyErr_Print();
-            return stateDicts; // Return an empty map to signal the error
-        }
-
-        PyObject* pFunc = PyObject_GetAttrString(pAggregator, "bytes_to_state_dicts");
-        if (!pFunc) {
-            PyErr_Print();
-            Py_DECREF(args); // Properly release the reference
-            return stateDicts; // Return an empty map to signal the error
-        }
-        PyObject* result = PyObject_CallObject(pFunc, args);
-        Py_DECREF(args); // Release the reference to the args tuple
-
-        if (result == nullptr) {
-            PyErr_Print();
-        }
-        else {
-
-            // Assuming the result is a tuple with two elements
-            if (PyTuple_Check(result) && PyTuple_Size(result) == 2) {
-                PyObject* firstElement = PyTuple_GetItem(result, 0);
-                PyObject* secondElement = PyTuple_GetItem(result, 1);
-
-                // Add elements to the unordered_map
-                stateDicts["p_net"] = firstElement;
-                stateDicts["v_net"] = secondElement;
-            }
-            else {
-                std::cerr << "Error: Unexpected return value from Python function." << std::endl;
-            }
-
-            Py_DECREF(result); // Release the reference to the result tuple
-        }
-
-        Py_DECREF(pFunc); // Release the reference to the function object
-    }
-    else {
+    else
+    {
         PyErr_Print();
     }
 
-    return stateDicts;
+    return std::make_pair(nullptr, nullptr);
 }
 
 

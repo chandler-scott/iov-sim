@@ -23,7 +23,6 @@
 #include "iov_sim/applications/ApplicationLayerTest.h"
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
 #include "veins/modules/messages/BaseFrame1609_4_m.h"
-#include "iov_sim/util/SerializeUtil.h"
 
 using namespace veins;
 using namespace iov_sim;
@@ -85,6 +84,8 @@ void ApplicationLayerTest::onWSM(BaseFrame1609_4* frame)
 
     if (frame) {
         if (dynamic_cast<ModelUpdateMessage*>(frame)) {
+            std::cout << "-- data message is a model update" << std::endl;
+
             // Handle AnotherMessageType
             ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
             findHost()->getDisplayString().setTagArg("i", 1, "green");
@@ -92,22 +93,15 @@ void ApplicationLayerTest::onWSM(BaseFrame1609_4* frame)
             auto pNetJson = appMessage->getPStateDict();
             auto vNetJson = appMessage->getVStateDict();
 
-            std::cout << pNetJson << std::endl;
-            std::cout << vNetJson << std::endl;
+            auto pNet = agent.CharToPyObject(pNetJson);
+            auto vNet = agent.CharToPyObject(vNetJson);
 
-            auto pNet = agent.stringToPyDict(pNetJson);
-            auto vNet = agent.stringToPyDict(vNetJson);
+            auto [pStateDict, vStateDict] = agent.getStateDictsFromJson(pNetJson, vNetJson);
 
-            std::cout << "V2" << std::endl;
-
-            auto stateDicts = agent.getStateDictsFromBytes(pNet, vNet);
-            std::cout << "V3" << std::endl;
-
-            agent.loadStateDicts(stateDicts);
-            std::cout << "V4" << std::endl;
+            agent.loadStateDicts(pStateDict, vStateDict);
 
 
-            std::cout << "received and set with no errors..." << std::endl;
+            std::cout << "-- loaded most up-to-date model" << std::endl;
 
 
         }

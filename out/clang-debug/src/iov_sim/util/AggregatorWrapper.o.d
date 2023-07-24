@@ -64,7 +64,7 @@
   /usr/include/python3.8/pyctype.h /usr/include/python3.8/pystrtod.h \
   /usr/include/python3.8/pystrcmp.h /usr/include/python3.8/dtoa.h \
   /usr/include/python3.8/fileutils.h /usr/include/python3.8/pyfpe.h \
-  /usr/include/python3.8/tracemalloc.h \
+  /usr/include/python3.8/tracemalloc.h iov_sim/util/BaseWrapper.h \
   /usr/include/python3.8/numpy/arrayobject.h \
   /usr/include/python3.8/numpy/ndarrayobject.h \
   /usr/include/python3.8/numpy/ndarraytypes.h \
@@ -257,6 +257,8 @@ iov_sim/util/PythonWrapper.h:
 /usr/include/python3.8/pyfpe.h:
 
 /usr/include/python3.8/tracemalloc.h:
+
+iov_sim/util/BaseWrapper.h:
 
 /usr/include/python3.8/numpy/arrayobject.h:
 
