@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
+// Copyright (C) 2011 David Eckhoff <eckhoff@cs.fau.de>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,10 +20,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package org.car2x.veins.subprojects.iov_sim.util;
+import iov_sim.base.messages.BaseMessage;
 
-simple PythonLifecycle
-{
-    @class(iov_sim::PythonLifecycle);
-    @display("i=block/app2");
+namespace iov_sim;
+
+packet ClusterBeaconMessage extends BaseMessage {
+    double speed;
+    double velocity;
+    double xVelocity;
+    double yVelocity;
+    double decceleration;
+    double acceleration;
+    double xPosition;
+    double yPosition;
+    double xDirection;
+    double yDirection;
 }

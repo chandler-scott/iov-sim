@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/VehicleInitMessage.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/modules/messages/ModelUpdateMessage.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "VehicleInitMessage_m.h"
+#include "ModelUpdateMessage_m.h"
 
 namespace omnetpp {
 
@@ -152,94 +152,94 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 namespace iov_sim {
 
-Register_Class(VehicleInitMessage)
+Register_Class(ModelUpdateMessage)
 
-VehicleInitMessage::VehicleInitMessage(const char *name, short kind) : ::veins::BaseFrame1609_4(name, kind)
+ModelUpdateMessage::ModelUpdateMessage(const char *name, short kind) : ::iov_sim::BaseMessage(name, kind)
 {
 }
 
-VehicleInitMessage::VehicleInitMessage(const VehicleInitMessage& other) : ::veins::BaseFrame1609_4(other)
+ModelUpdateMessage::ModelUpdateMessage(const ModelUpdateMessage& other) : ::iov_sim::BaseMessage(other)
 {
     copy(other);
 }
 
-VehicleInitMessage::~VehicleInitMessage()
+ModelUpdateMessage::~ModelUpdateMessage()
 {
 }
 
-VehicleInitMessage& VehicleInitMessage::operator=(const VehicleInitMessage& other)
+ModelUpdateMessage& ModelUpdateMessage::operator=(const ModelUpdateMessage& other)
 {
     if (this == &other) return *this;
-    ::veins::BaseFrame1609_4::operator=(other);
+    ::iov_sim::BaseMessage::operator=(other);
     copy(other);
     return *this;
 }
 
-void VehicleInitMessage::copy(const VehicleInitMessage& other)
+void ModelUpdateMessage::copy(const ModelUpdateMessage& other)
 {
-    this->data = other.data;
-    this->senderAddress = other.senderAddress;
-    this->serial = other.serial;
+    this->pStateDict = other.pStateDict;
+    this->vStateDict = other.vStateDict;
+    this->origin = other.origin;
 }
 
-void VehicleInitMessage::parsimPack(omnetpp::cCommBuffer *b) const
+void ModelUpdateMessage::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::veins::BaseFrame1609_4::parsimPack(b);
-    doParsimPacking(b,this->data);
-    doParsimPacking(b,this->senderAddress);
-    doParsimPacking(b,this->serial);
+    ::iov_sim::BaseMessage::parsimPack(b);
+    doParsimPacking(b,this->pStateDict);
+    doParsimPacking(b,this->vStateDict);
+    doParsimPacking(b,this->origin);
 }
 
-void VehicleInitMessage::parsimUnpack(omnetpp::cCommBuffer *b)
+void ModelUpdateMessage::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::veins::BaseFrame1609_4::parsimUnpack(b);
-    doParsimUnpacking(b,this->data);
-    doParsimUnpacking(b,this->senderAddress);
-    doParsimUnpacking(b,this->serial);
+    ::iov_sim::BaseMessage::parsimUnpack(b);
+    doParsimUnpacking(b,this->pStateDict);
+    doParsimUnpacking(b,this->vStateDict);
+    doParsimUnpacking(b,this->origin);
 }
 
-const char * VehicleInitMessage::getData() const
+const char * ModelUpdateMessage::getPStateDict() const
 {
-    return this->data.c_str();
+    return this->pStateDict.c_str();
 }
 
-void VehicleInitMessage::setData(const char * data)
+void ModelUpdateMessage::setPStateDict(const char * pStateDict)
 {
-    this->data = data;
+    this->pStateDict = pStateDict;
 }
 
-const ::veins::LAddress::L2Type& VehicleInitMessage::getSenderAddress() const
+const char * ModelUpdateMessage::getVStateDict() const
 {
-    return this->senderAddress;
+    return this->vStateDict.c_str();
 }
 
-void VehicleInitMessage::setSenderAddress(const ::veins::LAddress::L2Type& senderAddress)
+void ModelUpdateMessage::setVStateDict(const char * vStateDict)
 {
-    this->senderAddress = senderAddress;
+    this->vStateDict = vStateDict;
 }
 
-int VehicleInitMessage::getSerial() const
+const char * ModelUpdateMessage::getOrigin() const
 {
-    return this->serial;
+    return this->origin.c_str();
 }
 
-void VehicleInitMessage::setSerial(int serial)
+void ModelUpdateMessage::setOrigin(const char * origin)
 {
-    this->serial = serial;
+    this->origin = origin;
 }
 
-class VehicleInitMessageDescriptor : public omnetpp::cClassDescriptor
+class ModelUpdateMessageDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_data,
-        FIELD_senderAddress,
-        FIELD_serial,
+        FIELD_pStateDict,
+        FIELD_vStateDict,
+        FIELD_origin,
     };
   public:
-    VehicleInitMessageDescriptor();
-    virtual ~VehicleInitMessageDescriptor();
+    ModelUpdateMessageDescriptor();
+    virtual ~ModelUpdateMessageDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -265,24 +265,24 @@ class VehicleInitMessageDescriptor : public omnetpp::cClassDescriptor
     virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
-Register_ClassDescriptor(VehicleInitMessageDescriptor)
+Register_ClassDescriptor(ModelUpdateMessageDescriptor)
 
-VehicleInitMessageDescriptor::VehicleInitMessageDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(iov_sim::VehicleInitMessage)), "veins::BaseFrame1609_4")
+ModelUpdateMessageDescriptor::ModelUpdateMessageDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(iov_sim::ModelUpdateMessage)), "iov_sim::BaseMessage")
 {
     propertyNames = nullptr;
 }
 
-VehicleInitMessageDescriptor::~VehicleInitMessageDescriptor()
+ModelUpdateMessageDescriptor::~ModelUpdateMessageDescriptor()
 {
     delete[] propertyNames;
 }
 
-bool VehicleInitMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool ModelUpdateMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<VehicleInitMessage *>(obj)!=nullptr;
+    return dynamic_cast<ModelUpdateMessage *>(obj)!=nullptr;
 }
 
-const char **VehicleInitMessageDescriptor::getPropertyNames() const
+const char **ModelUpdateMessageDescriptor::getPropertyNames() const
 {
     if (!propertyNames) {
         static const char *names[] = {  nullptr };
@@ -293,19 +293,19 @@ const char **VehicleInitMessageDescriptor::getPropertyNames() const
     return propertyNames;
 }
 
-const char *VehicleInitMessageDescriptor::getProperty(const char *propertyName) const
+const char *ModelUpdateMessageDescriptor::getProperty(const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? base->getProperty(propertyName) : nullptr;
 }
 
-int VehicleInitMessageDescriptor::getFieldCount() const
+int ModelUpdateMessageDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? 3+base->getFieldCount() : 3;
 }
 
-unsigned int VehicleInitMessageDescriptor::getFieldTypeFlags(int field) const
+unsigned int ModelUpdateMessageDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -314,14 +314,14 @@ unsigned int VehicleInitMessageDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_data
-        0,    // FIELD_senderAddress
-        FD_ISEDITABLE,    // FIELD_serial
+        FD_ISEDITABLE,    // FIELD_pStateDict
+        FD_ISEDITABLE,    // FIELD_vStateDict
+        FD_ISEDITABLE,    // FIELD_origin
     };
     return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
 
-const char *VehicleInitMessageDescriptor::getFieldName(int field) const
+const char *ModelUpdateMessageDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -330,24 +330,24 @@ const char *VehicleInitMessageDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "data",
-        "senderAddress",
-        "serial",
+        "pStateDict",
+        "vStateDict",
+        "origin",
     };
     return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
 }
 
-int VehicleInitMessageDescriptor::findField(const char *fieldName) const
+int ModelUpdateMessageDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "data") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "senderAddress") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "serial") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "pStateDict") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "vStateDict") == 0) return baseIndex + 1;
+    if (strcmp(fieldName, "origin") == 0) return baseIndex + 2;
     return base ? base->findField(fieldName) : -1;
 }
 
-const char *VehicleInitMessageDescriptor::getFieldTypeString(int field) const
+const char *ModelUpdateMessageDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -356,14 +356,14 @@ const char *VehicleInitMessageDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "string",    // FIELD_data
-        "veins::LAddress::L2Type",    // FIELD_senderAddress
-        "int",    // FIELD_serial
+        "string",    // FIELD_pStateDict
+        "string",    // FIELD_vStateDict
+        "string",    // FIELD_origin
     };
     return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **VehicleInitMessageDescriptor::getFieldPropertyNames(int field) const
+const char **ModelUpdateMessageDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -376,7 +376,7 @@ const char **VehicleInitMessageDescriptor::getFieldPropertyNames(int field) cons
     }
 }
 
-const char *VehicleInitMessageDescriptor::getFieldProperty(int field, const char *propertyName) const
+const char *ModelUpdateMessageDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -389,7 +389,7 @@ const char *VehicleInitMessageDescriptor::getFieldProperty(int field, const char
     }
 }
 
-int VehicleInitMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+int ModelUpdateMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -397,13 +397,13 @@ int VehicleInitMessageDescriptor::getFieldArraySize(omnetpp::any_ptr object, int
             return base->getFieldArraySize(object, field);
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-void VehicleInitMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+void ModelUpdateMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -413,13 +413,13 @@ void VehicleInitMessageDescriptor::setFieldArraySize(omnetpp::any_ptr object, in
         }
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'VehicleInitMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'ModelUpdateMessage'", field);
     }
 }
 
-const char *VehicleInitMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+const char *ModelUpdateMessageDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -427,13 +427,13 @@ const char *VehicleInitMessageDescriptor::getFieldDynamicTypeString(omnetpp::any
             return base->getFieldDynamicTypeString(object,field,i);
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string VehicleInitMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+std::string ModelUpdateMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -441,16 +441,16 @@ std::string VehicleInitMessageDescriptor::getFieldValueAsString(omnetpp::any_ptr
             return base->getFieldValueAsString(object,field,i);
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: return oppstring2string(pp->getData());
-        case FIELD_senderAddress: return "";
-        case FIELD_serial: return long2string(pp->getSerial());
+        case FIELD_pStateDict: return oppstring2string(pp->getPStateDict());
+        case FIELD_vStateDict: return oppstring2string(pp->getVStateDict());
+        case FIELD_origin: return oppstring2string(pp->getOrigin());
         default: return "";
     }
 }
 
-void VehicleInitMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+void ModelUpdateMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -460,15 +460,16 @@ void VehicleInitMessageDescriptor::setFieldValueAsString(omnetpp::any_ptr object
         }
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: pp->setData((value)); break;
-        case FIELD_serial: pp->setSerial(string2long(value)); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'VehicleInitMessage'", field);
+        case FIELD_pStateDict: pp->setPStateDict((value)); break;
+        case FIELD_vStateDict: pp->setVStateDict((value)); break;
+        case FIELD_origin: pp->setOrigin((value)); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
 }
 
-omnetpp::cValue VehicleInitMessageDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+omnetpp::cValue ModelUpdateMessageDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -476,16 +477,16 @@ omnetpp::cValue VehicleInitMessageDescriptor::getFieldValue(omnetpp::any_ptr obj
             return base->getFieldValue(object,field,i);
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: return pp->getData();
-        case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
-        case FIELD_serial: return pp->getSerial();
-        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'VehicleInitMessage' as cValue -- field index out of range?", field);
+        case FIELD_pStateDict: return pp->getPStateDict();
+        case FIELD_vStateDict: return pp->getVStateDict();
+        case FIELD_origin: return pp->getOrigin();
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'ModelUpdateMessage' as cValue -- field index out of range?", field);
     }
 }
 
-void VehicleInitMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+void ModelUpdateMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -495,15 +496,16 @@ void VehicleInitMessageDescriptor::setFieldValue(omnetpp::any_ptr object, int fi
         }
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_data: pp->setData(value.stringValue()); break;
-        case FIELD_serial: pp->setSerial(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'VehicleInitMessage'", field);
+        case FIELD_pStateDict: pp->setPStateDict(value.stringValue()); break;
+        case FIELD_vStateDict: pp->setVStateDict(value.stringValue()); break;
+        case FIELD_origin: pp->setOrigin(value.stringValue()); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
 }
 
-const char *VehicleInitMessageDescriptor::getFieldStructName(int field) const
+const char *ModelUpdateMessageDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -516,7 +518,7 @@ const char *VehicleInitMessageDescriptor::getFieldStructName(int field) const
     };
 }
 
-omnetpp::any_ptr VehicleInitMessageDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+omnetpp::any_ptr ModelUpdateMessageDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -524,14 +526,13 @@ omnetpp::any_ptr VehicleInitMessageDescriptor::getFieldStructValuePointer(omnetp
             return base->getFieldStructValuePointer(object, field, i);
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        case FIELD_senderAddress: return omnetpp::toAnyPtr(&pp->getSenderAddress()); break;
         default: return omnetpp::any_ptr(nullptr);
     }
 }
 
-void VehicleInitMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+void ModelUpdateMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -541,9 +542,9 @@ void VehicleInitMessageDescriptor::setFieldStructValuePointer(omnetpp::any_ptr o
         }
         field -= base->getFieldCount();
     }
-    VehicleInitMessage *pp = omnetpp::fromAnyPtr<VehicleInitMessage>(object); (void)pp;
+    ModelUpdateMessage *pp = omnetpp::fromAnyPtr<ModelUpdateMessage>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'VehicleInitMessage'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ModelUpdateMessage'", field);
     }
 }
 

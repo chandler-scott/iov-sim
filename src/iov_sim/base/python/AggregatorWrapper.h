@@ -8,8 +8,8 @@
 #ifndef IOV_SIM_UTIL_AGGREGATORWRAPPER_H_
 #define IOV_SIM_UTIL_AGGREGATORWRAPPER_H_
 
-#include "iov_sim/util/PythonWrapper.h"
-#include "iov_sim/util/BaseWrapper.h"
+#include "iov_sim/base/python/PythonWrapper.h"
+#include "iov_sim/base/python/BaseWrapper.h"
 
 #include <unordered_map>
 #include <string>

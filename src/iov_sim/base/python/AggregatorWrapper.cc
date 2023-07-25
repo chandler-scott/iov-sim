@@ -20,8 +20,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/util/AggregatorWrapper.h"
-#include <Python.h>
+#include "iov_sim/base/python/AggregatorWrapper.h"
+
 #include <numpy/arrayobject.h> // Include the NumPy header for C API
 #include <iostream>
 

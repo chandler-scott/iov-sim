@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2011 David Eckhoff <eckhoff@cs.fau.de>
+// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,13 +20,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-import veins.modules.messages.BaseFrame1609_4;
+package org.car2x.veins.subprojects.iov_sim.modules.applications;
+import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
 
-
-namespace iov_sim;
-
-packet VehicleInitMessage extends veins::BaseFrame1609_4 {
-    string data;
-    veins::LAddress::L2Type senderAddress = -1;
-    int serial = 0;
+simple RSUApplication extends DemoBaseApplLayer
+{
+    @class(iov_sim::RSUApplication);
+    @display("i=block/app2");
+    string appName = default("RSU Application");
+    string policyLoad = default("fed_p");
+    string policySave = default("fed_p");
+    string valueLoad = default("fed_v");
+    string valueSave = default("fed_v");
+    
 }

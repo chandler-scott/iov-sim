@@ -20,8 +20,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/util/BaseApplicationLayer.h"
-#include "iov_sim/messages/VehicleInitMessage_m.h"
+#include "iov_sim/base/applications/BaseApplicationLayer.h"
+
 
 using namespace veins;
 using namespace iov_sim;
@@ -33,7 +33,6 @@ void BaseApplicationLayer::initialize(int stage)
     BaseApplLayer::initialize(stage);
 
     if (stage == 0) {
-
         // initialize pointers to other modules
         if (FindModule<TraCIMobility*>::findSubModule(getParentModule())) {
             mobility = TraCIMobilityAccess().get(getParentModule());
@@ -41,6 +40,7 @@ void BaseApplicationLayer::initialize(int stage)
             traciVehicle = mobility->getVehicleCommandInterface();
         }
         else {
+            std::cerr << "no mobility" << std::endl;
             traci = nullptr;
             mobility = nullptr;
             traciVehicle = nullptr;
@@ -82,7 +82,6 @@ void BaseApplicationLayer::initialize(int stage)
         receivedWSMs = 0;
     }
     else if (stage == 1) {
-
         // store MAC address for quick access
         myId = mac->getMACAddress();
 
@@ -208,6 +207,20 @@ void BaseApplicationLayer::handleParkingUpdate(cObject* obj)
     isParked = mobility->getParkingState();
 }
 
+void BaseApplicationLayer::sendModelUpdateMessage(const char* pNet, const char* vNet, const char* origin)
+{
+    ModelUpdateMessage* msg = new ModelUpdateMessage();
+    populateWSM(msg);
+
+    msg->setPStateDict(pNet);
+    msg->setVStateDict(vNet);
+    msg->setOrigin(origin);
+
+    // this rsu repeats the received traffic update in 2 seconds plus some random delay
+    sendDelayedDown(msg->dup(), 1 + uniform(0.01, 0.2));
+    delete msg;
+}
+
 void BaseApplicationLayer::handleLowerMsg(cMessage* msg)
 {
 
@@ -216,7 +229,12 @@ void BaseApplicationLayer::handleLowerMsg(cMessage* msg)
     BaseFrame1609_4* wsm = dynamic_cast<BaseFrame1609_4*>(msg);
     ASSERT(wsm);
 
-    if (VehicleInitMessage* bsm = dynamic_cast<VehicleInitMessage*>(wsm)) {
+    if (ModelRequestMessage* bsm = dynamic_cast<ModelRequestMessage*>(wsm)) {
+        receivedBSMs++;
+        onBSM(bsm);
+    }
+    else if (ClusterBeaconMessage* bsm = dynamic_cast<ClusterBeaconMessage*>(wsm))
+    {
         receivedBSMs++;
         onBSM(bsm);
     }

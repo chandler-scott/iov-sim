@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/util/AgentWrapper.h"
+#include "iov_sim/base/python/AgentWrapper.h"
 #include <iostream>
 #include <Python.h>
 
@@ -51,7 +51,6 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
         }
         else
         {
-            std::cout << "Successfully initialized the Agent!" << std::endl;
         }
     }
     catch (const std::exception &e)
@@ -87,7 +86,6 @@ void AgentWrapper::loadStateDicts(PyObject *pStateDict, PyObject *vStateDict)
         else
         {
             Py_DECREF(result);
-            std::cout << "state dict loaded!" << std::endl;
         }
     }
     else
@@ -147,7 +145,6 @@ void AgentWrapper::learn()
         else
         {
             Py_DECREF(result);
-            std::cout << "agent successfully learned!" << std::endl;
         }
     }
     else
@@ -177,7 +174,6 @@ void AgentWrapper::bufferFinishPath()
         else
         {
             Py_DECREF(result);
-            std::cout << "Finish path successful." << std::endl;
         }
     }
     else

@@ -25,6 +25,7 @@
 #include <map>
 #include "iov_sim/iov_sim.h"
 
+
 #include "veins/base/modules/BaseApplLayer.h"
 #include "veins/modules/utility/Consts80211p.h"
 #include "veins/modules/messages/BaseFrame1609_4_m.h"
@@ -34,6 +35,12 @@
 #include "veins/modules/mac/ieee80211p/DemoBaseApplLayerToMac1609_4Interface.h"
 #include "veins/modules/mobility/traci/TraCIMobility.h"
 #include "veins/modules/mobility/traci/TraCICommandInterface.h"
+#include "iov_sim/base/python/BaseWrapper.h"
+#include "iov_sim/modules/messages/ModelRequestMessage_m.h"
+#include "iov_sim/modules/messages/ModelUpdateMessage_m.h"
+#include "iov_sim/modules/messages/ClusterBeaconMessage_m.h"
+
+
 
 
 using namespace veins;
@@ -73,6 +80,8 @@ public:
     };
 
 protected:
+    void sendModelUpdateMessage(const char* pNet, const char* vNet, const char* origin = "rsu");
+
     /** @brief handle messages from below and calls the onWSM, onBSM, and onWSA functions accordingly */
     void handleLowerMsg(cMessage* msg) override;
 
@@ -143,8 +152,11 @@ protected:
     TraCICommandInterface* traci;
     TraCICommandInterface::Vehicle* traciVehicle;
 
+
     AnnotationManager* annotations;
     DemoBaseApplLayerToMac1609_4Interface* mac;
+
+
 
     /* support for parking currently only works with TraCI */
     bool isParked;

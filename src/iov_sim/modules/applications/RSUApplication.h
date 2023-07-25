@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
+// Copyright (C) 2016 David Eckhoff <david.eckhoff@fau.de>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,19 +20,37 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/util/PythonLifecycle.h"
-#include <iostream>
+#pragma once
 
-using namespace iov_sim;
-using namespace std;
+#include "iov_sim/iov_sim.h"
+#include "iov_sim/base/applications/BaseApplicationLayer.h"
+#include "iov_sim/modules/messages/ModelRequestMessage_m.h"
+#include "iov_sim/base/python/AggregatorWrapper.h"
+
 using namespace veins;
+namespace iov_sim {
+
+class IOV_SIM_API RSUApplication : public BaseApplicationLayer {
+public:
+    RSUApplication();
+
+    void initialize(int stage) override;
+    void finish() override;
 
 
-Define_Module(iov_sim::PythonLifecycle);
+protected:
+    void onBSM(BaseFrame1609_4* bsm) override;
+    void onWSM(BaseFrame1609_4* wsm) override;
+    void onWSA(DemoServiceAdvertisment* wsa) override;
 
-PythonLifecycle::PythonLifecycle() {
+    void sendModelUpdateMessage();
 
-}
+private:
+    AggregatorWrapper aggregator;
+    std::string policyLoad;
+    std::string valueLoad;
+    std::string policySave;
+    std::string valueSave;
+};
 
-PythonLifecycle::~PythonLifecycle() {
-}
+} // namespace iov_sim

@@ -23,36 +23,24 @@
 #pragma once
 
 #include "iov_sim/iov_sim.h"
-#include "iov_sim/util/BaseApplicationLayer.h"
-#include "iov_sim/util/AgentWrapper.h"
-#include "iov_sim/messages/VehicleInitMessage_m.h"
-#include "iov_sim/messages/ModelUpdateMessage_m.h"
+#include "iov_sim/base/applications/BaseApplicationLayer.h"
+#include "iov_sim/base/python/AgentWrapper.h"
+#include "iov_sim/base/util/NeighborTable.h"
+#include <cmath>
 
 
 using namespace veins;
 
 namespace iov_sim {
 
-/**
- * @brief
- * A tutorial demo for TraCI. When the car is stopped for longer than 10 seconds
- * it will send a message out to other cars containing the blocked road id.
- * Receiving cars will then trigger a reroute via TraCI.
- * When channel switching between SCH and CCH is enabled on the MAC, the message is
- * instead send out on a service channel following a Service Advertisement
- * on the CCH.
- *
- * @author Christoph Sommer : initial DemoApp
- * @author David Eckhoff : rewriting, moving functionality to DemoBaseApplLayer, adding WSA
- *
- */
 
-class IOV_SIM_API ApplicationLayerTest : public iov_sim::BaseApplicationLayer {
+class IOV_SIM_API VehicleApplication : public iov_sim::BaseApplicationLayer {
 public:
-    ApplicationLayerTest();
+    VehicleApplication();
 
     void initialize(int stage) override;
     void finish() override;
+
 
 
 protected:
@@ -66,11 +54,18 @@ protected:
     void onWSM(veins::BaseFrame1609_4* wsm) override;
     void onWSA(veins::DemoServiceAdvertisment* wsa) override;
 
+    void sendClusterBeaconMessage();
+    void sendModelUpdateMessage();
+    void loadModelUpdate(ModelUpdateMessage* appMessage);
+
     void handleSelfMsg(cMessage* msg) override;
     void handlePositionUpdate(cObject* obj) override;
 
 private:
     AgentWrapper agent;
+    ClusterBeaconMessage *clusterBeaconSelfMessage = nullptr;
+    NeighborTable neighborTable;
+    int clusterBeaconDelay;
 
 };
 

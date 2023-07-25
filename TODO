@@ -1,10 +1,5 @@
-1. Agent/Aggregator -> 
-  - getStateDictsAsBytes()
-  - getStateDictsFromBytes(p_bytes, v_bytes)
-1. serialize/deserialize state_dict...
 2. Create Agent Wrapper C++
   - next_observation, reward, terminated, truncated, _  = step(observation)
   - void buffer.store(obs, act, rew, val, logp)
 3. Create Env Python
 ----------------------------------
-Agent can receive json-formatted state-dicts... need to get them to load

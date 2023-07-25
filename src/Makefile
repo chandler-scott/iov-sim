@@ -29,21 +29,26 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
 OBJS = \
-    $O/iov_sim/applications/ApplicationLayerTest.o \
-    $O/iov_sim/applications/RSUApplication.o \
-    $O/iov_sim/util/AgentWrapper.o \
-    $O/iov_sim/util/AggregatorWrapper.o \
-    $O/iov_sim/util/BaseApplicationLayer.o \
-    $O/iov_sim/util/BaseWrapper.o \
-    $O/iov_sim/util/PythonLifecycle.o \
-    $O/iov_sim/util/PythonWrapper.o \
-    $O/iov_sim/messages/ModelUpdateMessage_m.o \
-    $O/iov_sim/messages/VehicleInitMessage_m.o
+    $O/iov_sim/base/applications/BaseApplicationLayer.o \
+    $O/iov_sim/base/python/AgentWrapper.o \
+    $O/iov_sim/base/python/AggregatorWrapper.o \
+    $O/iov_sim/base/python/BaseWrapper.o \
+    $O/iov_sim/base/python/PythonLifecycle.o \
+    $O/iov_sim/base/python/PythonWrapper.o \
+    $O/iov_sim/base/util/NeighborTable.o \
+    $O/iov_sim/modules/applications/RSUApplication.o \
+    $O/iov_sim/modules/applications/VehicleApplication.o \
+    $O/iov_sim/base/messages/BaseMessage_m.o \
+    $O/iov_sim/modules/messages/ClusterBeaconMessage_m.o \
+    $O/iov_sim/modules/messages/ModelRequestMessage_m.o \
+    $O/iov_sim/modules/messages/ModelUpdateMessage_m.o
 
 # Message files
 MSGFILES = \
-    iov_sim/messages/ModelUpdateMessage.msg \
-    iov_sim/messages/VehicleInitMessage.msg
+    iov_sim/base/messages/BaseMessage.msg \
+    iov_sim/modules/messages/ClusterBeaconMessage.msg \
+    iov_sim/modules/messages/ModelRequestMessage.msg \
+    iov_sim/modules/messages/ModelUpdateMessage.msg
 
 # SM files
 SMFILES =

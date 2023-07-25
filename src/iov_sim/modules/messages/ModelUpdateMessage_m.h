@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/messages/ModelUpdateMessage.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from iov_sim/modules/messages/ModelUpdateMessage.msg.
 //
 
 #ifndef __IOV_SIM_MODELUPDATEMESSAGE_M_H
@@ -34,30 +34,28 @@ class ModelUpdateMessage;
 
 }  // namespace iov_sim
 
-#include "veins/modules/messages/BaseFrame1609_4_m.h" // import veins.modules.messages.BaseFrame1609_4
+#include "iov_sim/base/messages/BaseMessage_m.h" // import iov_sim.base.messages.BaseMessage
 
 
 namespace iov_sim {
 
 /**
- * Class generated from <tt>iov_sim/messages/ModelUpdateMessage.msg:27</tt> by opp_msgtool.
+ * Class generated from <tt>iov_sim/modules/messages/ModelUpdateMessage.msg:27</tt> by opp_msgtool.
  * <pre>
- * packet ModelUpdateMessage extends veins::BaseFrame1609_4
+ * packet ModelUpdateMessage extends BaseMessage
  * {
  *     string pStateDict;
  *     string vStateDict;
- *     veins::LAddress::L2Type senderAddress = -1;
- *     int serial = 0;
+ *     string origin = "rsu";
  * }
  * </pre>
  */
-class IOV_SIM_API ModelUpdateMessage : public ::veins::BaseFrame1609_4
+class IOV_SIM_API ModelUpdateMessage : public ::iov_sim::BaseMessage
 {
   protected:
     ::omnetpp::opp_string pStateDict;
     ::omnetpp::opp_string vStateDict;
-    ::veins::LAddress::L2Type senderAddress = -1;
-    int serial = 0;
+    ::omnetpp::opp_string origin = "rsu";
 
   private:
     void copy(const ModelUpdateMessage& other);
@@ -80,12 +78,8 @@ class IOV_SIM_API ModelUpdateMessage : public ::veins::BaseFrame1609_4
     virtual const char * getVStateDict() const;
     virtual void setVStateDict(const char * vStateDict);
 
-    virtual const ::veins::LAddress::L2Type& getSenderAddress() const;
-    virtual ::veins::LAddress::L2Type& getSenderAddressForUpdate() { return const_cast<::veins::LAddress::L2Type&>(const_cast<ModelUpdateMessage*>(this)->getSenderAddress());}
-    virtual void setSenderAddress(const ::veins::LAddress::L2Type& senderAddress);
-
-    virtual int getSerial() const;
-    virtual void setSerial(int serial);
+    virtual const char * getOrigin() const;
+    virtual void setOrigin(const char * origin);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const ModelUpdateMessage& obj) {obj.parsimPack(b);}

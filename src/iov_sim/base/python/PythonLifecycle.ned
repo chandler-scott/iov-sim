@@ -20,35 +20,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#pragma once
-#include <omnetpp.h>
-#include "iov_sim/iov_sim.h"
-#include "iov_sim/util/PythonWrapper.h"
+package org.car2x.veins.subprojects.iov_sim.base.python;
 
-
-namespace iov_sim {
-
-/**
- * @brief
- * A tutorial demo for TraCI. When the car is stopped for longer than 10 seconds
- * it will send a message out to other cars containing the blocked road id.
- * Receiving cars will then trigger a reroute via TraCI.
- * When channel switching between SCH and CCH is enabled on the MAC, the message is
- * instead send out on a service channel following a Service Advertisement
- * on the CCH.
- *
- * @author Christoph Sommer : initial DemoApp
- * @author David Eckhoff : rewriting, moving functionality to DemoBaseApplLayer, adding WSA
- *
- */
-
-class IOV_SIM_API PythonLifecycle : public cSimpleModule{
-public:
-    PythonLifecycle();
-
-private:
-    ~PythonLifecycle();
-
-};
-
-} // namespace iov_sim
+simple PythonLifecycle
+{
+    @class(iov_sim::PythonLifecycle);
+    @display("i=block/app2");
+}

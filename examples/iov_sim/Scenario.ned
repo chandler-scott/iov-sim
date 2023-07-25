@@ -22,7 +22,7 @@
 
 package iov_sim.examples.iov_sim;
 import org.car2x.veins.nodes.RSU;
-import org.car2x.veins.subprojects.iov_sim.util.PythonLifecycle;
+import org.car2x.veins.subprojects.iov_sim.base.python.PythonLifecycle;
 
 
 network Scenario extends org.car2x.veins.nodes.Scenario

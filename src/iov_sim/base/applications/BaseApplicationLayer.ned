@@ -1,4 +1,4 @@
-package org.car2x.veins.subprojects.iov_sim.util;
+package org.car2x.veins.subprojects.iov_sim.base.applications;
 import org.car2x.veins.base.modules.IBaseApplLayer;
 
 //

@@ -20,16 +20,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package org.car2x.veins.subprojects.iov_sim.applications;
+package org.car2x.veins.subprojects.iov_sim.modules.applications;
 import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
 
-simple RSUApplication extends DemoBaseApplLayer
+simple VehicleApplication extends DemoBaseApplLayer
 {
-    @class(iov_sim::RSUApplication);
+    @class(iov_sim::VehicleApplication);
+    string appName = default("Vehicle Application");
+    int clusterBeaconDelay = default(5);
     @display("i=block/app2");
-    string policyLoad = default("fed_p");
-    string policySave = default("fed_p");
-    string valueLoad = default("fed_v");
-    string valueSave = default("fed_v");
-    
 }

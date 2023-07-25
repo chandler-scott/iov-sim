@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "iov_sim/util/PythonWrapper.h"
+#include "iov_sim/base/python/PythonWrapper.h"
 #include <unistd.h>
 #include <iostream>
 #include <dlfcn.h>
