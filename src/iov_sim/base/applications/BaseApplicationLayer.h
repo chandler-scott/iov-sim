@@ -151,7 +151,7 @@ protected:
     TraCIMobility* mobility;
     TraCICommandInterface* traci;
     TraCICommandInterface::Vehicle* traciVehicle;
-
+    const char* nodeName;
 
     AnnotationManager* annotations;
     DemoBaseApplLayerToMac1609_4Interface* mac;

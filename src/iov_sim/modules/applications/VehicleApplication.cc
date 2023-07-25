@@ -38,18 +38,21 @@ void VehicleApplication::initialize(int stage)
         // Initializing members and pointers of your application goes here
         EV << "Initializing " << par("appName").stringValue() << std::endl;
         clusterBeaconDelay = par("clusterBeaconDelay");
+        neighborTableTimeout = par("neighborTableTimeout");
+
     }
     else if (stage == 1) {
         // Initializing members that require initialized other modules goes here
-        std::cout << "Vehicle: sending Model Request Message" << std::endl;
+        std::cout << nodeName << ": sending Model Request Message" << std::endl;
         ModelRequestMessage* wsm = new ModelRequestMessage();
         populateWSM(wsm);
         wsm->setData("Hi there!");
         sendDown(wsm);
 
         clusterBeaconSelfMessage = new ClusterBeaconMessage("ClusterBeaconMessage");
+        neighborTablePruneMessage = new NeighborTablePruneMessage("NeighborTablePruneMessage");
         scheduleAt(simTime() + clusterBeaconDelay, clusterBeaconSelfMessage);
-        //sendClusterBeaconMessage();
+        scheduleAt(simTime() + neighborTableTimeout, neighborTablePruneMessage);
     }
 }
 
@@ -62,27 +65,33 @@ void VehicleApplication::finish()
 void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
 {
     if (ClusterBeaconMessage* beaconMsg = dynamic_cast<ClusterBeaconMessage*>(bsm)) {
-        std::cout << "Vehicle: received a Cluster Beacon Message" << std::endl;
+        std::cout << nodeName << ": received a Cluster Beacon Message" << std::endl;
 
         findHost()->getDisplayString().setTagArg("i", 1, "green");
 
-        double speed = beaconMsg->getSpeed();
-        double velocity = beaconMsg->getVelocity();
-        double xVelocity = beaconMsg->getXVelocity();
-        double yVelocity = beaconMsg->getYVelocity();
-        double acceleration = beaconMsg->getAcceleration();
-        double decceleration = beaconMsg->getDecceleration();
-        double xPosition = beaconMsg->getXPosition();
-        double yPosition = beaconMsg->getYPosition();
-        double xDirection = beaconMsg->getXDirection();
-        double yDirection = beaconMsg->getYDirection();
+        NeighborEntry entry;
+
+        entry.speed = beaconMsg->getSpeed();
+        entry.velocity = beaconMsg->getVelocity();
+        entry.xVelocity = beaconMsg->getXVelocity();
+        entry.yVelocity = beaconMsg->getYVelocity();
+        entry.acceleration = beaconMsg->getAcceleration();
+        entry.deceleration = beaconMsg->getDeceleration();
+        entry.xPosition = beaconMsg->getXPosition();
+        entry.yPosition = beaconMsg->getYPosition();
+        entry.xDirection = beaconMsg->getXDirection();
+        entry.yDirection = beaconMsg->getYDirection();
+        entry.timestamp = simTime().dbl();
+        auto sender = beaconMsg->getSender();
 
         // add entry to neighbor table
         std::cout << "-- adding message to neighbor table" << std::endl;
+        neighborTable.addRow(entry, sender);
+        neighborTable.printTable();
 
     }
     else if (ModelRequestMessage* requestMsg = dynamic_cast<ModelRequestMessage*>(bsm)) {
-        std::cout << "Vehicle: received a Model Request Message" << std::endl;
+        std::cout << nodeName << ": received a Model Request Message" << std::endl;
         findHost()->getDisplayString().setTagArg("i", 1, "blue");
         auto origin = requestMsg->getOrigin();
 
@@ -102,7 +111,7 @@ void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
 
     }
     else {
-        std::cout << "RSU: received a different beacon message than expected.." << std::endl;
+        std::cout << nodeName << ": received a different beacon message than expected.." << std::endl;
         delete bsm;
     }
 }
@@ -111,7 +120,7 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
 {
     if (frame) {
         if (dynamic_cast<ModelUpdateMessage*>(frame)) {
-            std::cout << "Vehicle: received a Model Update Message" << std::endl;
+            std::cout << nodeName << ": received a Model Update Message" << std::endl;
             ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
 
             // load up-to-date model
@@ -128,14 +137,14 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
 
 void VehicleApplication::sendClusterBeaconMessage()
 {
-    std::cout << "Vehicle: sending a Cluster Beacon Message" << std::endl;
+    std::cout << nodeName << ": sending a Cluster Beacon Message" << std::endl;
 
     ClusterBeaconMessage* msg = new ClusterBeaconMessage();
     populateWSM(msg);
 
     // get mobility data
     double acceleration = traciVehicle->getAcceleration();
-    double decceleration = traciVehicle->getDeccel();
+    double deceleration = traciVehicle->getDeccel();
     double speed = mobility->getSpeed();
     Coord position = mobility->getPositionAt(simTime());
     Coord direction = mobility->getCurrentDirection();
@@ -150,7 +159,7 @@ void VehicleApplication::sendClusterBeaconMessage()
 
     // set message fields
     msg->setAcceleration(acceleration);
-    msg->setDecceleration(decceleration);
+    msg->setDeceleration(deceleration);
 
     msg->setSpeed(speed);
     msg->setVelocity(velocity);
@@ -161,6 +170,8 @@ void VehicleApplication::sendClusterBeaconMessage()
     msg->setYPosition(position.y);
     msg->setXDirection(direction.x);
     msg->setYDirection(direction.y);
+
+    msg->setSender(nodeName);
 
 
     sendDelayedDown(msg->dup(), uniform(0.01, 0.2));
@@ -199,21 +210,60 @@ void VehicleApplication::loadModelUpdate(ModelUpdateMessage* appMessage)
 
 }
 
-void VehicleApplication::onWSA(DemoServiceAdvertisment* wsa)
+void VehicleApplication::addSelfToNeighborTable()
 {
-    std::cout << "ApplicationLayerTest: omWSA" << std::endl;
-    // Your application has received a service advertisement from another car or RSU
-    // code for handling the message goes here, see TraciDemo11p.cc for examples
+    Coord position = mobility->getPositionAt(simTime());
+    Coord direction = mobility->getCurrentDirection();
+    double angle = traciVehicle->getAngle();
+    double speed = mobility->getSpeed();
+
+    // calculate velocities
+    double angleRads = angle * (M_PI / 180.0);
+    double xVelocity = speed * cos(angleRads);
+    double yVelocity = speed * sin(angleRads);
+    double velocity = sqrt((xVelocity * xVelocity) + (yVelocity * yVelocity));
+
+    NeighborEntry entry;
+
+    entry.speed = speed;
+    entry.velocity = velocity;
+    entry.xVelocity = xVelocity;
+    entry.yVelocity = yVelocity;
+    entry.acceleration = traciVehicle->getAcceleration();
+    entry.deceleration = traciVehicle->getDeccel();
+    entry.xPosition = position.x;
+    entry.yPosition = position.y;
+    entry.xDirection = direction.x;
+    entry.yDirection = direction.y;
+    entry.timestamp = simTime().dbl();
+    auto sender = nodeName;
+
+    // add entry to neighbor table
+    std::cout << "-- adding message to neighbor table" << std::endl;
+    neighborTable.addRow(entry, sender);
 }
+
 
 void VehicleApplication::handleSelfMsg(cMessage* msg)
 {
     if (msg == clusterBeaconSelfMessage) {
         sendClusterBeaconMessage();
         scheduleAt(simTime() + clusterBeaconDelay, msg);
-    } else {
-        // Handle other messages here...
-    }
+    } else if (msg == neighborTablePruneMessage) {
+        std::cout << nodeName << ": pruning neighbor table..." << std::endl;
+        neighborTable.pruneTable(simTime().dbl());
+        addSelfToNeighborTable();
+
+        std::cout << "-- scoring  neighbors..." << std::endl;
+        neighborTable.scoreNeighbors();
+
+        std::cout << "-- new neighbor table:" << std::endl;
+        neighborTable.printTable();
+        neighborTable.printAverages();
+        neighborTable.printScores();
+
+        scheduleAt(simTime() + neighborTableTimeout, msg);
+    } else {}
 }
 
 void VehicleApplication::handlePositionUpdate(cObject* obj)

@@ -25,11 +25,12 @@ import iov_sim.base.messages.BaseMessage;
 namespace iov_sim;
 
 packet ClusterBeaconMessage extends BaseMessage {
+    string sender;
     double speed;
     double velocity;
     double xVelocity;
     double yVelocity;
-    double decceleration;
+    double deceleration;
     double acceleration;
     double xPosition;
     double yPosition;

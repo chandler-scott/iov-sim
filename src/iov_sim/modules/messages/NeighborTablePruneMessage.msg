@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
+// Copyright (C) 2011 David Eckhoff <eckhoff@cs.fau.de>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,14 +20,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package org.car2x.veins.subprojects.iov_sim.modules.applications;
-import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
+import iov_sim.base.messages.BaseMessage;
 
-simple VehicleApplication extends DemoBaseApplLayer
-{
-    @class(iov_sim::VehicleApplication);
-    string appName = default("Vehicle Application");
-    int clusterBeaconDelay = default(5);
-    double neighborTableTimeout = default(30);
-    @display("i=block/app2");
+namespace iov_sim;
+
+packet NeighborTablePruneMessage extends BaseMessage {
+    string data;
 }

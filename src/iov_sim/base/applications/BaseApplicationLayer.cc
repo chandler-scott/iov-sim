@@ -84,6 +84,7 @@ void BaseApplicationLayer::initialize(int stage)
     else if (stage == 1) {
         // store MAC address for quick access
         myId = mac->getMACAddress();
+        nodeName = getParentModule()->getFullName();
 
         // simulate asynchronous channel access
 

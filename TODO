@@ -1,5 +1,10 @@
 2. Create Agent Wrapper C++
   - next_observation, reward, terminated, truncated, _  = step(observation)
   - void buffer.store(obs, act, rew, val, logp)
-3. Create Env Python
-----------------------------------
+----------------------------------i
+
+neighbor table score formula
+neighbor table changeWeights() method 		// this is what we change after selectAction 
+CH election message
+CH selection message
+--- collect and store reward metadata in some structure 

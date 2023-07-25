@@ -26,6 +26,10 @@
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
 #include "iov_sim/base/python/AgentWrapper.h"
 #include "iov_sim/base/util/NeighborTable.h"
+#include "iov_sim/base/util/NeighborEntry.h"
+#include "iov_sim/modules/messages/NeighborTablePruneMessage_m.h"
+
+
 #include <cmath>
 
 
@@ -52,7 +56,6 @@ protected:
     void onBSM(BaseFrame1609_4* bsm) override;
     // to handle when the application receives a data message from another car or RSU
     void onWSM(veins::BaseFrame1609_4* wsm) override;
-    void onWSA(veins::DemoServiceAdvertisment* wsa) override;
 
     void sendClusterBeaconMessage();
     void sendModelUpdateMessage();
@@ -61,12 +64,16 @@ protected:
     void handleSelfMsg(cMessage* msg) override;
     void handlePositionUpdate(cObject* obj) override;
 
+    void addSelfToNeighborTable();
+
 private:
     AgentWrapper agent;
     ClusterBeaconMessage *clusterBeaconSelfMessage = nullptr;
+    NeighborTablePruneMessage *neighborTablePruneMessage = nullptr;
+
     NeighborTable neighborTable;
     int clusterBeaconDelay;
-
+    double neighborTableTimeout;
 };
 
 } // namespace iov_sim

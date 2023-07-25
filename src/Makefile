@@ -41,14 +41,16 @@ OBJS = \
     $O/iov_sim/base/messages/BaseMessage_m.o \
     $O/iov_sim/modules/messages/ClusterBeaconMessage_m.o \
     $O/iov_sim/modules/messages/ModelRequestMessage_m.o \
-    $O/iov_sim/modules/messages/ModelUpdateMessage_m.o
+    $O/iov_sim/modules/messages/ModelUpdateMessage_m.o \
+    $O/iov_sim/modules/messages/NeighborTablePruneMessage_m.o
 
 # Message files
 MSGFILES = \
     iov_sim/base/messages/BaseMessage.msg \
     iov_sim/modules/messages/ClusterBeaconMessage.msg \
     iov_sim/modules/messages/ModelRequestMessage.msg \
-    iov_sim/modules/messages/ModelUpdateMessage.msg
+    iov_sim/modules/messages/ModelUpdateMessage.msg \
+    iov_sim/modules/messages/NeighborTablePruneMessage.msg
 
 # SM files
 SMFILES =

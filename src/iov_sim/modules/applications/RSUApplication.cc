@@ -66,7 +66,7 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
         // RSU has received an initialize message from a vehicle -> they need an
         // updated model. Respond with ModelUpdateMessage (message containing
         // up-to-date AI model)
-        std::cout << "RSU: received a Model Request Message" << std::endl;
+        std::cout << nodeName << ": received a Model Request Message" << std::endl;
 
         findHost()->getDisplayString().setTagArg("i", 1, "blue");
         auto origin = requestMsg->getOrigin();
@@ -81,7 +81,7 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
         }
     }
     else {
-        std::cout << "RSU: received a different beacon message than expected.." << std::endl;
+        std::cout << nodeName << ": received a different beacon message than expected.." << std::endl;
     }
 }
 
@@ -97,7 +97,7 @@ void RSUApplication::onWSM(BaseFrame1609_4* frame)
 {
     if (frame) {
         if (dynamic_cast<ModelUpdateMessage*>(frame)) {
-            std::cout << "RSU: received a Model Update Message" << std::endl;
+            std::cout << nodeName << ": received a Model Update Message" << std::endl;
             ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
 
             auto pNetJson = appMessage->getPStateDict();
