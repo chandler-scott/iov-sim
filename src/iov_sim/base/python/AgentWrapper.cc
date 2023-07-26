@@ -29,8 +29,9 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
     // Access the Aggregator class from the Python module
     PyObject *pModule = wrapper.ppoModule;
     PyObject *pClass = PyObject_GetAttrString(pModule, "Agent");
-    std::cout << "Initialized the Agent Wrapper Class!\n"
-              << "--now trying to init Agent class" << std::endl;
+    Logger::info("Initialized the Agent Wrapper Class!", "AgentWrapper");
+    Logger::info("--now trying to init Agent class", "AgentWrapper");
+
 
     PyObject *obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject *actDim = wrapper.callZerosBoxSpace(act_size);
@@ -47,7 +48,7 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
         {
             // Handle the exception here
             PyErr_Print();
-            std::cerr << "Error creating Agent instance!" << std::endl;
+            Logger::error("Error creating Agent instance!", "AgentWrapper");
         }
         else
         {
@@ -56,11 +57,15 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
     catch (const std::exception &e)
     {
         // Handle any C++ exceptions that might occur during the PyObject_CallObject call
-        std::cerr << "Caught C++ exception: " << e.what() << std::endl;
+        string ex = "Caught C++ exception: ";
+        ex +=  e.what();
+        Logger::error(ex, "AgentWrapper");
     }
     catch (...)
     {
         // Handle any other unexpected C++ exceptions
+        Logger::error("Caught an unexpected C++ exception!", "AgentWrapper");
+
         std::cerr << "Caught an unexpected C++ exception!" << std::endl;
     }
 }

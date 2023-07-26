@@ -82,7 +82,7 @@ std::pair<PyObject *, PyObject *> BaseWrapper::getStateDictsAsJson(PyObject *pCl
             }
             else
             {
-                std::cerr << "Error: Unexpected return value from Python function." << std::endl;
+                Logger::error("Unexpected return value from Python function.", "BaseWrapper");
             }
         }
     }
@@ -133,7 +133,7 @@ std::pair<PyObject *, PyObject *> BaseWrapper::getStateDictsFromJson(PyObject *p
             }
             else
             {
-                std::cerr << "Error: Unexpected return value from Python function." << std::endl;
+                Logger::error("Unexpected return value from Python function.", "BaseWrapper");
             }
 
             Py_DECREF(result); // Release the reference to the result tuple

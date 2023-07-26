@@ -26,6 +26,7 @@ namespace iov_sim;
 
 packet ClusterBeaconMessage extends BaseMessage {
     string sender;
+    int carsInRange;
     double speed;
     double velocity;
     double xVelocity;

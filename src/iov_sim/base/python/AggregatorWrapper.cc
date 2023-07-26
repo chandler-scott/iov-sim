@@ -33,8 +33,9 @@ AggregatorWrapper::AggregatorWrapper() : BaseWrapper()
     // Access the Aggregator class from the Python module
     PyObject* pModule = wrapper.ppoModule;
     PyObject* pClass = PyObject_GetAttrString(pModule, "Aggregator");
-    std::cout << "Initialized the Aggregator Wrapper Class!\n"
-              << "--now trying to init Aggregator class" << std::endl;
+    Logger::info("Initialized the Aggregator Wrapper Class!", "AggregatorWrapper");
+    Logger::info("-- now trying to init Aggregator class", "AggregatorWrapper");
+
 
     PyObject* obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject* actDim = wrapper.callZerosBoxSpace(act_size);
@@ -49,19 +50,20 @@ AggregatorWrapper::AggregatorWrapper() : BaseWrapper()
         if (pAggregator == nullptr) {
             // Handle the exception here
             PyErr_Print();
-            std::cerr << "Error creating Aggregator instance!" << std::endl;
+            Logger::error("Error creating Aggregator instance!", "AggregatorWrapper");
         }
         else {
-            std::cout << "Successfully initialized the Aggregator!" << std::endl;
+            Logger::info("Successfully initialized the Aggregator!", "AggregatorWrapper");
         }
     }
     catch (const std::exception& e) {
         // Handle any C++ exceptions that might occur during the PyObject_CallObject call
-        std::cerr << "Caught C++ exception: " << e.what() << std::endl;
-    }
+        string ex = "Caught C++ exception: ";
+        ex +=  e.what();
+        Logger::error(ex, "AgentWrapper");    }
     catch (...) {
         // Handle any other unexpected C++ exceptions
-        std::cerr << "Caught an unexpected C++ exception!" << std::endl;
+        Logger::error("Caught an unexpected C++ exception!", "AggregatorWrapper");
     }
 }
 
@@ -113,7 +115,7 @@ void AggregatorWrapper::saveStateDict(const std::string& policySave, const std::
         PyObject* args = PyTuple_Pack(2, pSaveArgObj, vSaveArgObj);
 
         // Use the state_dict() method to get the state dictionaries of the neural networks
-        std::cout << "saving model..." << std::endl;
+        Logger::info("saving model...", "AggregatorWrapper");
         PyObject* pFunc = PyObject_GetAttrString(pAggregator, "save_aggregate");
         PyObject* result = PyObject_CallObject(pFunc, args);
 
@@ -123,7 +125,7 @@ void AggregatorWrapper::saveStateDict(const std::string& policySave, const std::
         }
         else {
             Py_DECREF(result);
-            std::cout << "model saved!" << std::endl;
+            Logger::info("model saved!", "AggregatorWrapper");
         }
     }
     else {
@@ -149,7 +151,7 @@ void AggregatorWrapper::loadStateDict(const std::string& policyLoad, const std::
         PyObject* args = PyTuple_Pack(2, pLoadArgObj, vLoadArgObj);
 
         // Use the state_dict() method to get the state dictionaries of the neural networks
-        std::cout << "loading model..." << std::endl;
+        Logger::info("loading model...", "AggregatorWrapper");
         PyObject* pFunc = PyObject_GetAttrString(pAggregator, "load");
 
         PyObject* result = PyObject_CallObject(pFunc, args);
@@ -159,7 +161,7 @@ void AggregatorWrapper::loadStateDict(const std::string& policyLoad, const std::
         }
         else {
             Py_DECREF(result);
-            std::cout << "model loaded!" << std::endl;
+            Logger::info("model loaded!", "AggregatorWrapper");
         }
     }
     else {

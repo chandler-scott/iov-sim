@@ -1,10 +1,11 @@
-2. Create Agent Wrapper C++
-  - next_observation, reward, terminated, truncated, _  = step(observation)
-  - void buffer.store(obs, act, rew, val, logp)
-----------------------------------i
-
-neighbor table score formula
-neighbor table changeWeights() method 		// this is what we change after selectAction 
-CH election message
-CH selection message
---- collect and store reward metadata in some structure 
+- CH Election -> Coordinate election results
+- cluster timeout and reelection implementation
+  - timeout for no cluster head present
+  - threshold for cluster head to call for reelection (after some time)
+- implment training loop
+  - Agent
+    - next_observation, reward, terminated, truncated, _  = step(observation)
+    - void buffer.store(obs, act, rew, val, logp)
+  - Reward
+    - structure metadata in a way that can be fairly scored
+ 

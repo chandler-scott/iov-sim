@@ -8,6 +8,8 @@
 #define IOV_SIM_UTIL_BASEWRAPPER_H_
 
 #include "iov_sim/base/python/PythonWrapper.h"
+#include "iov_sim/base/util/Logger.h"
+
 #include <unordered_map>
 #include <string>
 

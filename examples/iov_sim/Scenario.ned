@@ -41,8 +41,8 @@ network Scenario extends org.car2x.veins.nodes.Scenario
 		// middle y coord
 		rsu[3].mobility.y = 4000;
 		rsu[3].mobility.x = 3500;
-		rsu[4].mobility.y = 3850;
-		rsu[4].mobility.x = 5300;
+		rsu[4].mobility.y = 3350;
+		rsu[4].mobility.x = 5200;
 		rsu[5].mobility.y = 3850;
 		rsu[5].mobility.x = 7600;
 		
@@ -50,8 +50,8 @@ network Scenario extends org.car2x.veins.nodes.Scenario
 		// low y coord
 	    rsu[7].mobility.y = 6000;
 		rsu[7].mobility.x = 2750;
-		rsu[8].mobility.y = 6000;
-		rsu[8].mobility.x = 6000;
+		rsu[8].mobility.y = 5750;
+		rsu[8].mobility.x = 5750;
 		rsu[9].mobility.y = 5500;
 		rsu[9].mobility.x = 9000;
 	

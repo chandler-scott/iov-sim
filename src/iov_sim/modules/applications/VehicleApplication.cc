@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#include "VehicleApplication.h"
+#include "iov_sim/modules/applications/VehicleApplication.h"
 
 using namespace veins;
 using namespace iov_sim;
@@ -36,28 +36,55 @@ void VehicleApplication::initialize(int stage)
     BaseApplicationLayer::initialize(stage);
     if (stage == 0) {
         // Initializing members and pointers of your application goes here
-        EV << "Initializing " << par("appName").stringValue() << std::endl;
+        Logger::info("Initializing...", nodeName);
+
         clusterBeaconDelay = par("clusterBeaconDelay");
         neighborTableTimeout = par("neighborTableTimeout");
-
+        clusterHead = false;
+        clusterMember = false;
     }
     else if (stage == 1) {
         // Initializing members that require initialized other modules goes here
-        std::cout << nodeName << ": sending Model Request Message" << std::endl;
-        ModelRequestMessage* wsm = new ModelRequestMessage();
-        populateWSM(wsm);
-        wsm->setData("Hi there!");
-        sendDown(wsm);
+        Logger::info("-- initializing message types...", nodeName);
 
+        modelRequestMessage = new ModelRequestMessage();
+        vehClusterDataMessage = new VehicleClusterDataMessage("ClusterDataMessage");
+        rsuClusterDataMessage = new RSUClusterDataMessage("ClusterDataMessage");
+        clusterElectionMessage = new ClusterElectionMessage("ClusterElectionMessage");
+        clusterSelectionMessage = new ClusterSelectionMessage(nodeName);
+        clusterBeaconMessage = new ClusterBeaconMessage();
         clusterBeaconSelfMessage = new ClusterBeaconMessage("ClusterBeaconMessage");
         neighborTablePruneMessage = new NeighborTablePruneMessage("NeighborTablePruneMessage");
-        scheduleAt(simTime() + clusterBeaconDelay, clusterBeaconSelfMessage);
-        scheduleAt(simTime() + neighborTableTimeout, neighborTablePruneMessage);
+
+        Logger::info("-- populating messages...", nodeName);
+
+        populateWSM(clusterBeaconMessage);
+        populateWSM(vehClusterDataMessage);
+        populateWSM(rsuClusterDataMessage);
+        populateWSM(modelRequestMessage);
+
+        modelRequestMessage->setData("requesting model");
+
+        Logger::info("-- sending model request message!", nodeName);
+
+        sendDown(modelRequestMessage->dup());
+        scheduleAt(simTime() + clusterBeaconDelay, clusterBeaconSelfMessage->dup());
+        scheduleAt(simTime() + neighborTableTimeout, neighborTablePruneMessage->dup());
     }
 }
 
 void VehicleApplication::finish()
 {
+    // clean up messages
+    delete modelRequestMessage;
+    delete neighborTablePruneMessage;
+    delete clusterBeaconMessage;
+    delete clusterBeaconSelfMessage;
+    delete clusterElectionMessage;
+    delete clusterSelectionMessage;
+    delete vehClusterDataMessage;
+    delete rsuClusterDataMessage;
+
     BaseApplicationLayer::finish();
     // statistics recording goes here
 }
@@ -65,12 +92,13 @@ void VehicleApplication::finish()
 void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
 {
     if (ClusterBeaconMessage* beaconMsg = dynamic_cast<ClusterBeaconMessage*>(bsm)) {
-        std::cout << nodeName << ": received a Cluster Beacon Message" << std::endl;
+        Logger::info("received a Cluster Beacon Message", nodeName);
 
-        findHost()->getDisplayString().setTagArg("i", 1, "green");
+        // findHost()->getDisplayString().setTagArg("i", 1, "green");
 
         NeighborEntry entry;
 
+        entry.carsInRange = beaconMsg->getCarsInRange();
         entry.speed = beaconMsg->getSpeed();
         entry.velocity = beaconMsg->getVelocity();
         entry.xVelocity = beaconMsg->getXVelocity();
@@ -81,38 +109,40 @@ void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
         entry.yPosition = beaconMsg->getYPosition();
         entry.xDirection = beaconMsg->getXDirection();
         entry.yDirection = beaconMsg->getYDirection();
+        entry.yDirection = beaconMsg->getYDirection();
         entry.timestamp = simTime().dbl();
+
         auto sender = beaconMsg->getSender();
 
         // add entry to neighbor table
-        std::cout << "-- adding message to neighbor table" << std::endl;
+        Logger::info("-- adding message to neighbor table", nodeName);
         neighborTable.addRow(entry, sender);
-        neighborTable.printTable();
-
     }
     else if (ModelRequestMessage* requestMsg = dynamic_cast<ModelRequestMessage*>(bsm)) {
-        std::cout << nodeName << ": received a Model Request Message" << std::endl;
+        Logger::info("received a Model Request Message", nodeName);
         findHost()->getDisplayString().setTagArg("i", 1, "blue");
         auto origin = requestMsg->getOrigin();
 
         if (std::strcmp(origin, "rsu") == 0)
         {
-            std::cout << "-- rsu beacon" << std::endl;
+            Logger::info("-- rsu beacon", nodeName);
             sendModelUpdateMessage();
-            std::cout << "-- sending local up-to-date model to rsu." << std::endl;
-
-
+            Logger::info("-- sending local up-to-date model to rsu.", nodeName);
         }
         else {
             findHost()->getDisplayString().setTagArg("i", 1, "");
-
-            std::cout << "-- ignoring vehicle beacon" << std::endl;
+            Logger::info("-- ignoring vehicle beacon", nodeName);
         }
+    }
+    else if (ClusterSelectionMessage* requestMsg = dynamic_cast<ClusterSelectionMessage*>(bsm)) {
+        Logger::info("received a cluster selection message", nodeName);
+        findHost()->getDisplayString().setTagArg("i", 1, "blue");
 
+        clusterHeadId = requestMsg->getData();
+        clusterMember = true;
     }
     else {
-        std::cout << nodeName << ": received a different beacon message than expected.." << std::endl;
-        delete bsm;
+        Logger::info("-- received an unknown beacon message type..", nodeName);
     }
 }
 
@@ -120,16 +150,80 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
 {
     if (frame) {
         if (dynamic_cast<ModelUpdateMessage*>(frame)) {
-            std::cout << nodeName << ": received a Model Update Message" << std::endl;
+            Logger::info("received a Model Update Message", nodeName);
             ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
 
             // load up-to-date model
             loadModelUpdate(appMessage);
-            std::cout << "-- loaded most up-to-date model" << std::endl;
+            Logger::info("-- loaded most up-to-date model", nodeName);
+
+            Logger::info("-- scheduling cluster head election for 5 seconds from now", nodeName);
+            scheduleAt(simTime() + 5, clusterElectionMessage->dup());
+
         }
-        else {
-            delete frame;
+        else if (dynamic_cast<RSUClusterDataMessage*>(frame) && clusterHead == true) {
+            Logger::info("received an RSU Cluster Data Message", nodeName);
+            RSUClusterDataMessage* appMessage = check_and_cast<RSUClusterDataMessage*>(frame);
+
+            auto destination = appMessage->getDestination();
+            std::string origin = appMessage->getOrigin();
+
+            if (std::strcmp(destination, nodeName) == 0)
+            {
+                Logger::info("-- its for me!", nodeName);
+                Logger::info("-- Forwarding to neighbors..", nodeName);
+
+                auto neighbors = neighborTable.getAllNeighbors();
+
+                neighborTable.printTable();
+                for (const auto neighbor : neighbors) {
+                    if (neighbor != nodeName)
+                    {
+                        auto log = "-- sending data message to " + neighbor;
+                        Logger::info(log, nodeName);
+                        vehClusterDataMessage->setDestination(neighbor.c_str());
+                        vehClusterDataMessage->setOrigin(nodeName);
+                        sendDelayedDown(vehClusterDataMessage->dup(), uniform(0.01, 0.2));
+                    }
+                }
+            }
+            else {
+                Logger::info("-- not for me...", nodeName);
+            }
         }
+        else if (dynamic_cast<VehicleClusterDataMessage*>(frame)) {
+            Logger::info("received a Vehicle Cluster Data Message", nodeName);
+            VehicleClusterDataMessage* appMessage = check_and_cast<VehicleClusterDataMessage*>(frame);
+
+            auto destination = appMessage->getDestination();
+            std::string origin = appMessage->getOrigin();
+
+            if (std::strcmp(destination, nodeName) == 0)
+            {
+                Logger::info("-- its for me!", nodeName);
+
+                if (clusterHead == true){
+                    auto log = "-- CH && msg originated from veh " + origin;
+                    Logger::info(log, nodeName);
+                }
+                else if (clusterMember == true)
+                {
+                    // message is from another vehicle
+                    Logger::info("-- CM recieved data message", nodeName);
+                    // disperse to CH
+                    vehClusterDataMessage->setDestination(clusterHeadId.c_str());
+                    vehClusterDataMessage->setOrigin(nodeName);
+
+                    sendDown(vehClusterDataMessage->dup());
+                    Logger::info("-- sent!", nodeName);
+
+                }
+            }
+            else {
+                Logger::info("-- not for me...", nodeName);
+            }
+        }
+        else { Logger::info("!!!", nodeName); }
     }
 }
 
@@ -137,10 +231,7 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
 
 void VehicleApplication::sendClusterBeaconMessage()
 {
-    std::cout << nodeName << ": sending a Cluster Beacon Message" << std::endl;
-
-    ClusterBeaconMessage* msg = new ClusterBeaconMessage();
-    populateWSM(msg);
+    Logger::info("sending a Cluster Beacon Message", nodeName);
 
     // get mobility data
     double acceleration = traciVehicle->getAcceleration();
@@ -158,24 +249,25 @@ void VehicleApplication::sendClusterBeaconMessage()
     double velocity = sqrt((xVelocity * xVelocity) + (yVelocity * yVelocity));
 
     // set message fields
-    msg->setAcceleration(acceleration);
-    msg->setDeceleration(deceleration);
+    clusterBeaconMessage->setCarsInRange(neighborTable.getSize());
 
-    msg->setSpeed(speed);
-    msg->setVelocity(velocity);
-    msg->setXVelocity(xVelocity);
-    msg->setYVelocity(yVelocity);
+    clusterBeaconMessage->setAcceleration(acceleration);
+    clusterBeaconMessage->setDeceleration(deceleration);
 
-    msg->setXPosition(position.x);
-    msg->setYPosition(position.y);
-    msg->setXDirection(direction.x);
-    msg->setYDirection(direction.y);
+    clusterBeaconMessage->setSpeed(speed);
+    clusterBeaconMessage->setVelocity(velocity);
+    clusterBeaconMessage->setXVelocity(xVelocity);
+    clusterBeaconMessage->setYVelocity(yVelocity);
 
-    msg->setSender(nodeName);
+    clusterBeaconMessage->setXPosition(position.x);
+    clusterBeaconMessage->setYPosition(position.y);
+    clusterBeaconMessage->setXDirection(direction.x);
+    clusterBeaconMessage->setYDirection(direction.y);
+
+    clusterBeaconMessage->setSender(nodeName);
 
 
-    sendDelayedDown(msg->dup(), uniform(0.01, 0.2));
-    delete msg;
+    sendDelayedDown(clusterBeaconMessage->dup(), uniform(0.01, 0.2));
 }
 
 void VehicleApplication::sendModelUpdateMessage()
@@ -200,12 +292,13 @@ void VehicleApplication::loadModelUpdate(ModelUpdateMessage* appMessage)
 
     if (std::strcmp(origin, "rsu") == 0)
     {
-        std::cout << "-- model from rsu. loading..." << std::endl;
+        Logger::info("-- model from rsu. loading...", nodeName);
+
         auto [pStateDict, vStateDict] = agent.getStateDictsFromJson(pNetJson, vNetJson);
         agent.loadStateDicts(pStateDict, vStateDict);
     }
     else {
-        std::cout << "-- ignoring vehicle request" << std::endl;
+        Logger::info("-- ignoring vehicle request", nodeName);
     }
 
 }
@@ -225,6 +318,7 @@ void VehicleApplication::addSelfToNeighborTable()
 
     NeighborEntry entry;
 
+    entry.carsInRange = neighborTable.size();
     entry.speed = speed;
     entry.velocity = velocity;
     entry.xVelocity = xVelocity;
@@ -239,30 +333,54 @@ void VehicleApplication::addSelfToNeighborTable()
     auto sender = nodeName;
 
     // add entry to neighbor table
-    std::cout << "-- adding message to neighbor table" << std::endl;
+    Logger::info("-- adding message to neighbor table", nodeName);
     neighborTable.addRow(entry, sender);
 }
 
 
 void VehicleApplication::handleSelfMsg(cMessage* msg)
 {
-    if (msg == clusterBeaconSelfMessage) {
+    if (ClusterBeaconMessage* m = dynamic_cast<ClusterBeaconMessage*>(msg)) {
         sendClusterBeaconMessage();
-        scheduleAt(simTime() + clusterBeaconDelay, msg);
-    } else if (msg == neighborTablePruneMessage) {
-        std::cout << nodeName << ": pruning neighbor table..." << std::endl;
+        scheduleAt(simTime() + clusterBeaconDelay, m->dup());
+        delete m;
+    } else if (NeighborTablePruneMessage* m = dynamic_cast<NeighborTablePruneMessage*>(msg)) {
+        Logger::info("pruning neighbor table...", nodeName);
         neighborTable.pruneTable(simTime().dbl());
+
+        Logger::info("-- new neighbor table", nodeName);
+        neighborTable.printTable();
+        scheduleAt(simTime() + neighborTableTimeout, m->dup());
+        delete m;
+    } else if (ClusterElectionMessage* m = dynamic_cast<ClusterElectionMessage*>(msg)) {
+        Logger::info("holding cluster election...", nodeName);
         addSelfToNeighborTable();
 
-        std::cout << "-- scoring  neighbors..." << std::endl;
-        neighborTable.scoreNeighbors();
-
-        std::cout << "-- new neighbor table:" << std::endl;
-        neighborTable.printTable();
+        Logger::info("-- scoring  neighbors...", nodeName);
+        auto bestCandidateNeighbor = neighborTable.getBestScoringNeighbor();
         neighborTable.printAverages();
         neighborTable.printScores();
+        Logger::info("-- winner: " + bestCandidateNeighbor, nodeName);
 
-        scheduleAt(simTime() + neighborTableTimeout, msg);
+        // if we won self-election, broadcast
+        if (nodeName == bestCandidateNeighbor)
+        {
+            findHost()->getDisplayString().setTagArg("i", 1, "orange");
+            clusterHead = true;
+            Logger::info("-- I won! alerting nearby nodes..", nodeName);
+
+            clusterSelectionMessage->setData(nodeName);
+            populateWSM(clusterSelectionMessage);
+            sendDelayedDown(clusterSelectionMessage->dup(), uniform(0.01, 0.2));
+        }
+        else
+        {
+            clusterHead = false;
+            findHost()->getDisplayString().setTagArg("i", 1, "transparent");
+            Logger::info("-- I lost! keeping that to myself..", nodeName);
+        }
+
+        delete m;
     } else {}
 }
 

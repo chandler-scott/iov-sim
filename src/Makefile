@@ -35,22 +35,31 @@ OBJS = \
     $O/iov_sim/base/python/BaseWrapper.o \
     $O/iov_sim/base/python/PythonLifecycle.o \
     $O/iov_sim/base/python/PythonWrapper.o \
+    $O/iov_sim/base/util/Logger.o \
     $O/iov_sim/base/util/NeighborTable.o \
     $O/iov_sim/modules/applications/RSUApplication.o \
     $O/iov_sim/modules/applications/VehicleApplication.o \
     $O/iov_sim/base/messages/BaseMessage_m.o \
     $O/iov_sim/modules/messages/ClusterBeaconMessage_m.o \
+    $O/iov_sim/modules/messages/ClusterElectionMessage_m.o \
+    $O/iov_sim/modules/messages/ClusterSelectionMessage_m.o \
     $O/iov_sim/modules/messages/ModelRequestMessage_m.o \
     $O/iov_sim/modules/messages/ModelUpdateMessage_m.o \
-    $O/iov_sim/modules/messages/NeighborTablePruneMessage_m.o
+    $O/iov_sim/modules/messages/NeighborTablePruneMessage_m.o \
+    $O/iov_sim/modules/messages/RSUClusterDataMessage_m.o \
+    $O/iov_sim/modules/messages/VehicleClusterDataMessage_m.o
 
 # Message files
 MSGFILES = \
     iov_sim/base/messages/BaseMessage.msg \
     iov_sim/modules/messages/ClusterBeaconMessage.msg \
+    iov_sim/modules/messages/ClusterElectionMessage.msg \
+    iov_sim/modules/messages/ClusterSelectionMessage.msg \
     iov_sim/modules/messages/ModelRequestMessage.msg \
     iov_sim/modules/messages/ModelUpdateMessage.msg \
-    iov_sim/modules/messages/NeighborTablePruneMessage.msg
+    iov_sim/modules/messages/NeighborTablePruneMessage.msg \
+    iov_sim/modules/messages/RSUClusterDataMessage.msg \
+    iov_sim/modules/messages/VehicleClusterDataMessage.msg
 
 # SM files
 SMFILES =

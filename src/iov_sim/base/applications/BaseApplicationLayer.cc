@@ -22,8 +22,8 @@
 
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
 
-
 using namespace veins;
+using namespace std;
 using namespace iov_sim;
 
 Define_Module(iov_sim::BaseApplicationLayer);
@@ -31,8 +31,9 @@ Define_Module(iov_sim::BaseApplicationLayer);
 void BaseApplicationLayer::initialize(int stage)
 {
     BaseApplLayer::initialize(stage);
-
     if (stage == 0) {
+        nodeName = getParentModule()->getFullName();
+
         // initialize pointers to other modules
         if (FindModule<TraCIMobility*>::findSubModule(getParentModule())) {
             mobility = TraCIMobilityAccess().get(getParentModule());
@@ -40,7 +41,6 @@ void BaseApplicationLayer::initialize(int stage)
             traciVehicle = mobility->getVehicleCommandInterface();
         }
         else {
-            std::cerr << "no mobility" << std::endl;
             traci = nullptr;
             mobility = nullptr;
             traciVehicle = nullptr;
@@ -84,7 +84,6 @@ void BaseApplicationLayer::initialize(int stage)
     else if (stage == 1) {
         // store MAC address for quick access
         myId = mac->getMACAddress();
-        nodeName = getParentModule()->getFullName();
 
         // simulate asynchronous channel access
 
@@ -224,9 +223,6 @@ void BaseApplicationLayer::sendModelUpdateMessage(const char* pNet, const char* 
 
 void BaseApplicationLayer::handleLowerMsg(cMessage* msg)
 {
-
-    EV_INFO << myId << " BaseApplicationLayer: handleLowerMsg" << std::endl;
-
     BaseFrame1609_4* wsm = dynamic_cast<BaseFrame1609_4*>(msg);
     ASSERT(wsm);
 
@@ -235,6 +231,11 @@ void BaseApplicationLayer::handleLowerMsg(cMessage* msg)
         onBSM(bsm);
     }
     else if (ClusterBeaconMessage* bsm = dynamic_cast<ClusterBeaconMessage*>(wsm))
+    {
+        receivedBSMs++;
+        onBSM(bsm);
+    }
+    else if (ClusterSelectionMessage* bsm = dynamic_cast<ClusterSelectionMessage*>(wsm))
     {
         receivedBSMs++;
         onBSM(bsm);

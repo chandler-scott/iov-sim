@@ -12,6 +12,7 @@
 using namespace std;
 
 struct NeighborEntry {
+    int carsInRange;
     double speed;
     double velocity;
     double xVelocity;

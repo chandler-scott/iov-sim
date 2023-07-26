@@ -51,6 +51,10 @@ private:
     std::string valueLoad;
     std::string policySave;
     std::string valueSave;
+
+    RSUClusterDataMessage *rsuClusterDataMessage = nullptr;
+    ModelRequestMessage *modelRequestMessage = nullptr;
+
 };
 
 } // namespace iov_sim

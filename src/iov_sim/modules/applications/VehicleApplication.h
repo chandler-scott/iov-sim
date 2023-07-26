@@ -28,6 +28,9 @@
 #include "iov_sim/base/util/NeighborTable.h"
 #include "iov_sim/base/util/NeighborEntry.h"
 #include "iov_sim/modules/messages/NeighborTablePruneMessage_m.h"
+#include "iov_sim/modules/messages/ClusterElectionMessage_m.h"
+#include "iov_sim/modules/messages/ClusterSelectionMessage_m.h"
+
 
 
 #include <cmath>
@@ -68,12 +71,22 @@ protected:
 
 private:
     AgentWrapper agent;
-    ClusterBeaconMessage *clusterBeaconSelfMessage = nullptr;
+    ModelRequestMessage *modelRequestMessage = nullptr;
     NeighborTablePruneMessage *neighborTablePruneMessage = nullptr;
+    ClusterBeaconMessage *clusterBeaconSelfMessage = nullptr;
+    ClusterBeaconMessage *clusterBeaconMessage = nullptr;
+    ClusterElectionMessage *clusterElectionMessage = nullptr;
+    ClusterSelectionMessage *clusterSelectionMessage = nullptr;
+    VehicleClusterDataMessage *vehClusterDataMessage = nullptr;
+    RSUClusterDataMessage *rsuClusterDataMessage = nullptr;
+
 
     NeighborTable neighborTable;
     int clusterBeaconDelay;
     double neighborTableTimeout;
+    std::string clusterHeadId;
+    bool clusterHead;
+    bool clusterMember;
 };
 
 } // namespace iov_sim

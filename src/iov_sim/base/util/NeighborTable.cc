@@ -8,7 +8,28 @@
 #include "NeighborTable.h"
 
 // Constructor
-NeighborTable::NeighborTable(double defaultTimeout) : timeout(defaultTimeout) {}
+NeighborTable::NeighborTable(double defaultTimeout) : timeout(defaultTimeout)
+{
+    setWeights();
+}
+
+// Set weights for scoring neighbors
+void NeighborTable::setWeights(double xVelWeight, double yVelWeight, double velWeight,
+                               double speedWeight, double accelWeight, double decelWeight,
+                               double xPosWeight, double yPosWeight, double timeWeight,
+                               double inRangeWeight)
+{
+    carsInRangeWeight = inRangeWeight;
+    xVelocityWeight = xVelWeight;
+    yVelocityWeight = yVelWeight;
+    velocityWeight = velWeight;
+    speedWeight = speedWeight;
+    accelerationWeight = accelWeight;
+    decelerationWeight = decelWeight;
+    xPositionWeight = xPosWeight;
+    yPositionWeight = yPosWeight;
+    timeWeight = timeWeight;
+}
 
 // Add a row to the table
 void NeighborTable::addRow(const NeighborEntry& entry, const char* nodeId) {
@@ -29,6 +50,7 @@ void NeighborTable::pruneTable(double currentTime) {
 
 // Calculate metadata for the neighbor table
 void NeighborTable::calculateMetadata() {
+    double totalCarsInRange = 0.0;
     double totalXVelocity = 0.0;
     double totalYVelocity = 0.0;
     double totalVelocity = 0.0;
@@ -37,8 +59,10 @@ void NeighborTable::calculateMetadata() {
     double totalDeceleration = 0.0;
     double totalXPosition = 0.0;
     double totalYPosition = 0.0;
+    double totalTimestamp = 0.0;
 
     for (const auto& entry : table) {
+        totalCarsInRange += entry.second.carsInRange;
         totalXVelocity += entry.second.xVelocity;
         totalYVelocity += entry.second.yVelocity;
         totalVelocity += entry.second.velocity;
@@ -47,9 +71,12 @@ void NeighborTable::calculateMetadata() {
         totalDeceleration += entry.second.deceleration;
         totalXPosition += entry.second.xPosition;
         totalYPosition += entry.second.yPosition;
+        totalTimestamp += entry.second.timestamp;
+
     }
     auto size = table.size();
 
+    avgCarsInRange = totalCarsInRange / size;
     avgXVelocity = totalXVelocity / size;
     avgYVelocity = totalXVelocity / size;
     avgVelocity = totalVelocity / size;
@@ -58,18 +85,60 @@ void NeighborTable::calculateMetadata() {
     avgDeceleration = totalDeceleration / size;
     avgXPosition = totalXPosition / size;
     avgYPosition = totalYPosition / size;
+    avgTimestamp = totalTimestamp / size;
+
     centricity = 0;
 }
 
-
 // Reset the table to empty
 void NeighborTable::scoreNeighbors() {
-    calculateMetadata();
     score.clear();
+    for (const auto& entry : table) {
+        score[entry.first] =
+                carsInRangeWeight * (avgCarsInRange - entry.second.carsInRange) +
+                xVelocityWeight * (avgXVelocity - entry.second.xVelocity) +
+                yVelocityWeight * (avgYVelocity - entry.second.yVelocity) +
+                velocityWeight * (avgVelocity - entry.second.velocity) +
+                speedWeight * (avgSpeed - entry.second.speed) +
+                accelerationWeight * (avgAcceleration - entry.second.acceleration) +
+                decelerationWeight * (avgDeceleration - entry.second.deceleration) +
+                xPositionWeight * (avgXPosition - entry.second.xPosition) +
+                yPositionWeight * (avgYPosition - entry.second.yPosition) +
+                timeWeight * (avgTimestamp - entry.second.timestamp);
+    }
+}
+
+std::string NeighborTable::getBestScoringNeighbor() {
+    // calculate averages for scoring
+    calculateMetadata();
+
+    // Make sure the scores are up-to-date
+    scoreNeighbors();
+
+    // return closest neighbor to 0
+    double closestScore = std::numeric_limits<double>::max();
+    std::string closestEntry;
+
+    for (const auto& entry : score) {
+        double currentScore = std::abs(entry.second);
+        if (currentScore < closestScore) {
+            closestScore = currentScore;
+            closestEntry = entry.first;
+        }
+    }
+
+    return closestEntry;
+}
+
+std::vector<std::string> NeighborTable::getAllNeighbors() {
+    std::vector<std::string> keys;
+    keys.reserve(table.size());
 
     for (const auto& entry : table) {
-        score[entry.first] = 1;
+        keys.push_back(entry.first);
     }
+
+    return keys;
 }
 
 // Reset the table to empty
@@ -88,6 +157,7 @@ void NeighborTable::printScores() {
 // Print the calculated averages
 void NeighborTable::printAverages() {
     cout << "Calculated Averages:" << endl;
+    cout << "Average Cars in Range: " << avgCarsInRange << endl;
     cout << "Average X Velocity: " << avgXVelocity << endl;
     cout << "Average Y Velocity: " << avgYVelocity << endl;
     cout << "Average Velocity: " << avgVelocity << endl;
@@ -103,6 +173,7 @@ void NeighborTable::printAverages() {
 void NeighborTable::printTable() {
     for (const auto& entry : table) {
         cout << "Name: " << entry.first << ", Speed: " << entry.second.speed
+             << ", Cars in Range: " << entry.second.carsInRange
              << ", Velocity: " << entry.second.velocity
              << ", xVelocity: " << entry.second.xVelocity
              << ", yVelocity: " << entry.second.yVelocity
