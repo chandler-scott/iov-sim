@@ -84,6 +84,19 @@ private:
     NeighborTable neighborTable;
     int clusterBeaconDelay;
     double neighborTableTimeout;
+
+    // duration for election
+    double clusterElectionDuration;
+
+    // timeout for nodes to buy into election
+    double clusterElectionTimeout;
+
+    // timeout for cluster head to accept role
+    double clusterHeadTimeout;
+
+    // threshold for cluster head to call for new election
+    double clusterReelectionThreshold;
+
     std::string clusterHeadId;
     bool clusterHead;
     bool clusterMember;

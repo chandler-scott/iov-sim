@@ -26,6 +26,7 @@
 
 AgentWrapper::AgentWrapper() : BaseWrapper()
 {
+    localStepsPerEpoch = 5;
     // Access the Aggregator class from the Python module
     PyObject *pModule = wrapper.ppoModule;
     PyObject *pClass = PyObject_GetAttrString(pModule, "Agent");
@@ -35,8 +36,9 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
 
     PyObject *obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject *actDim = wrapper.callZerosBoxSpace(act_size);
+    PyObject *localSteps = PyLong_FromLong(localStepsPerEpoch);
 
-    PyObject *args = PyTuple_Pack(2, obsDim, actDim);
+    PyObject *args = PyTuple_Pack(3, obsDim, actDim, localSteps);
     // // Create an instance of the Aggregator class
     try
     {
@@ -74,6 +76,22 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
 AgentWrapper::~AgentWrapper()
 {
     Py_DECREF(pAgent);
+}
+
+PyObject* AgentWrapper::toPyFloat(double value)
+{
+    return PyFloat_FromDouble(value);
+}
+
+
+PyObject* AgentWrapper::toTensor(std::vector<double> list)
+{
+    return wrapper.callToTensor(list);
+}
+
+std::vector<double> AgentWrapper::toDoublesList(PyObject* pyObject)
+{
+    return wrapper.callToDoublesList(pyObject);
 }
 
 void AgentWrapper::loadStateDicts(PyObject *pStateDict, PyObject *vStateDict)
@@ -131,8 +149,43 @@ std::pair<PyObject *, PyObject *> AgentWrapper::getStateDictsFromJson(const char
     return std::make_pair(nullptr, nullptr);
 }
 
-void AgentWrapper::step()
+std::tuple<PyObject *, PyObject *, PyObject *> AgentWrapper::step(PyObject* observation)
 {
+    if (pAgent)
+    {
+        PyObject *args = PyTuple_Pack(1, observation);
+        PyObject *pFunc = PyObject_GetAttrString(pAgent, "step");
+
+        PyObject *result = PyObject_CallObject(pFunc, args);
+        if (result == nullptr)
+        {
+            PyErr_Print();
+        }
+        else
+        {
+            // Assuming the result is a tuple with two elements
+            if (PyTuple_Check(result) && PyTuple_Size(result) == 3)
+            {
+                PyObject *action = PyTuple_GetItem(result, 0);
+                PyObject *value = PyTuple_GetItem(result, 1);
+                PyObject *logp = PyTuple_GetItem(result, 2);
+
+
+                return std::make_tuple(action, value, logp);
+            }
+            else
+            {
+                Logger::error("3 Unexpected return value from Python function.", "BaseWrapper");
+            }
+            Py_DECREF(result);
+        }
+    }
+    else
+    {
+        PyErr_Print();
+    }
+    return std::make_tuple(nullptr, nullptr, nullptr);
+
 }
 
 void AgentWrapper::learn()
@@ -158,17 +211,39 @@ void AgentWrapper::learn()
     }
 }
 
-void AgentWrapper::bufferStoreTransition()
-{
-}
-
-void AgentWrapper::bufferFinishPath()
+void AgentWrapper::bufferStoreTransition(PyObject* observation, PyObject* action, PyObject* reward,
+        PyObject* value, PyObject* logp)
 {
     if (pAgent)
     {
         PyObject *pBuffer = PyObject_GetAttrString(pAgent, "buffer");
 
-        PyObject *args = PyTuple_Pack(0);
+        PyObject *args = PyTuple_Pack(5, observation, action, reward, value, logp);
+        PyObject *pFunc = PyObject_GetAttrString(pBuffer, "store");
+
+        PyObject *result = PyObject_CallObject(pFunc, args);
+        if (result == nullptr)
+        {
+            PyErr_Print();
+        }
+        else
+        {
+            Py_DECREF(result);
+        }
+    }
+    else
+    {
+        PyErr_Print();
+    }
+}
+
+void AgentWrapper::bufferFinishPath(PyObject* lastValue)
+{
+    if (pAgent)
+    {
+        PyObject *pBuffer = PyObject_GetAttrString(pAgent, "buffer");
+
+        PyObject *args = PyTuple_Pack(1, lastValue);
         PyObject *pFunc = PyObject_GetAttrString(pBuffer, "finish_path");
 
         PyObject *result = PyObject_CallObject(pFunc, args);

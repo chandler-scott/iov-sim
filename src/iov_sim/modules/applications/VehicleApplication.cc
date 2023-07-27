@@ -39,7 +39,12 @@ void VehicleApplication::initialize(int stage)
         Logger::info("Initializing...", nodeName);
 
         clusterBeaconDelay = par("clusterBeaconDelay");
+        clusterElectionDuration = par("clusterElectionDuration");
+        clusterElectionTimeout = par("clusterElectionTimeout");
+        clusterHeadTimeout = par("clusterHeadTimeout");
+        clusterReelectionThreshold = par("clusterReelectionThreshold");
         neighborTableTimeout = par("neighborTableTimeout");
+
         clusterHead = false;
         clusterMember = false;
     }
@@ -318,7 +323,7 @@ void VehicleApplication::addSelfToNeighborTable()
 
     NeighborEntry entry;
 
-    entry.carsInRange = neighborTable.size();
+    entry.carsInRange = neighborTable.getSize();
     entry.speed = speed;
     entry.velocity = velocity;
     entry.xVelocity = xVelocity;
@@ -354,9 +359,46 @@ void VehicleApplication::handleSelfMsg(cMessage* msg)
         delete m;
     } else if (ClusterElectionMessage* m = dynamic_cast<ClusterElectionMessage*>(msg)) {
         Logger::info("holding cluster election...", nodeName);
-        addSelfToNeighborTable();
+        // election setup
 
-        Logger::info("-- scoring  neighbors...", nodeName);
+        /* START TRAINING CODE */
+
+        addSelfToNeighborTable();
+        neighborTable.calculateMetadata();
+
+        // step in the environment with observation
+        auto observation = agent.toTensor(neighborTable.toList());
+        auto [action, value, logp] = agent.step(observation);
+        Logger::info("-- step works", nodeName);
+
+        // parse actions into neighbor table
+
+        std::vector<double> doubleData = agent.toDoublesList(action);
+        Logger::info("-- tensorToList works", nodeName);
+
+        neighborTable.setWeights(doubleData[0], doubleData[1], doubleData[2], doubleData[3],
+                doubleData[4], doubleData[5], doubleData[6], doubleData[7],
+                doubleData[8], doubleData[9]);
+        Logger::info("-- table weights updated.", nodeName);
+
+
+        auto reward = agent.toPyFloat(1);
+        // must store a transition for localStepsPerEpoch
+        agent.bufferStoreTransition(observation, action, reward, value, logp);
+        agent.bufferStoreTransition(observation, action, reward, value, logp);
+        agent.bufferStoreTransition(observation, action, reward, value, logp);
+        agent.bufferStoreTransition(observation, action, reward, value, logp);
+        agent.bufferStoreTransition(observation, action, reward, value, logp);
+
+        auto v = agent.toPyFloat(0);
+        agent.bufferFinishPath(v);
+        Logger::info("-- buffer finish path works: ", nodeName);
+
+        agent.learn();
+        Logger::info("-- learn works: ", nodeName);
+
+        /* END TRAINING CODE */
+
         auto bestCandidateNeighbor = neighborTable.getBestScoringNeighbor();
         neighborTable.printAverages();
         neighborTable.printScores();

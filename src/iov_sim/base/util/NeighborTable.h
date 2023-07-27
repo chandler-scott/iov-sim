@@ -54,9 +54,10 @@ public:
     std::vector<std::string> getAllNeighbors();
 
 
-    int getSize() {
-        return table.size();
-    }
+    std::vector<double> toList();
+
+
+    int getSize();
 
     // Reset the table to empty
     void resetTable();

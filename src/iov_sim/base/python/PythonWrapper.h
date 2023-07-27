@@ -9,7 +9,10 @@
 #define IOV_SIM_UTIL_PYTHONWRAPPER_H_
 
 #include <Python.h>
+#include "iov_sim/base/util/Logger.h"
 #include <iostream>
+#include <vector>
+
 
 using namespace std;
 
@@ -24,6 +27,8 @@ public:
     PythonWrapper(const PythonWrapper&) = delete;
     PythonWrapper& operator=(const PythonWrapper&) = delete;
 
+    std::vector<double> callToDoublesList(PyObject* pyObject);
+    PyObject* callToTensor(const std::vector<double>& inputList, double lower_bound = -1, double upper_bound = 1);
     PyObject* callZerosBoxSpace(int box_size, double lower_bound = -1, double upper_bound = 1);
     void loadPythonModule(const char* moduleName, PyObject*& module);
 

@@ -12,6 +12,7 @@
 #include "iov_sim/base/python/BaseWrapper.h"
 #include <unordered_map>
 #include <string>
+#include <tuple>
 
 using namespace std;
 
@@ -23,18 +24,25 @@ public:
 
     void loadStateDicts(PyObject *pStateDict, PyObject *vStateDict);
 
+    PyObject* toTensor(std::vector<double> list);
+    PyObject* toPyFloat(double value);
+    std::vector<double> toDoublesList(PyObject* pyObject);
+
+
     std::pair<PyObject *, PyObject *> getStateDictsAsJson();
     std::pair<PyObject *, PyObject *> getStateDictsFromJson(const char* pJson, const char* vJson);
 
-    void step();
+    std::tuple<PyObject *, PyObject *, PyObject *> step(PyObject* observation);
     void learn();
 
-    void bufferStoreTransition();
-    void bufferFinishPath();
+    void bufferStoreTransition(PyObject* observation, PyObject* action, PyObject* reward,
+            PyObject* value, PyObject* logp);
+    void bufferFinishPath(PyObject* lastValue);
 
 
 private:
     PyObject *pAgent;
+    int localStepsPerEpoch;
 };
 
 #endif /* IOV_SIM_UTIL_AGENTWRAPPER_H_ */

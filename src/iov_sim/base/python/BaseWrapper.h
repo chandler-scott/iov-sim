@@ -12,6 +12,8 @@
 
 #include <unordered_map>
 #include <string>
+#include <iostream>
+
 
 using namespace std;
 
@@ -35,7 +37,7 @@ protected:
     PythonWrapper &wrapper;
 
     // neural network parameters
-    int obs_size = 4;
+    int obs_size = 10;
     int act_size = 3;
     double lower_bound = -1.0;
     double upper_bound = 1.0;

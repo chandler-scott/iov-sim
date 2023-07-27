@@ -29,5 +29,9 @@ simple VehicleApplication extends DemoBaseApplLayer
     string appName = default("Vehicle Application");
     int clusterBeaconDelay = default(5);
     double neighborTableTimeout = default(30);
+    double clusterElectionDuration = default(2);
+    double clusterElectionTimeout = default(3);
+    double clusterHeadTimeout = default(3);
+    double clusterReelectionThreshold = default(0.7);    
     @display("i=block/app2");
 }

@@ -21,8 +21,6 @@
 //
 
 #include "iov_sim/base/python/BaseWrapper.h"
-#include <iostream>
-#include <Python.h>
 
 BaseWrapper::BaseWrapper()
     : wrapper(PythonWrapper::getInstance())
@@ -82,7 +80,7 @@ std::pair<PyObject *, PyObject *> BaseWrapper::getStateDictsAsJson(PyObject *pCl
             }
             else
             {
-                Logger::error("Unexpected return value from Python function.", "BaseWrapper");
+                Logger::error("1 Unexpected return value from Python function.", "BaseWrapper");
             }
         }
     }
@@ -133,7 +131,7 @@ std::pair<PyObject *, PyObject *> BaseWrapper::getStateDictsFromJson(PyObject *p
             }
             else
             {
-                Logger::error("Unexpected return value from Python function.", "BaseWrapper");
+                Logger::error("2 Unexpected return value from Python function.", "BaseWrapper");
             }
 
             Py_DECREF(result); // Release the reference to the result tuple

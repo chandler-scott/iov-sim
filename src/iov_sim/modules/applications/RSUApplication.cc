@@ -91,6 +91,7 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
     else if (ClusterSelectionMessage* requestMsg = dynamic_cast<ClusterSelectionMessage*>(bsm)) {
         Logger::info("received a cluster selection message", nodeName);
         auto clusterHeadId = requestMsg->getData();
+        /*
 
         rsuClusterDataMessage->setOrigin(nodeName);
         rsuClusterDataMessage->setDestination(clusterHeadId);
@@ -98,6 +99,7 @@ void RSUApplication::onBSM(BaseFrame1609_4* bsm)
         sendDelayedDown(rsuClusterDataMessage->dup(), simTime()+1);
         auto log = std::string("-- sending data message to ") + clusterHeadId;
         Logger::info(log, nodeName);
+        */
     }
     else {
         Logger::info("received an unknown beacon message type..", nodeName);
@@ -146,8 +148,6 @@ void RSUApplication::onWSM(BaseFrame1609_4* frame)
             if (std::strcmp(destination, nodeName) == 0)
             {
                 Logger::info("-- its for me!", nodeName);
-
-                // stats or something
             }
             else {
                 Logger::info("-- not for me...", nodeName);

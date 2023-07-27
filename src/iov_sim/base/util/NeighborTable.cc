@@ -14,10 +14,9 @@ NeighborTable::NeighborTable(double defaultTimeout) : timeout(defaultTimeout)
 }
 
 // Set weights for scoring neighbors
-void NeighborTable::setWeights(double xVelWeight, double yVelWeight, double velWeight,
-                               double speedWeight, double accelWeight, double decelWeight,
-                               double xPosWeight, double yPosWeight, double timeWeight,
-                               double inRangeWeight)
+void NeighborTable::setWeights(double inRangeWeight, double xVelWeight,
+        double yVelWeight, double velWeight, double speedWeight, double accelWeight,
+        double decelWeight, double xPosWeight, double yPosWeight,double timeWeight)
 {
     carsInRangeWeight = inRangeWeight;
     xVelocityWeight = xVelWeight;
@@ -108,10 +107,28 @@ void NeighborTable::scoreNeighbors() {
     }
 }
 
-std::string NeighborTable::getBestScoringNeighbor() {
-    // calculate averages for scoring
-    calculateMetadata();
+std::vector<double> NeighborTable::toList() {
+    std::vector<double> values;
+    values.push_back(avgCarsInRange);
+    values.push_back(avgXVelocity);
+    values.push_back(avgYVelocity);
+    values.push_back(avgVelocity);
+    values.push_back(avgSpeed);
+    values.push_back(avgAcceleration);
+    values.push_back(avgDeceleration);
+    values.push_back(avgXPosition);
+    values.push_back(avgYPosition);
+    values.push_back(avgTimestamp);
 
+    // Return the vector
+    return values;
+}
+
+int NeighborTable::getSize() {
+    return table.size();
+}
+
+std::string NeighborTable::getBestScoringNeighbor() {
     // Make sure the scores are up-to-date
     scoreNeighbors();
 
