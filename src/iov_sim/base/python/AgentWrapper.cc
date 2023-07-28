@@ -31,7 +31,7 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
     PyObject *pModule = wrapper.ppoModule;
     PyObject *pClass = PyObject_GetAttrString(pModule, "Agent");
     Logger::info("Initialized the Agent Wrapper Class!", "AgentWrapper");
-    Logger::info("--now trying to init Agent class", "AgentWrapper");
+    Logger::info("-- now trying to init Agent class", "AgentWrapper");
 
 
     PyObject *obsDim = wrapper.callZerosBoxSpace(obs_size);
@@ -54,6 +54,7 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
         }
         else
         {
+            Logger::info("-- Agent successfully initialized!", "AgentWrapper");
         }
     }
     catch (const std::exception &e)

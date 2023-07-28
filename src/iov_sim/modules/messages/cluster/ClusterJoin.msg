@@ -24,7 +24,7 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet VehicleClusterDataMessage extends BaseMessage {
+packet ClusterJoin extends BaseMessage {
     string origin;
-    string destination;
+    string clusterId;
 }

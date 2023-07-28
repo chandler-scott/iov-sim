@@ -209,7 +209,7 @@ void BaseApplicationLayer::handleParkingUpdate(cObject* obj)
 
 void BaseApplicationLayer::sendModelUpdateMessage(const char* pNet, const char* vNet, const char* origin)
 {
-    ModelUpdateMessage* msg = new ModelUpdateMessage();
+    ModelUpdate* msg = new ModelUpdate();
     populateWSM(msg);
 
     msg->setPStateDict(pNet);
@@ -226,16 +226,36 @@ void BaseApplicationLayer::handleLowerMsg(cMessage* msg)
     BaseFrame1609_4* wsm = dynamic_cast<BaseFrame1609_4*>(msg);
     ASSERT(wsm);
 
-    if (ModelRequestMessage* bsm = dynamic_cast<ModelRequestMessage*>(wsm)) {
+    if (ModelRequest* bsm = dynamic_cast<ModelRequest*>(wsm)) {
         receivedBSMs++;
         onBSM(bsm);
     }
-    else if (ClusterBeaconMessage* bsm = dynamic_cast<ClusterBeaconMessage*>(wsm))
+    else if (ClusterBeacon* bsm = dynamic_cast<ClusterBeacon*>(wsm))
     {
         receivedBSMs++;
         onBSM(bsm);
     }
-    else if (ClusterSelectionMessage* bsm = dynamic_cast<ClusterSelectionMessage*>(wsm))
+    else if (ClusterJoin* bsm = dynamic_cast<ClusterJoin*>(wsm))
+    {
+        receivedBSMs++;
+        onBSM(bsm);
+    }
+    else if (Election* bsm = dynamic_cast<Election*>(wsm))
+    {
+        receivedBSMs++;
+        onBSM(bsm);
+    }
+    else if (Leader* bsm = dynamic_cast<Leader*>(wsm))
+    {
+        receivedBSMs++;
+        onBSM(bsm);
+    }
+    else if (Probe* bsm = dynamic_cast<Probe*>(wsm))
+    {
+        receivedBSMs++;
+        onBSM(bsm);
+    }
+    else if (Reply* bsm = dynamic_cast<Reply*>(wsm))
     {
         receivedBSMs++;
         onBSM(bsm);

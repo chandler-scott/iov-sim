@@ -24,6 +24,8 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet ClusterElectionMessage extends BaseMessage {
+packet ClusterData extends BaseMessage {
+    string origin;
+    string destination;
     string data;
 }

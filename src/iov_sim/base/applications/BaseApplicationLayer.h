@@ -37,13 +37,16 @@
 #include "veins/modules/mobility/traci/TraCICommandInterface.h"
 #include "iov_sim/base/python/BaseWrapper.h"
 #include "iov_sim/base/util/Logger.h"
-#include "iov_sim/modules/messages/ModelRequestMessage_m.h"
-#include "iov_sim/modules/messages/ModelUpdateMessage_m.h"
-#include "iov_sim/modules/messages/ClusterBeaconMessage_m.h"
-#include "iov_sim/modules/messages/ClusterElectionMessage_m.h"
-#include "iov_sim/modules/messages/ClusterSelectionMessage_m.h"
-#include "iov_sim/modules/messages/RSUClusterDataMessage_m.h"
-#include "iov_sim/modules/messages/VehicleClusterDataMessage_m.h"
+#include "iov_sim/modules/messages/model/ModelRequest_m.h"
+#include "iov_sim/modules/messages/model/ModelUpdate_m.h"
+#include "iov_sim/modules/messages/cluster/ClusterBeacon_m.h"
+#include "iov_sim/modules/messages/cluster/ClusterData_m.h"
+#include "iov_sim/modules/messages/cluster/ClusterJoin_m.h"
+#include "iov_sim/modules/messages/election/Ack_m.h"
+#include "iov_sim/modules/messages/election/Election_m.h"
+#include "iov_sim/modules/messages/election/Leader_m.h"
+#include "iov_sim/modules/messages/election/Probe_m.h"
+#include "iov_sim/modules/messages/election/Reply_m.h"
 
 
 

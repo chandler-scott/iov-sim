@@ -24,6 +24,7 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet NeighborTablePruneMessage extends BaseMessage {
-    string data;
+packet Leader extends BaseMessage {
+    string clusterHeadId;
+    string destination;
 }

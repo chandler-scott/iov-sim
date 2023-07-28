@@ -47,34 +47,46 @@ void VehicleApplication::initialize(int stage)
 
         clusterHead = false;
         clusterMember = false;
+        parent = nullptr;
     }
     else if (stage == 1) {
         // Initializing members that require initialized other modules goes here
         Logger::info("-- initializing message types...", nodeName);
 
-        modelRequestMessage = new ModelRequestMessage();
-        vehClusterDataMessage = new VehicleClusterDataMessage("ClusterDataMessage");
-        rsuClusterDataMessage = new RSUClusterDataMessage("ClusterDataMessage");
-        clusterElectionMessage = new ClusterElectionMessage("ClusterElectionMessage");
-        clusterSelectionMessage = new ClusterSelectionMessage(nodeName);
-        clusterBeaconMessage = new ClusterBeaconMessage();
-        clusterBeaconSelfMessage = new ClusterBeaconMessage("ClusterBeaconMessage");
-        neighborTablePruneMessage = new NeighborTablePruneMessage("NeighborTablePruneMessage");
+        modelRequestMessage = new ModelRequest();
+        modelUpdateMessage = new ModelUpdate();
+
+        clusterBeaconMessage = new ClusterBeacon();
+        clusterDataMessage = new ClusterData();
+        clusterJoinMessage = new ClusterJoin();
+
+        ackMessage = new Ack();
+        electionMessage = new Election();
+        leaderMessage = new Leader();
+        probeMessage = new Probe();
+        replyMessage = new Reply();
+
 
         Logger::info("-- populating messages...", nodeName);
 
-        populateWSM(clusterBeaconMessage);
-        populateWSM(vehClusterDataMessage);
-        populateWSM(rsuClusterDataMessage);
         populateWSM(modelRequestMessage);
+        populateWSM(modelUpdateMessage);
+
+        populateWSM(clusterBeaconMessage);
+        populateWSM(clusterDataMessage);
+        populateWSM(clusterJoinMessage);
+
+        populateWSM(ackMessage);
+        populateWSM(electionMessage);
+        populateWSM(leaderMessage);
+        populateWSM(probeMessage);
+        populateWSM(replyMessage);
 
         modelRequestMessage->setData("requesting model");
 
         Logger::info("-- sending model request message!", nodeName);
 
         sendDown(modelRequestMessage->dup());
-        scheduleAt(simTime() + clusterBeaconDelay, clusterBeaconSelfMessage->dup());
-        scheduleAt(simTime() + neighborTableTimeout, neighborTablePruneMessage->dup());
     }
 }
 
@@ -82,13 +94,16 @@ void VehicleApplication::finish()
 {
     // clean up messages
     delete modelRequestMessage;
-    delete neighborTablePruneMessage;
+    delete modelUpdateMessage;
     delete clusterBeaconMessage;
-    delete clusterBeaconSelfMessage;
-    delete clusterElectionMessage;
-    delete clusterSelectionMessage;
-    delete vehClusterDataMessage;
-    delete rsuClusterDataMessage;
+    delete clusterDataMessage;
+    delete clusterJoinMessage;
+    delete ackMessage;
+    delete electionMessage;
+    delete leaderMessage;
+    delete probeMessage;
+    delete replyMessage;
+
 
     BaseApplicationLayer::finish();
     // statistics recording goes here
@@ -96,34 +111,7 @@ void VehicleApplication::finish()
 
 void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
 {
-    if (ClusterBeaconMessage* beaconMsg = dynamic_cast<ClusterBeaconMessage*>(bsm)) {
-        Logger::info("received a Cluster Beacon Message", nodeName);
-
-        // findHost()->getDisplayString().setTagArg("i", 1, "green");
-
-        NeighborEntry entry;
-
-        entry.carsInRange = beaconMsg->getCarsInRange();
-        entry.speed = beaconMsg->getSpeed();
-        entry.velocity = beaconMsg->getVelocity();
-        entry.xVelocity = beaconMsg->getXVelocity();
-        entry.yVelocity = beaconMsg->getYVelocity();
-        entry.acceleration = beaconMsg->getAcceleration();
-        entry.deceleration = beaconMsg->getDeceleration();
-        entry.xPosition = beaconMsg->getXPosition();
-        entry.yPosition = beaconMsg->getYPosition();
-        entry.xDirection = beaconMsg->getXDirection();
-        entry.yDirection = beaconMsg->getYDirection();
-        entry.yDirection = beaconMsg->getYDirection();
-        entry.timestamp = simTime().dbl();
-
-        auto sender = beaconMsg->getSender();
-
-        // add entry to neighbor table
-        Logger::info("-- adding message to neighbor table", nodeName);
-        neighborTable.addRow(entry, sender);
-    }
-    else if (ModelRequestMessage* requestMsg = dynamic_cast<ModelRequestMessage*>(bsm)) {
+    if (ModelRequest* requestMsg = dynamic_cast<ModelRequest*>(bsm)) {
         Logger::info("received a Model Request Message", nodeName);
         findHost()->getDisplayString().setTagArg("i", 1, "blue");
         auto origin = requestMsg->getOrigin();
@@ -139,12 +127,62 @@ void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
             Logger::info("-- ignoring vehicle beacon", nodeName);
         }
     }
-    else if (ClusterSelectionMessage* requestMsg = dynamic_cast<ClusterSelectionMessage*>(bsm)) {
-        Logger::info("received a cluster selection message", nodeName);
+    else if (ClusterBeacon* beaconMsg = dynamic_cast<ClusterBeacon*>(bsm)) {
+        Logger::info("received a Cluster Beacon Message", nodeName);
+
+        // decide if cluster is worth joining, if so, send cluster join, else
+        // start an election
+
+        /*
+            NeighborEntry entry;
+
+            entry.carsInRange = beaconMsg->getCarsInRange();
+            entry.speed = beaconMsg->getSpeed();
+            entry.velocity = beaconMsg->getVelocity();
+            entry.xVelocity = beaconMsg->getXVelocity();
+            entry.yVelocity = beaconMsg->getYVelocity();
+            entry.acceleration = beaconMsg->getAcceleration();
+            entry.deceleration = beaconMsg->getDeceleration();
+            entry.xPosition = beaconMsg->getXPosition();
+            entry.yPosition = beaconMsg->getYPosition();
+            entry.xDirection = beaconMsg->getXDirection();
+            entry.yDirection = beaconMsg->getYDirection();
+            entry.yDirection = beaconMsg->getYDirection();
+            entry.timestamp = simTime().dbl();
+
+            auto sender = beaconMsg->getSender();
+
+
+
+            // add entry to neighbor table
+            Logger::info("-- adding message to neighbor table", nodeName);
+            neighborTable.addRow(entry, sender);
+         *
+         */
+    }
+    else if (ClusterJoin* requestMsg = dynamic_cast<ClusterJoin*>(bsm)) {
+        Logger::info("received a Cluster join message", nodeName);
+
+    }
+    else if (Election* requestMsg = dynamic_cast<Election*>(bsm)) {
+        Logger::info("received an Election message", nodeName);
+        findHost()->getDisplayString().setTagArg("i", 1, "yellow");
+
+        parent = requestMsg->getOrigin();
+        cancelEvent(electionMessage);
+    }
+    else if (Leader* requestMsg = dynamic_cast<Leader*>(bsm)) {
+        Logger::info("received a Leader message", nodeName);
         findHost()->getDisplayString().setTagArg("i", 1, "blue");
 
-        clusterHeadId = requestMsg->getData();
+        clusterHeadId = requestMsg->getClusterHeadId();
         clusterMember = true;
+    }
+    else if (Probe* requestMsg = dynamic_cast<Probe*>(bsm)) {
+        Logger::info("received a Probe message", nodeName);
+    }
+    else if (Reply* requestMsg = dynamic_cast<Reply*>(bsm)) {
+        Logger::info("received a Reply message", nodeName);
     }
     else {
         Logger::info("-- received an unknown beacon message type..", nodeName);
@@ -154,21 +192,20 @@ void VehicleApplication::onBSM(BaseFrame1609_4* bsm)
 void VehicleApplication::onWSM(BaseFrame1609_4* frame)
 {
     if (frame) {
-        if (dynamic_cast<ModelUpdateMessage*>(frame)) {
+        if (ModelUpdate* appMessage = dynamic_cast<ModelUpdate*>(frame)) {
             Logger::info("received a Model Update Message", nodeName);
-            ModelUpdateMessage* appMessage = check_and_cast<ModelUpdateMessage*>(frame);
-
             // load up-to-date model
             loadModelUpdate(appMessage);
             Logger::info("-- loaded most up-to-date model", nodeName);
 
+            /* HERE IMPLEMENT ELECTION START LOGIC */
+
             Logger::info("-- scheduling cluster head election for 5 seconds from now", nodeName);
-            scheduleAt(simTime() + 5, clusterElectionMessage->dup());
+            scheduleAt(simTime() + 5, electionMessage->dup());
 
         }
-        else if (dynamic_cast<RSUClusterDataMessage*>(frame) && clusterHead == true) {
-            Logger::info("received an RSU Cluster Data Message", nodeName);
-            RSUClusterDataMessage* appMessage = check_and_cast<RSUClusterDataMessage*>(frame);
+        else if (ClusterData* appMessage = dynamic_cast<ClusterData*>(frame)) {
+            Logger::info("received a Cluster Data Message", nodeName);
 
             auto destination = appMessage->getDestination();
             std::string origin = appMessage->getOrigin();
@@ -186,9 +223,9 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
                     {
                         auto log = "-- sending data message to " + neighbor;
                         Logger::info(log, nodeName);
-                        vehClusterDataMessage->setDestination(neighbor.c_str());
-                        vehClusterDataMessage->setOrigin(nodeName);
-                        sendDelayedDown(vehClusterDataMessage->dup(), uniform(0.01, 0.2));
+                        clusterDataMessage->setDestination(neighbor.c_str());
+                        clusterDataMessage->setOrigin(nodeName);
+                        sendDelayedDown(clusterDataMessage->dup(), uniform(0.01, 0.2));
                     }
                 }
             }
@@ -196,37 +233,8 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
                 Logger::info("-- not for me...", nodeName);
             }
         }
-        else if (dynamic_cast<VehicleClusterDataMessage*>(frame)) {
-            Logger::info("received a Vehicle Cluster Data Message", nodeName);
-            VehicleClusterDataMessage* appMessage = check_and_cast<VehicleClusterDataMessage*>(frame);
-
-            auto destination = appMessage->getDestination();
-            std::string origin = appMessage->getOrigin();
-
-            if (std::strcmp(destination, nodeName) == 0)
-            {
-                Logger::info("-- its for me!", nodeName);
-
-                if (clusterHead == true){
-                    auto log = "-- CH && msg originated from veh " + origin;
-                    Logger::info(log, nodeName);
-                }
-                else if (clusterMember == true)
-                {
-                    // message is from another vehicle
-                    Logger::info("-- CM recieved data message", nodeName);
-                    // disperse to CH
-                    vehClusterDataMessage->setDestination(clusterHeadId.c_str());
-                    vehClusterDataMessage->setOrigin(nodeName);
-
-                    sendDown(vehClusterDataMessage->dup());
-                    Logger::info("-- sent!", nodeName);
-
-                }
-            }
-            else {
-                Logger::info("-- not for me...", nodeName);
-            }
+        else if (Ack* appMessage = dynamic_cast<Ack*>(frame)) {
+            Logger::info("received a Cluster Data Message", nodeName);
         }
         else { Logger::info("!!!", nodeName); }
     }
@@ -234,7 +242,7 @@ void VehicleApplication::onWSM(BaseFrame1609_4* frame)
 
 
 
-void VehicleApplication::sendClusterBeaconMessage()
+void VehicleApplication::sendElectionAck()
 {
     Logger::info("sending a Cluster Beacon Message", nodeName);
 
@@ -254,25 +262,25 @@ void VehicleApplication::sendClusterBeaconMessage()
     double velocity = sqrt((xVelocity * xVelocity) + (yVelocity * yVelocity));
 
     // set message fields
-    clusterBeaconMessage->setCarsInRange(neighborTable.getSize());
+    ackMessage->setCarsInRange(neighborTable.getSize());
 
-    clusterBeaconMessage->setAcceleration(acceleration);
-    clusterBeaconMessage->setDeceleration(deceleration);
+    ackMessage->setAcceleration(acceleration);
+    ackMessage->setDeceleration(deceleration);
 
-    clusterBeaconMessage->setSpeed(speed);
-    clusterBeaconMessage->setVelocity(velocity);
-    clusterBeaconMessage->setXVelocity(xVelocity);
-    clusterBeaconMessage->setYVelocity(yVelocity);
+    ackMessage->setSpeed(speed);
+    ackMessage->setVelocity(velocity);
+    ackMessage->setXVelocity(xVelocity);
+    ackMessage->setYVelocity(yVelocity);
 
-    clusterBeaconMessage->setXPosition(position.x);
-    clusterBeaconMessage->setYPosition(position.y);
-    clusterBeaconMessage->setXDirection(direction.x);
-    clusterBeaconMessage->setYDirection(direction.y);
+    ackMessage->setXPosition(position.x);
+    ackMessage->setYPosition(position.y);
+    ackMessage->setXDirection(direction.x);
+    ackMessage->setYDirection(direction.y);
 
-    clusterBeaconMessage->setSender(nodeName);
+    ackMessage->setSender(nodeName);
 
 
-    sendDelayedDown(clusterBeaconMessage->dup(), uniform(0.01, 0.2));
+    sendDelayedDown(ackMessage->dup(), uniform(0.01, 0.2));
 }
 
 void VehicleApplication::sendModelUpdateMessage()
@@ -285,7 +293,7 @@ void VehicleApplication::sendModelUpdateMessage()
     BaseApplicationLayer::sendModelUpdateMessage(pNet, vNet, "vehicle");
 }
 
-void VehicleApplication::loadModelUpdate(ModelUpdateMessage* appMessage)
+void VehicleApplication::loadModelUpdate(ModelUpdate* appMessage)
 {
     findHost()->getDisplayString().setTagArg("i", 1, "purple");
 
@@ -342,22 +350,12 @@ void VehicleApplication::addSelfToNeighborTable()
     neighborTable.addRow(entry, sender);
 }
 
-
 void VehicleApplication::handleSelfMsg(cMessage* msg)
 {
-    if (ClusterBeaconMessage* m = dynamic_cast<ClusterBeaconMessage*>(msg)) {
-        sendClusterBeaconMessage();
-        scheduleAt(simTime() + clusterBeaconDelay, m->dup());
-        delete m;
-    } else if (NeighborTablePruneMessage* m = dynamic_cast<NeighborTablePruneMessage*>(msg)) {
-        Logger::info("pruning neighbor table...", nodeName);
-        neighborTable.pruneTable(simTime().dbl());
-
-        Logger::info("-- new neighbor table", nodeName);
-        neighborTable.printTable();
-        scheduleAt(simTime() + neighborTableTimeout, m->dup());
-        delete m;
-    } else if (ClusterElectionMessage* m = dynamic_cast<ClusterElectionMessage*>(msg)) {
+    if (dynamic_cast<ClusterBeacon*>(msg)) {
+        // ch should send beacon
+        scheduleAt(simTime() + clusterBeaconDelay, clusterBeaconMessage->dup());
+    } else if (dynamic_cast<Election*>(msg)) {
         Logger::info("holding cluster election...", nodeName);
         // election setup
 
@@ -369,18 +367,11 @@ void VehicleApplication::handleSelfMsg(cMessage* msg)
         // step in the environment with observation
         auto observation = agent.toTensor(neighborTable.toList());
         auto [action, value, logp] = agent.step(observation);
-        Logger::info("-- step works", nodeName);
-
-        // parse actions into neighbor table
 
         std::vector<double> doubleData = agent.toDoublesList(action);
-        Logger::info("-- tensorToList works", nodeName);
-
         neighborTable.setWeights(doubleData[0], doubleData[1], doubleData[2], doubleData[3],
                 doubleData[4], doubleData[5], doubleData[6], doubleData[7],
                 doubleData[8], doubleData[9]);
-        Logger::info("-- table weights updated.", nodeName);
-
 
         auto reward = agent.toPyFloat(1);
         // must store a transition for localStepsPerEpoch
@@ -411,9 +402,8 @@ void VehicleApplication::handleSelfMsg(cMessage* msg)
             clusterHead = true;
             Logger::info("-- I won! alerting nearby nodes..", nodeName);
 
-            clusterSelectionMessage->setData(nodeName);
-            populateWSM(clusterSelectionMessage);
-            sendDelayedDown(clusterSelectionMessage->dup(), uniform(0.01, 0.2));
+            leaderMessage->setClusterHeadId(nodeName);
+            sendDelayedDown(leaderMessage->dup(), uniform(0.01, 0.2));
         }
         else
         {
@@ -421,15 +411,5 @@ void VehicleApplication::handleSelfMsg(cMessage* msg)
             findHost()->getDisplayString().setTagArg("i", 1, "transparent");
             Logger::info("-- I lost! keeping that to myself..", nodeName);
         }
-
-        delete m;
     } else {}
-}
-
-void VehicleApplication::handlePositionUpdate(cObject* obj)
-{
-    BaseApplicationLayer::handlePositionUpdate(obj);
-
-    // the vehicle has moved. Code that reacts to new positions goes here.
-    // member variables such as currentPosition and currentSpeed are updated in the parent class
 }

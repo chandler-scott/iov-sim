@@ -24,7 +24,6 @@
 
 #include "iov_sim/iov_sim.h"
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
-#include "iov_sim/modules/messages/ModelRequestMessage_m.h"
 #include "iov_sim/base/python/AggregatorWrapper.h"
 
 using namespace veins;
@@ -52,8 +51,7 @@ private:
     std::string policySave;
     std::string valueSave;
 
-    RSUClusterDataMessage *rsuClusterDataMessage = nullptr;
-    ModelRequestMessage *modelRequestMessage = nullptr;
+    ModelRequest *modelRequestMessage = nullptr;
 
 };
 

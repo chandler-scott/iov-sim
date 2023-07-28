@@ -24,17 +24,8 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet ClusterBeaconMessage extends BaseMessage {
-    string sender;
-    int carsInRange;
-    double speed;
-    double velocity;
-    double xVelocity;
-    double yVelocity;
-    double deceleration;
-    double acceleration;
-    double xPosition;
-    double yPosition;
-    double xDirection;
-    double yDirection;
+packet ModelUpdate extends BaseMessage {
+    string pStateDict;
+    string vStateDict;
+    string origin = "rsu";
 }

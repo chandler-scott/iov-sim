@@ -27,9 +27,6 @@
 #include "iov_sim/base/python/AgentWrapper.h"
 #include "iov_sim/base/util/NeighborTable.h"
 #include "iov_sim/base/util/NeighborEntry.h"
-#include "iov_sim/modules/messages/NeighborTablePruneMessage_m.h"
-#include "iov_sim/modules/messages/ClusterElectionMessage_m.h"
-#include "iov_sim/modules/messages/ClusterSelectionMessage_m.h"
 
 
 
@@ -57,33 +54,41 @@ protected:
 
 protected:
     void onBSM(BaseFrame1609_4* bsm) override;
-    // to handle when the application receives a data message from another car or RSU
-    void onWSM(veins::BaseFrame1609_4* wsm) override;
+    void onWSM(BaseFrame1609_4* wsm) override;
 
-    void sendClusterBeaconMessage();
+    void sendElectionAck();
     void sendModelUpdateMessage();
-    void loadModelUpdate(ModelUpdateMessage* appMessage);
+    void loadModelUpdate(ModelUpdate* appMessage);
 
     void handleSelfMsg(cMessage* msg) override;
-    void handlePositionUpdate(cObject* obj) override;
 
     void addSelfToNeighborTable();
 
 private:
     AgentWrapper agent;
-    ModelRequestMessage *modelRequestMessage = nullptr;
-    NeighborTablePruneMessage *neighborTablePruneMessage = nullptr;
-    ClusterBeaconMessage *clusterBeaconSelfMessage = nullptr;
-    ClusterBeaconMessage *clusterBeaconMessage = nullptr;
-    ClusterElectionMessage *clusterElectionMessage = nullptr;
-    ClusterSelectionMessage *clusterSelectionMessage = nullptr;
-    VehicleClusterDataMessage *vehClusterDataMessage = nullptr;
-    RSUClusterDataMessage *rsuClusterDataMessage = nullptr;
+
+    // model message types
+    ModelRequest *modelRequestMessage = nullptr;
+    ModelUpdate *modelUpdateMessage = nullptr;
+
+    // cluster message types
+    ClusterBeacon *clusterBeaconMessage = nullptr;
+    ClusterData *clusterDataMessage = nullptr;
+    ClusterJoin *clusterJoinMessage = nullptr;
+
+    // election message types
+    Ack *ackMessage = nullptr;
+    Election *electionMessage = nullptr;
+    Leader *leaderMessage = nullptr;
+    Probe *probeMessage = nullptr;
+    Reply *replyMessage = nullptr;
+
 
 
     NeighborTable neighborTable;
     int clusterBeaconDelay;
     double neighborTableTimeout;
+    const char* parent;
 
     // duration for election
     double clusterElectionDuration;

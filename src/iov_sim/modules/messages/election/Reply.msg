@@ -24,8 +24,7 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet ModelUpdateMessage extends BaseMessage {
-    string pStateDict;
-    string vStateDict;
-    string origin = "rsu";
+packet Reply extends BaseMessage {
+    string origin;
+    string destination;
 }

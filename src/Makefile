@@ -40,26 +40,30 @@ OBJS = \
     $O/iov_sim/modules/applications/RSUApplication.o \
     $O/iov_sim/modules/applications/VehicleApplication.o \
     $O/iov_sim/base/messages/BaseMessage_m.o \
-    $O/iov_sim/modules/messages/ClusterBeaconMessage_m.o \
-    $O/iov_sim/modules/messages/ClusterElectionMessage_m.o \
-    $O/iov_sim/modules/messages/ClusterSelectionMessage_m.o \
-    $O/iov_sim/modules/messages/ModelRequestMessage_m.o \
-    $O/iov_sim/modules/messages/ModelUpdateMessage_m.o \
-    $O/iov_sim/modules/messages/NeighborTablePruneMessage_m.o \
-    $O/iov_sim/modules/messages/RSUClusterDataMessage_m.o \
-    $O/iov_sim/modules/messages/VehicleClusterDataMessage_m.o
+    $O/iov_sim/modules/messages/cluster/ClusterBeacon_m.o \
+    $O/iov_sim/modules/messages/cluster/ClusterData_m.o \
+    $O/iov_sim/modules/messages/cluster/ClusterJoin_m.o \
+    $O/iov_sim/modules/messages/election/Ack_m.o \
+    $O/iov_sim/modules/messages/election/Election_m.o \
+    $O/iov_sim/modules/messages/election/Leader_m.o \
+    $O/iov_sim/modules/messages/election/Probe_m.o \
+    $O/iov_sim/modules/messages/election/Reply_m.o \
+    $O/iov_sim/modules/messages/model/ModelRequest_m.o \
+    $O/iov_sim/modules/messages/model/ModelUpdate_m.o
 
 # Message files
 MSGFILES = \
     iov_sim/base/messages/BaseMessage.msg \
-    iov_sim/modules/messages/ClusterBeaconMessage.msg \
-    iov_sim/modules/messages/ClusterElectionMessage.msg \
-    iov_sim/modules/messages/ClusterSelectionMessage.msg \
-    iov_sim/modules/messages/ModelRequestMessage.msg \
-    iov_sim/modules/messages/ModelUpdateMessage.msg \
-    iov_sim/modules/messages/NeighborTablePruneMessage.msg \
-    iov_sim/modules/messages/RSUClusterDataMessage.msg \
-    iov_sim/modules/messages/VehicleClusterDataMessage.msg
+    iov_sim/modules/messages/cluster/ClusterBeacon.msg \
+    iov_sim/modules/messages/cluster/ClusterData.msg \
+    iov_sim/modules/messages/cluster/ClusterJoin.msg \
+    iov_sim/modules/messages/election/Ack.msg \
+    iov_sim/modules/messages/election/Election.msg \
+    iov_sim/modules/messages/election/Leader.msg \
+    iov_sim/modules/messages/election/Probe.msg \
+    iov_sim/modules/messages/election/Reply.msg \
+    iov_sim/modules/messages/model/ModelRequest.msg \
+    iov_sim/modules/messages/model/ModelUpdate.msg
 
 # SM files
 SMFILES =

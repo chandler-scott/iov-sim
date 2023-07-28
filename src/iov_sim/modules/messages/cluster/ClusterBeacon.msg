@@ -24,7 +24,8 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet RSUClusterDataMessage extends BaseMessage {
-    string origin;
-    string destination;
+packet ClusterBeacon extends BaseMessage {
+    string clusterId;
+    double chXPosition;
+    double chYPosition;
 }

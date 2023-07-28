@@ -24,7 +24,7 @@ import iov_sim.base.messages.BaseMessage;
 
 namespace iov_sim;
 
-packet ModelRequestMessage extends BaseMessage {
-    string data;
-    string origin = "vehicle";
+packet Probe extends BaseMessage {
+    string origin;
+    string destination;
 }
