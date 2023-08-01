@@ -20,11 +20,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-import iov_sim.base.messages.BaseMessage;
+import iov_sim.modules.messages.cluster.ClusterBaseMessage;
 
 namespace iov_sim;
 
-packet ClusterJoin extends BaseMessage {
+packet ClusterJoin extends ClusterBaseMessage {
     string origin;
-    string clusterId;
 }

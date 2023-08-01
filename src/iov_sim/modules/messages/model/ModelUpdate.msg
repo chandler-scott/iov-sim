@@ -20,12 +20,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-import iov_sim.base.messages.BaseMessage;
+import iov_sim.modules.messages.model.ModelBaseMessage;
 
 namespace iov_sim;
 
-packet ModelUpdate extends BaseMessage {
+packet ModelUpdate extends ModelBaseMessage {
     string pStateDict;
     string vStateDict;
-    string origin = "rsu";
 }

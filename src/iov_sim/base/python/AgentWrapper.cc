@@ -25,14 +25,21 @@
 #include <Python.h>
 
 AgentWrapper::AgentWrapper() : BaseWrapper()
+{ }
+
+
+AgentWrapper::~AgentWrapper()
 {
-    localStepsPerEpoch = 5;
+    Py_DECREF(pAgent);
+}
+
+void AgentWrapper::initializeAgent()
+{
     // Access the Aggregator class from the Python module
     PyObject *pModule = wrapper.ppoModule;
     PyObject *pClass = PyObject_GetAttrString(pModule, "Agent");
-    Logger::info("Initialized the Agent Wrapper Class!", "AgentWrapper");
-    Logger::info("-- now trying to init Agent class", "AgentWrapper");
 
+    Logger::info(std::to_string(localStepsPerEpoch), "A");
 
     PyObject *obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject *actDim = wrapper.callZerosBoxSpace(act_size);
@@ -40,43 +47,30 @@ AgentWrapper::AgentWrapper() : BaseWrapper()
 
     PyObject *args = PyTuple_Pack(3, obsDim, actDim, localSteps);
     // // Create an instance of the Aggregator class
-    try
-    {
-        pAgent = PyObject_CallObject(pClass, args);
-        Py_DECREF(args);
 
-        // Check for exceptions raised during the function call
-        if (pAgent == nullptr)
-        {
-            // Handle the exception here
-            PyErr_Print();
-            Logger::error("Error creating Agent instance!", "AgentWrapper");
-        }
-        else
-        {
-            Logger::info("-- Agent successfully initialized!", "AgentWrapper");
-        }
-    }
-    catch (const std::exception &e)
-    {
-        // Handle any C++ exceptions that might occur during the PyObject_CallObject call
-        string ex = "Caught C++ exception: ";
-        ex +=  e.what();
-        Logger::error(ex, "AgentWrapper");
-    }
-    catch (...)
-    {
-        // Handle any other unexpected C++ exceptions
-        Logger::error("Caught an unexpected C++ exception!", "AgentWrapper");
+    pAgent = PyObject_CallObject(pClass, args);
+    Py_DECREF(args);
 
-        std::cerr << "Caught an unexpected C++ exception!" << std::endl;
+    // Check for exceptions raised during the function call
+    if (pAgent == nullptr)
+    {
+        // Handle the exception here
+        PyErr_Print();
+        Logger::error("Error creating Agent instance!", "AgentWrapper");
     }
+    else
+    {
+        Logger::info("-- Agent successfully initialized!", "AgentWrapper");
+    }}
+
+int AgentWrapper::getLocalStepsPerEpoch()
+{
+    return localStepsPerEpoch;
 }
 
-
-AgentWrapper::~AgentWrapper()
+void AgentWrapper::setLocalStepsPerEpoch(int value)
 {
-    Py_DECREF(pAgent);
+    localStepsPerEpoch = value;
 }
 
 PyObject* AgentWrapper::toPyFloat(double value)

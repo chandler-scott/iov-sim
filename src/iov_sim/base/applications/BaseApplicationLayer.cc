@@ -113,6 +113,11 @@ void BaseApplicationLayer::initialize(int stage)
     }
 }
 
+void BaseApplicationLayer::setDisplayColor(const char* color)
+{
+    findHost()->getDisplayString().setTagArg("i", 1, color);
+}
+
 simtime_t BaseApplicationLayer::computeAsynchronousSendingTime(simtime_t interval, ChannelType chan)
 {
 
@@ -207,14 +212,16 @@ void BaseApplicationLayer::handleParkingUpdate(cObject* obj)
     isParked = mobility->getParkingState();
 }
 
-void BaseApplicationLayer::sendModelUpdateMessage(const char* pNet, const char* vNet, const char* origin)
+void BaseApplicationLayer::sendModelUpdateMessage(const char* destination, const char* pNet, const char* vNet, const char* origin)
 {
-    ModelUpdate* msg = new ModelUpdate();
+    ModelUpdate* msg = new ModelUpdate("Model Update Message");
     populateWSM(msg);
 
     msg->setPStateDict(pNet);
     msg->setVStateDict(vNet);
     msg->setOrigin(origin);
+    msg->setDestination(destination);
+
 
     // this rsu repeats the received traffic update in 2 seconds plus some random delay
     sendDelayedDown(msg->dup(), 1 + uniform(0.01, 0.2));
@@ -226,48 +233,23 @@ void BaseApplicationLayer::handleLowerMsg(cMessage* msg)
     BaseFrame1609_4* wsm = dynamic_cast<BaseFrame1609_4*>(msg);
     ASSERT(wsm);
 
-    if (ModelRequest* bsm = dynamic_cast<ModelRequest*>(wsm)) {
-        receivedBSMs++;
-        onBSM(bsm);
+    /* model messages */
+    if (ModelBaseMessage* bsm = dynamic_cast<ModelBaseMessage*>(wsm)) {
+        onModelMsg(bsm);
     }
-    else if (ClusterBeacon* bsm = dynamic_cast<ClusterBeacon*>(wsm))
-    {
-        receivedBSMs++;
-        onBSM(bsm);
+    /* cluster messages */
+    else if (ClusterBaseMessage* bsm = dynamic_cast<ClusterBaseMessage*>(wsm)) {
+        onClusterMsg(bsm);
     }
-    else if (ClusterJoin* bsm = dynamic_cast<ClusterJoin*>(wsm))
-    {
-        receivedBSMs++;
-        onBSM(bsm);
+    /* election messages */
+    else if (ElectionBaseMessage* bsm = dynamic_cast<ElectionBaseMessage*>(wsm)) {
+        onElectionMsg(bsm);
     }
-    else if (Election* bsm = dynamic_cast<Election*>(wsm))
-    {
-        receivedBSMs++;
-        onBSM(bsm);
+    /* neighbor messages */
+    else if (NeighborBaseMessage* bsm = dynamic_cast<NeighborBaseMessage*>(wsm)) {
+        onNeighborMsg(bsm);
     }
-    else if (Leader* bsm = dynamic_cast<Leader*>(wsm))
-    {
-        receivedBSMs++;
-        onBSM(bsm);
-    }
-    else if (Probe* bsm = dynamic_cast<Probe*>(wsm))
-    {
-        receivedBSMs++;
-        onBSM(bsm);
-    }
-    else if (Reply* bsm = dynamic_cast<Reply*>(wsm))
-    {
-        receivedBSMs++;
-        onBSM(bsm);
-    }
-    else if (DemoServiceAdvertisment* wsa = dynamic_cast<DemoServiceAdvertisment*>(wsm)) {
-        receivedWSAs++;
-        onWSA(wsa);
-    }
-    else {
-        receivedWSMs++;
-        onWSM(wsm);
-    }
+    else { }
 
     delete (msg);
 }

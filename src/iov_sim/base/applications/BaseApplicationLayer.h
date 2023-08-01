@@ -37,16 +37,23 @@
 #include "veins/modules/mobility/traci/TraCICommandInterface.h"
 #include "iov_sim/base/python/BaseWrapper.h"
 #include "iov_sim/base/util/Logger.h"
+#include "iov_sim/base/messages/Timeout_m.h"
+#include "iov_sim/base/messages/Timer_m.h"
 #include "iov_sim/modules/messages/model/ModelRequest_m.h"
 #include "iov_sim/modules/messages/model/ModelUpdate_m.h"
-#include "iov_sim/modules/messages/cluster/ClusterBeacon_m.h"
+#include "iov_sim/modules/messages/cluster/ClusterHeartbeat_m.h"
+#include "iov_sim/modules/messages/cluster/ClusterHeartbeatReply_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterData_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterJoin_m.h"
 #include "iov_sim/modules/messages/election/Ack_m.h"
+#include "iov_sim/modules/messages/election/AckTimeout_m.h"
 #include "iov_sim/modules/messages/election/Election_m.h"
+#include "iov_sim/modules/messages/election/ElectionTimeout_m.h"
 #include "iov_sim/modules/messages/election/Leader_m.h"
 #include "iov_sim/modules/messages/election/Probe_m.h"
 #include "iov_sim/modules/messages/election/Reply_m.h"
+#include "iov_sim/modules/messages/neighbor/NeighborBeacon_m.h"
+
 
 
 
@@ -87,7 +94,9 @@ public:
     };
 
 protected:
-    void sendModelUpdateMessage(const char* pNet, const char* vNet, const char* origin = "rsu");
+    void setDisplayColor(const char* color);
+
+    void sendModelUpdateMessage(const char* destination, const char* pNet, const char* vNet, const char* origin = "rsu");
 
     /** @brief handle messages from below and calls the onWSM, onBSM, and onWSA functions accordingly */
     void handleLowerMsg(cMessage* msg) override;
@@ -98,14 +107,17 @@ protected:
     /** @brief sets all the necessary fields in the WSM, BSM, or WSA. */
     virtual void populateWSM(BaseFrame1609_4* wsm, LAddress::L2Type rcvId = LAddress::L2BROADCAST(), int serial = 0);
 
-    /** @brief this function is called upon receiving a BaseFrame1609_4 */
-    virtual void onWSM(BaseFrame1609_4* wsm){};
+    /*@brief this function is called upon receiving a Model Message*/
+    virtual void onModelMsg(BaseMessage* msg) {};
 
-    /** @brief this function is called upon receiving a DemoSafetyMessage, also referred to as a beacon  */
-    virtual void onBSM(BaseFrame1609_4* bsm){};
+    /*@brief this function is called upon receiving an Election Message*/
+    virtual void onElectionMsg(BaseMessage* msg) {};
 
-    /** @brief this function is called upon receiving a DemoServiceAdvertisement */
-    virtual void onWSA(DemoServiceAdvertisment* wsa){};
+    /*@brief this function is called upon receiving a Cluster Message*/
+    virtual void onClusterMsg(BaseMessage* msg) {};
+
+    /*@brief this function is called upon receiving a Neighbor Message*/
+    virtual void onNeighborMsg(BaseMessage* msg) {};
 
     /** @brief this function is called every time the vehicle receives a position update signal */
     virtual void handlePositionUpdate(cObject* obj);

@@ -22,6 +22,12 @@ public:
     AgentWrapper();
     ~AgentWrapper();
 
+    void initializeAgent();
+
+
+    int getLocalStepsPerEpoch();
+    void setLocalStepsPerEpoch(int value);
+
     void loadStateDicts(PyObject *pStateDict, PyObject *vStateDict);
 
     PyObject* toTensor(std::vector<double> list);
@@ -38,6 +44,7 @@ public:
     void bufferStoreTransition(PyObject* observation, PyObject* action, PyObject* reward,
             PyObject* value, PyObject* logp);
     void bufferFinishPath(PyObject* lastValue);
+
 
 
 private:

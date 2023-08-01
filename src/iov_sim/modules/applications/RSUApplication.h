@@ -38,11 +38,9 @@ public:
 
 
 protected:
-    void onBSM(BaseFrame1609_4* bsm) override;
-    void onWSM(BaseFrame1609_4* wsm) override;
-    void onWSA(DemoServiceAdvertisment* wsa) override;
+    void onModelMsg(BaseMessage* msg) override;
 
-    void sendModelUpdateMessage();
+    void sendModelUpdateMessage(const char*);
 
 private:
     AggregatorWrapper aggregator;

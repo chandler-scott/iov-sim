@@ -35,35 +35,56 @@ OBJS = \
     $O/iov_sim/base/python/BaseWrapper.o \
     $O/iov_sim/base/python/PythonLifecycle.o \
     $O/iov_sim/base/python/PythonWrapper.o \
+    $O/iov_sim/base/util/ClusterTable.o \
     $O/iov_sim/base/util/Logger.o \
-    $O/iov_sim/base/util/NeighborTable.o \
+    $O/iov_sim/base/util/NeighborList.o \
     $O/iov_sim/modules/applications/RSUApplication.o \
     $O/iov_sim/modules/applications/VehicleApplication.o \
     $O/iov_sim/base/messages/BaseMessage_m.o \
-    $O/iov_sim/modules/messages/cluster/ClusterBeacon_m.o \
+    $O/iov_sim/base/messages/Timeout_m.o \
+    $O/iov_sim/base/messages/Timer_m.o \
+    $O/iov_sim/modules/messages/cluster/ClusterBaseMessage_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterData_m.o \
+    $O/iov_sim/modules/messages/cluster/ClusterHeartbeat_m.o \
+    $O/iov_sim/modules/messages/cluster/ClusterHeartbeatReply_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterJoin_m.o \
     $O/iov_sim/modules/messages/election/Ack_m.o \
+    $O/iov_sim/modules/messages/election/AckTimeout_m.o \
     $O/iov_sim/modules/messages/election/Election_m.o \
+    $O/iov_sim/modules/messages/election/ElectionBaseMessage_m.o \
+    $O/iov_sim/modules/messages/election/ElectionTimeout_m.o \
     $O/iov_sim/modules/messages/election/Leader_m.o \
     $O/iov_sim/modules/messages/election/Probe_m.o \
     $O/iov_sim/modules/messages/election/Reply_m.o \
+    $O/iov_sim/modules/messages/model/ModelBaseMessage_m.o \
     $O/iov_sim/modules/messages/model/ModelRequest_m.o \
-    $O/iov_sim/modules/messages/model/ModelUpdate_m.o
+    $O/iov_sim/modules/messages/model/ModelUpdate_m.o \
+    $O/iov_sim/modules/messages/neighbor/NeighborBaseMessage_m.o \
+    $O/iov_sim/modules/messages/neighbor/NeighborBeacon_m.o
 
 # Message files
 MSGFILES = \
     iov_sim/base/messages/BaseMessage.msg \
-    iov_sim/modules/messages/cluster/ClusterBeacon.msg \
+    iov_sim/base/messages/Timeout.msg \
+    iov_sim/base/messages/Timer.msg \
+    iov_sim/modules/messages/cluster/ClusterBaseMessage.msg \
     iov_sim/modules/messages/cluster/ClusterData.msg \
+    iov_sim/modules/messages/cluster/ClusterHeartbeat.msg \
+    iov_sim/modules/messages/cluster/ClusterHeartbeatReply.msg \
     iov_sim/modules/messages/cluster/ClusterJoin.msg \
     iov_sim/modules/messages/election/Ack.msg \
+    iov_sim/modules/messages/election/AckTimeout.msg \
     iov_sim/modules/messages/election/Election.msg \
+    iov_sim/modules/messages/election/ElectionBaseMessage.msg \
+    iov_sim/modules/messages/election/ElectionTimeout.msg \
     iov_sim/modules/messages/election/Leader.msg \
     iov_sim/modules/messages/election/Probe.msg \
     iov_sim/modules/messages/election/Reply.msg \
+    iov_sim/modules/messages/model/ModelBaseMessage.msg \
     iov_sim/modules/messages/model/ModelRequest.msg \
-    iov_sim/modules/messages/model/ModelUpdate.msg
+    iov_sim/modules/messages/model/ModelUpdate.msg \
+    iov_sim/modules/messages/neighbor/NeighborBaseMessage.msg \
+    iov_sim/modules/messages/neighbor/NeighborBeacon.msg
 
 # SM files
 SMFILES =

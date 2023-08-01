@@ -1,7 +1,27 @@
-- CH Election -> Coordinate election results
-- cluster timeout and reelection implementation
-  - timeout for no cluster head present
-  - threshold for cluster head to call for reelection (after some time)
-- Reward
-  - structure metadata in a way that can be fairly scored
+ Clustering
+ - threshold for CH/CM trigger reelection (create a clusterHealthTimer)
+    * after p% of vehicles in neighbor list are not in cluster table
  
+ 
+ Election
+ - some mechanism to decide whether to join election
+ - leader msg -> send cluster table
+ - on leader msg rcv -> init cluster table
+ - could add cluster table (or just new joiners) to heartbeat
+ 
+ 
+ Learning
+  - reward
+  - redo observation/action input/output:
+	 - observation:
+		 - neighbor table
+		 - cluster table
+		 - neighbor connectivity %
+	 - action:
+		 - join election weights (score election holders)
+		 - score neighbor weights for election
+		 - threshold % for reelection call
+ 
+ Aggregation
+ CM -> CH
+ CH -> RSU

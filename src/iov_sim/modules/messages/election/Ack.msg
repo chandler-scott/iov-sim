@@ -20,22 +20,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-import iov_sim.base.messages.BaseMessage;
+import iov_sim.modules.messages.election.ElectionBaseMessage;
 
 namespace iov_sim;
 
-packet Ack extends BaseMessage {
-    string destination;
-    string sender;
-    int carsInRange;
-    double speed;
-    double velocity;
-    double xVelocity;
-    double yVelocity;
-    double deceleration;
-    double acceleration;
-    double xPosition;
-    double yPosition;
-    double xDirection;
-    double yDirection;
+packet Ack extends ElectionBaseMessage {
+    string sender = "";
+    int carsInRange = 0;
+    double speed = 0;
+    double velocity = 0;
+    double xVelocity = 0;
+    double yVelocity = 0;
+    double deceleration = 0;
+    double acceleration = 0;
+    double xPosition = 0;
+    double yPosition = 0;
+    double xDirection = 0;
+    double yDirection = 0;
 }

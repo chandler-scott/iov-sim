@@ -25,12 +25,22 @@
 #include "iov_sim/iov_sim.h"
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
 #include "iov_sim/base/python/AgentWrapper.h"
-#include "iov_sim/base/util/NeighborTable.h"
+#include "iov_sim/base/util/ClusterTable.h"
+#include "iov_sim/base/util/NeighborList.h"
 #include "iov_sim/base/util/NeighborEntry.h"
-
-
-
 #include <cmath>
+
+/* *
+ *
+ *  COLOR SCHEME
+ *  received model: #FFC107 (Amber)
+ *  CH election start source: #25e407 (Light Green)
+ *  CH election retry source: #1c4c15 (Dark Green)
+ *  CH election participant: #2196F3 (Blue)
+ *  Cluster head: #9C27B0 (Purple)
+ *  Cluster member: #FF5722 (Orange)
+ * */
+
 
 
 using namespace veins;
@@ -53,48 +63,95 @@ protected:
     int currentSubscribedServiceId;
 
 protected:
-    void onBSM(BaseFrame1609_4* bsm) override;
-    void onWSM(BaseFrame1609_4* wsm) override;
+    void onModelMsg(BaseMessage* msg) override;
+    void onElectionMsg(BaseMessage* msg) override;
+    void onClusterMsg(BaseMessage* msg) override;
+    void onNeighborMsg(BaseMessage* msg) override;
 
-    void sendElectionAck();
-    void sendModelUpdateMessage();
+
+    void sendModelUpdateMsg();
+    void sendModelRequestMsg();
+    void sendNeighborBeacon();
+
+    void sendElectionMsg();
+    void sendElectionAck(Election* msg);
+    void sendLeaderMsg(const char* leaderElected);
+
     void loadModelUpdate(ModelUpdate* appMessage);
+    void addSelfToNeighborTable();
 
+    void handleElection(const char* winnerId);
+    void handleObservation();
+    void handleLearn();
     void handleSelfMsg(cMessage* msg) override;
 
-    void addSelfToNeighborTable();
+    void step();
+    void observe();
+    void learn();
+
+
 
 private:
     AgentWrapper agent;
 
-    // model message types
-    ModelRequest *modelRequestMessage = nullptr;
-    ModelUpdate *modelUpdateMessage = nullptr;
-
-    // cluster message types
-    ClusterBeacon *clusterBeaconMessage = nullptr;
-    ClusterData *clusterDataMessage = nullptr;
-    ClusterJoin *clusterJoinMessage = nullptr;
-
-    // election message types
-    Ack *ackMessage = nullptr;
-    Election *electionMessage = nullptr;
-    Leader *leaderMessage = nullptr;
-    Probe *probeMessage = nullptr;
-    Reply *replyMessage = nullptr;
+    /* @brief Timeout for node to receive reply for Ack message */
+    Timeout *ackTimeout = nullptr;
+    /* @brief Timeout for node to receive reply for Election message */
+    Timeout *electionTimeout = nullptr;
+    /* @brief Timeout for node to receive reply for Model Request message */
+    Timeout *modelRequestTimeout = nullptr;
+    /* @brief Timeout for node to receive reply for Cluster Heartbeat message */
+    Timeout *clusterHeartbeatTimeout = nullptr;
+    /* @brief Timeout for node to receive reply for Cluster Heartbeat Reply message */
+    Timeout *clusterHeartbeatReplyTimeout = nullptr;
 
 
+    /* @brief Timer for node to start an election */
+    Timer *startElection = nullptr;
+    /* @brief Timer for node to observe environment state */
+    Timer *observeEnvironmentTimer = nullptr;
+    /* @brief Timer for node to send neighbor beacons */
+    Timer *neighborBeaconTimer = nullptr;
+    /* @brief Timer for node to send cluster heartbeat */
+    Timer *clusterHeartbeatTimer = nullptr;
+    /* @brief Timer for node to observe environment state */
+    Timer *pruneNeighborListTimer = nullptr;
 
-    NeighborTable neighborTable;
+
+    // AI params
+    PyObject* curObservation;
+    PyObject* curAction;
+    PyObject* curReward;
+    PyObject* curValue;
+    PyObject* curLogp;
+    int numObservations;
+
+    // model request parameters
+    bool receivedModel;
+    double requestModelTimeout;
+
+    ClusterTable clusterTable;
+    NeighborList neighborList;
     int clusterBeaconDelay;
     double neighborTableTimeout;
     const char* parent;
 
-    // duration for election
-    double clusterElectionDuration;
+
+    /* ELECTION PARAMS */
+    // true if node is in process of electing a leader
+    // false if node has a leader
+    bool electingLeader;
+    const char* electionId;
+    string electionParentId;
+    const char* leaderId;
+    bool hasSentElectionAck;
+    bool receivedElectionAck;
+    bool receivedElectionLeader;
+
 
     // timeout for nodes to buy into election
     double clusterElectionTimeout;
+
 
     // timeout for cluster head to accept role
     double clusterHeadTimeout;

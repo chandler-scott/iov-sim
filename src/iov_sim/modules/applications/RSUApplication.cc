@@ -45,14 +45,14 @@ void RSUApplication::initialize(int stage)
         aggregator.loadStateDict(policyLoad, valueLoad);
     }
     else if (stage == 1) {
-        modelRequestMessage = new ModelRequest();
+        modelRequestMessage = new ModelRequest("Model Request");
 
         populateWSM(modelRequestMessage);
 
         modelRequestMessage->setData("model request");
         modelRequestMessage->setOrigin("rsu");
 
-        sendDelayedDown(modelRequestMessage->dup(), 10 + uniform(0.01, 0.2));
+        // sendDelayedDown(modelRequestMessage->dup(), 10 + uniform(0.01, 0.2));
     }
 }
 
@@ -64,72 +64,27 @@ void RSUApplication::finish()
     delete modelRequestMessage;
 }
 
-void RSUApplication::onBSM(BaseFrame1609_4* bsm)
+void RSUApplication::onModelMsg(BaseMessage* msg)
 {
-   if (ModelRequest* requestMsg = dynamic_cast<ModelRequest*>(bsm)) {
+   if (ModelRequest* requestMsg = dynamic_cast<ModelRequest*>(msg)) {
         // RSU has received an initialize message from a vehicle -> they need an
         // updated model. Respond with ModelUpdateMessage (message containing
         // up-to-date AI model)
         Logger::info("received a Model Request Message", nodeName);
 
-        findHost()->getDisplayString().setTagArg("i", 1, "blue");
+        findHost()->getDisplayString().setTagArg("i", 1, "green");
         auto origin = requestMsg->getOrigin();
 
-        if (std::strcmp(origin, "vehicle") == 0)
+        if (std::strcmp(origin, "rsu") != 0)
         {
             Logger::info("-- request from vehicle. sending...", nodeName);
-            sendModelUpdateMessage();
-        }
-        else {
-            Logger::info("-- ignoring rsu beacon", nodeName);
+            sendModelUpdateMessage(origin);
         }
     }
-    else {
-        Logger::info("received an unknown beacon message type..", nodeName);
-    }
+   else { }
 }
 
-void RSUApplication::onWSA(DemoServiceAdvertisment* wsa)
-{
-    // if this RSU receives a WSA for service 42, it will tune to the chan
-    if (wsa->getPsid() == 42) {
-        mac->changeServiceChannel(static_cast<Channel>(wsa->getTargetChannel()));
-    }
-}
-
-void RSUApplication::onWSM(BaseFrame1609_4* frame)
-{
-    if (frame) {
-        if (dynamic_cast<ModelUpdate*>(frame)) {
-            Logger::info("received a Model Update Message", nodeName);
-            ModelUpdate* appMessage = check_and_cast<ModelUpdate*>(frame);
-
-            auto pNetJson = appMessage->getPStateDict();
-            auto vNetJson = appMessage->getVStateDict();
-            auto origin = appMessage->getOrigin();
-
-            if (std::strcmp(origin, "vehicle") == 0)
-            {
-                Logger::info("-- request from vehicle", nodeName);
-                // parse into state_dicts
-                auto [pStateDict, vStateDict] = aggregator.getStateDictsFromJson(pNetJson, vNetJson);
-
-                // aggregate here
-
-                // send reply
-                sendModelUpdateMessage();
-            }
-            else {
-                Logger::info("-- ignoring rsu message", nodeName);
-            }
-        }
-        else {
-            Logger::info("!!!", nodeName);
-        }
-    }
-}
-
-void RSUApplication::sendModelUpdateMessage()
+void RSUApplication::sendModelUpdateMessage(const char* destination)
 {
     // get state_dicts as json-formatted PyObject string
     auto [pJson, vJson] = aggregator.getStateDictsAsJson();
@@ -139,6 +94,6 @@ void RSUApplication::sendModelUpdateMessage()
     auto vNet = aggregator.PyObjectToChar(vJson);
 
     // send message
-    BaseApplicationLayer::sendModelUpdateMessage(pNet, vNet);
+    BaseApplicationLayer::sendModelUpdateMessage(destination, pNet, vNet);
     Logger::info("-- up-to-date model sent!", nodeName);
 }
