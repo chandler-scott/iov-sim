@@ -36,6 +36,7 @@ OBJS = \
     $O/iov_sim/base/python/PythonLifecycle.o \
     $O/iov_sim/base/python/PythonWrapper.o \
     $O/iov_sim/base/util/ClusterTable.o \
+    $O/iov_sim/base/util/ElectionHolder.o \
     $O/iov_sim/base/util/Logger.o \
     $O/iov_sim/base/util/NeighborList.o \
     $O/iov_sim/modules/applications/RSUApplication.o \

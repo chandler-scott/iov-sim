@@ -28,7 +28,10 @@
 #include "iov_sim/base/util/ClusterTable.h"
 #include "iov_sim/base/util/NeighborList.h"
 #include "iov_sim/base/util/NeighborEntry.h"
+#include "iov_sim/base/util/ElectionHolder.h"
+
 #include <cmath>
+#include <algorithm> // Added for std::find
 
 /* *
  *
@@ -77,8 +80,13 @@ protected:
     void sendElectionAck(Election* msg);
     void sendLeaderMsg(const char* leaderElected);
 
+    double calculateConnectivityPercentage();
+
     void loadModelUpdate(ModelUpdate* appMessage);
     void addSelfToNeighborTable();
+
+    void leaveCluster();
+    void leaveElection();
 
     void handleElection(const char* winnerId);
     void handleObservation();
@@ -108,12 +116,16 @@ private:
 
     /* @brief Timer for node to start an election */
     Timer *startElection = nullptr;
+    /* @brief Timer for election duration */
+    Timer *electionDuration = nullptr;
     /* @brief Timer for node to observe environment state */
     Timer *observeEnvironmentTimer = nullptr;
     /* @brief Timer for node to send neighbor beacons */
     Timer *neighborBeaconTimer = nullptr;
     /* @brief Timer for node to send cluster heartbeat */
     Timer *clusterHeartbeatTimer = nullptr;
+    /* @brief Timer for node to check cluster connectivity */
+    Timer *clusterHealthTimer = nullptr;
     /* @brief Timer for node to observe environment state */
     Timer *pruneNeighborListTimer = nullptr;
 

@@ -1,27 +1,18 @@
- Clustering
- - threshold for CH/CM trigger reelection (create a clusterHealthTimer)
-    * after p% of vehicles in neighbor list are not in cluster table
- 
- 
- Election
+Election
  - some mechanism to decide whether to join election
  - leader msg -> send cluster table
- - on leader msg rcv -> init cluster table
- - could add cluster table (or just new joiners) to heartbeat
+   - on leader msg rcv -> get and init cluster table
  
+ Cluster
+ -  prune from cluster table when no heartbeat reply received
+ -  with heartbeat, send up-to-date cluster table (or just new joiners)
+ -  "join cluster" functionality
  
  Learning
-  - reward
-  - redo observation/action input/output:
-	 - observation:
-		 - neighbor table
-		 - cluster table
-		 - neighbor connectivity %
-	 - action:
-		 - join election weights (score election holders)
-		 - score neighbor weights for election
-		 - threshold % for reelection call
+ - reward
+ - action:
+   - join election weights (score election holders)
  
  Aggregation
- CM -> CH
- CH -> RSU
+  - CM -> CH
+  - CH -> RSU

@@ -160,7 +160,7 @@ std::string ClusterTable::getBestScoringNeighbor() {
     return closestEntry;
 }
 
-std::vector<std::string> ClusterTable::getAllNeighbors() {
+std::vector<std::string> ClusterTable::getAllNeighbors() const {
     std::vector<std::string> keys;
     keys.reserve(table.size());
 

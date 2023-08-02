@@ -39,7 +39,7 @@ void AgentWrapper::initializeAgent()
     PyObject *pModule = wrapper.ppoModule;
     PyObject *pClass = PyObject_GetAttrString(pModule, "Agent");
 
-    Logger::info(std::to_string(localStepsPerEpoch), "A");
+    Logger::info(std::to_string(obs_size), "A");
 
     PyObject *obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject *actDim = wrapper.callZerosBoxSpace(act_size);

@@ -32,6 +32,6 @@ simple VehicleApplication extends DemoBaseApplLayer
     double neighborTableTimeout = default(30);
     double clusterElectionTimeout = default(3);
     double clusterHeadTimeout = default(3);
-    double clusterReelectionThreshold = default(0.7);    
+    double clusterReelectionThreshold = default(0.6);    
     @display("i=block/app2");
 }

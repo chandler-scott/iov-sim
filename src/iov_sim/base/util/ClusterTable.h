@@ -51,7 +51,7 @@ public:
     // get best scoring neighbor (closest to 0)
     std::string getBestScoringNeighbor();
 
-    std::vector<std::string> getAllNeighbors();
+    std::vector<std::string> getAllNeighbors() const;
 
 
     std::vector<double> toList();

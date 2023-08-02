@@ -31,6 +31,20 @@ void NeighborList::pruneList(double currentTime) {
     }
 }
 
+std::vector<std::string> NeighborList::getAllNeighbors() const {
+    std::vector<std::string> neighbors;
+    for (const auto& entry : neighborMap) {
+        neighbors.push_back(entry.first);
+    }
+    return neighbors;
+}
+
+// Method to get the size of list
+int NeighborList::getSize() const
+{
+    return neighborMap.size();
+}
+
 // Method to print the list with a nice format
 void NeighborList::printList() {
     std::cout << "Neighbor List:" << std::endl;

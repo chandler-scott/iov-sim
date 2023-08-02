@@ -176,40 +176,90 @@ PyObject* PythonWrapper::callToTensor(const std::vector<double>& inputList, doub
     PyObject* py_lower_bound = PyFloat_FromDouble(lower_bound);
     PyObject* py_upper_bound = PyFloat_FromDouble(upper_bound);
 
+    if (!py_lower_bound || !py_upper_bound) {
+        PyErr_Print();
+        PyErr_Clear();
+        fprintf(stderr, "Error converting bounds to Python objects.\n");
+
+        Py_XDECREF(py_lower_bound);
+        Py_XDECREF(py_upper_bound);
+        return nullptr;
+    }
+
     PyObject* pList = PyList_New(inputList.size());
+    if (!pList) {
+        PyErr_Print();
+        PyErr_Clear();
+        fprintf(stderr, "Error creating Python list.\n");
+
+        Py_XDECREF(py_lower_bound);
+        Py_XDECREF(py_upper_bound);
+        return nullptr;
+    }
+
     for (size_t i = 0; i < inputList.size(); ++i) {
         PyObject* pValue = PyFloat_FromDouble(inputList[i]);
+        if (!pValue) {
+            PyErr_Print();
+            PyErr_Clear();
+            fprintf(stderr, "Error converting element %zu to Python float.\n", i);
+
+            Py_XDECREF(pValue);
+            Py_DECREF(pList);
+            Py_XDECREF(py_lower_bound);
+            Py_XDECREF(py_upper_bound);
+            return nullptr;
+        }
+
         PyList_SetItem(pList, i, pValue);
     }
 
     // Get the function object from the module
     PyObject* pFunc = PyObject_GetAttrString(utilModule, "to_tensor");
-
-    if (pFunc && PyCallable_Check(pFunc)) {
-        // Call the Python function with the provided arguments
-
-        PyObject* pArgs = PyTuple_Pack(3, pList, py_lower_bound, py_upper_bound);
-
-        PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-
-        Py_DECREF(pArgs);
-
-        // Decrease the reference count of the function object
-        Py_XDECREF(pFunc);
-        Py_XDECREF(pList);
-
-
-        // Return the result of the Python function call
-        return pResult;
-    }
-    else {
-        if (PyErr_Occurred())
+    if (!pFunc || !PyCallable_Check(pFunc)) {
+        if (PyErr_Occurred()) {
             PyErr_Print();
+            PyErr_Clear();
+        }
         fprintf(stderr, "Cannot find function 'to_tensor'.\n");
+
+        Py_XDECREF(pFunc);
+        Py_DECREF(pList);
+        Py_XDECREF(py_lower_bound);
+        Py_XDECREF(py_upper_bound);
+        return nullptr;
     }
 
-    // If there was an error, return nullptr
-    return nullptr;
+    // Call the Python function with the provided arguments
+    PyObject* pArgs = PyTuple_Pack(3, pList, py_lower_bound, py_upper_bound);
+    if (!pArgs) {
+        PyErr_Print();
+        PyErr_Clear();
+        fprintf(stderr, "Error creating function arguments.\n");
+
+        Py_DECREF(pFunc);
+        Py_DECREF(pList);
+        Py_XDECREF(py_lower_bound);
+        Py_XDECREF(py_upper_bound);
+        return nullptr;
+    }
+
+    PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+    if (!pResult) {
+        PyErr_Print();
+        PyErr_Clear();
+        fprintf(stderr, "Error calling Python function.\n");
+    }
+
+    // Decrease the reference count of the function object
+    Py_XDECREF(pFunc);
+    Py_DECREF(pList);
+    Py_XDECREF(py_lower_bound);
+    Py_XDECREF(py_upper_bound);
+    Py_DECREF(pArgs);
+
+    // Return the result of the Python function call
+    return pResult;
 }
 
 PyObject* PythonWrapper::callZerosBoxSpace(int box_size, double lower_bound, double upper_bound)
@@ -324,5 +374,4 @@ PyObject* PythonWrapper::deserializeStateDict(std::string stateDictString)
 
         // If there was an error, return nullptr
         return nullptr;
-
 }
