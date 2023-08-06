@@ -42,7 +42,10 @@ void RSUApplication::initialize(int stage)
         policySave = par("policySave").stringValue();
         valueSave = par("valueSave").stringValue();
 
-        aggregator.loadStateDict(policyLoad, valueLoad);
+        if (par("loadModel").boolValue())
+        {
+            aggregator.loadStateDict(policyLoad, valueLoad);
+        }
     }
     else if (stage == 1) {
         modelRequestMessage = new ModelRequest("Model Request");
@@ -59,7 +62,11 @@ void RSUApplication::initialize(int stage)
 void RSUApplication::finish()
 {
     BaseApplicationLayer::finish();
-    aggregator.saveStateDict(policySave, valueSave);
+
+    if (par("saveModel").boolValue())
+    {
+        aggregator.saveStateDict(policySave, valueSave);
+    }
 
     delete modelRequestMessage;
 }
@@ -87,11 +94,11 @@ void RSUApplication::onModelMsg(BaseMessage* msg)
 void RSUApplication::sendModelUpdateMessage(const char* destination)
 {
     // get state_dicts as json-formatted PyObject string
-    auto [pJson, vJson] = aggregator.getStateDictsAsJson();
+    auto jsonStateDicts = aggregator.getStateDictsAsJson();
 
     // convert PyObject to const char*
-    auto pNet = aggregator.PyObjectToChar(pJson);
-    auto vNet = aggregator.PyObjectToChar(vJson);
+    auto pNet = aggregator.PyObjectToChar(jsonStateDicts.first);
+    auto vNet = aggregator.PyObjectToChar(jsonStateDicts.second);
 
     // send message
     BaseApplicationLayer::sendModelUpdateMessage(destination, pNet, vNet);

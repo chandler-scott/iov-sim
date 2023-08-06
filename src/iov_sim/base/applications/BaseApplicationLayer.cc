@@ -113,9 +113,9 @@ void BaseApplicationLayer::initialize(int stage)
     }
 }
 
-void BaseApplicationLayer::setDisplayColor(const char* color)
+void BaseApplicationLayer::setDisplayColor(const Color& color)
 {
-    findHost()->getDisplayString().setTagArg("i", 1, color);
+    findHost()->getDisplayString().setTagArg("i", 1, color.toString().c_str());
 }
 
 simtime_t BaseApplicationLayer::computeAsynchronousSendingTime(simtime_t interval, ChannelType chan)

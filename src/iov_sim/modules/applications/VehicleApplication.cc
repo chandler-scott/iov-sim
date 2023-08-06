@@ -40,7 +40,9 @@ void VehicleApplication::initialize(int stage) {
         clusterBeaconDelay = par("clusterBeaconDelay");
         clusterElectionTimeout = par("clusterElectionTimeout");
         clusterHeadTimeout = par("clusterHeadTimeout");
-        clusterReelectionThreshold = par("clusterReelectionThreshold");
+        connectivityThreshold = par("connectivityThreshold");
+        electionScoreThreshold = par("electionScoreThreshold");
+        clusterScoreThreshold = par("clusterScoreThreshold");
         neighborTableTimeout = par("neighborTableTimeout");
         agent.setLocalStepsPerEpoch(par("localStepsPerEpoch"));
 
@@ -74,7 +76,7 @@ void VehicleApplication::initialize(int stage) {
         clusterHeartbeatTimeout->setTimeout(4);
         clusterHeartbeatReplyTimeout = new Timeout(
                 "Cluster Heartbeat Reply Timeout");
-        clusterHeartbeatReplyTimeout->setTimeout(2);
+        clusterHeartbeatReplyTimeout->setTimeout(4);
 
         startElection = new Timer("Start Election Timer");
         startElection->setTime(5);
@@ -86,10 +88,14 @@ void VehicleApplication::initialize(int stage) {
         neighborBeaconTimer->setTime(3);
         clusterHeartbeatTimer = new Timer("Cluster Heartbeat Timer");
         clusterHeartbeatTimer->setTime(3);
+        clusterHeartbeatDuration = new Timer("Heartbeat Duration Timer");
+        clusterHeartbeatDuration->setTime(3);
         clusterHealthTimer = new Timer("Cluster Health Timer");
         clusterHealthTimer->setTime(6);
         pruneNeighborListTimer = new Timer("Prune Neighbor List Timer");
         pruneNeighborListTimer->setTime(3);
+        timeClusteredTimer = new Timer("Record Time Clustered Timer");
+        timeClusteredTimer->setTime(1);
 
         sendModelRequestMsg();
         // schedule neighber beacon msg
@@ -127,16 +133,20 @@ void VehicleApplication::finish() {
     if (clusterHeartbeatReplyTimeout->isScheduled()) {
         cancelEvent(clusterHeartbeatReplyTimeout);
     }
+    if (clusterHeartbeatDuration->isScheduled()) {
+        cancelEvent(clusterHeartbeatDuration);
+    }
     if (electionDuration->isScheduled()) {
         cancelEvent(electionDuration);
     }
 
-    delete clusterHeartbeatTimer;
     delete ackTimeout;
     delete startElection;
     delete electionDuration;
     delete electionTimeout;
     delete modelRequestTimeout;
+    delete clusterHeartbeatTimer;
+    delete clusterHeartbeatDuration;
     delete clusterHeartbeatTimeout;
     delete clusterHeartbeatReplyTimeout;
 
@@ -162,7 +172,7 @@ void VehicleApplication::onModelMsg(BaseMessage *msg) {
                 cancelEvent(modelRequestTimeout);
             }
 
-            setDisplayColor("#FFC107");
+            setDisplayColor(Color::MODEL_RCV);
             receivedModel = true;
 
             // load model then step()
@@ -178,24 +188,35 @@ void VehicleApplication::onModelMsg(BaseMessage *msg) {
             }
             // handle observation
             numObservations = 0;
+
+            auto time = simTime() + timeClusteredTimer->getTime();
             scheduleAt(simTime() + observeEnvironmentTimer->getTime(),
                     observeEnvironmentTimer);
+
+            scheduleAt(simTime() + timeClusteredTimer->getTime(),
+                    timeClusteredTimer);
         }
     }
 }
 
 void VehicleApplication::onElectionMsg(BaseMessage *msg) {
     if (Election *requestMsg = dynamic_cast<Election*>(msg)) {
-        // need logic for if we want to join this election
-        ElectionHolder holder = ElectionHolder(requestMsg->getElectionHolder());
+        if (!receivedModel)
+        {
+            return;
+        }
+        auto electionHolder = NeighborEntry(requestMsg->getNodeMobility());
+        auto self = selfToNeighborEntry();
 
-        bool participate = receivedModel && !(clusterHead || clusterMember)
-                && !receivedElectionAck;
+        // compare electionHolder to self
+        double score = scoreElectionHolder(electionHolder, self);
 
-        if (participate)
+        if (score >= electionScoreThreshold)
         {
             Logger::info("Participating in election!", nodeName);
             leaveElection();
+            leaveCluster();
+
             sendElectionAck(requestMsg);
         }
     } else if (Ack *appMessage = dynamic_cast<Ack*>(msg)) {
@@ -210,20 +231,7 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
             }
 
             receivedElectionAck = true;
-
-            NeighborEntry entry;
-
-            entry.carsInRange = appMessage->getCarsInRange();
-            entry.speed = appMessage->getSpeed();
-            entry.velocity = appMessage->getVelocity();
-            entry.xVelocity = appMessage->getXVelocity();
-            entry.yVelocity = appMessage->getYVelocity();
-            entry.acceleration = appMessage->getAcceleration();
-            entry.deceleration = appMessage->getDeceleration();
-            entry.xPosition = appMessage->getXPosition();
-            entry.yPosition = appMessage->getYPosition();
-            entry.xDirection = appMessage->getXDirection();
-            entry.yDirection = appMessage->getYDirection();
+            NeighborEntry entry = NeighborEntry(appMessage->getNodeMobility());
             auto origin = appMessage->getOrigin();
 
             // add entry to neighbor table
@@ -244,6 +252,7 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
             electionParentId = "";
 
             handleElection(leaderMsg->getClusterHeadId());
+            clusterTable.fromString(leaderMsg->getClusterTable());
         }
     } else if (Probe * requestMsg = dynamic_cast<Probe*>(msg)) {
         Logger::info("received a Probe message", nodeName);
@@ -254,39 +263,67 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
     }
 }
 
-void VehicleApplication::onClusterMsg(BaseMessage *msg) {
-    if (ClusterHeartbeat *appMessage = dynamic_cast<ClusterHeartbeat*>(msg)) {
-        if (std::strcmp(appMessage->getClusterId(), clusterHeadId.c_str())
-                == 0) {
-            if (clusterHeartbeatTimeout->isScheduled()) {
-                cancelEvent(clusterHeartbeatTimeout);
-            }
 
-            Logger::info("received a Cluster Heartbeat", nodeName);
+
+void VehicleApplication::onClusterMsg(BaseMessage *msg) {
+    if (ClusterHeartbeat *appMessage = dynamic_cast<ClusterHeartbeat*>(msg))
+    {
+
+        string chId = appMessage->getClusterId();
+
+        Logger::info("received a Cluster Heartbeat", nodeName);
+        Logger::info(clusterHeadId, nodeName);
+        Logger::info(appMessage->getOrigin(), nodeName);
+        Logger::info(to_string(chId.compare(clusterHeadId)), nodeName);
+
+
+        if (receivedModel && chId.compare(clusterHeadId))
+        {
+            Logger::info("Here!", nodeName);
+            clusterTable.fromString(appMessage->getClusterTable());
+
+            if (clusterScoreThreshold < scoreCluster())
+            {
+                // join cluster
+                clusterMember = true;
+                clusterHeadId = chId;
+                sendHeartbeatReply();
+                cmHeartbeatRcvs++;
+            }
+            else
+            {
+                clusterTable.resetTable();
+            }
+        }
+        else if (std::strcmp(appMessage->getClusterId(), clusterHeadId.c_str()) == 0)
+        {
+            Logger::info("received a Cluster Heartbeat from " + clusterHeadId, nodeName);
             Logger::info("-- from my CH, replying..", nodeName);
 
-            ClusterHeartbeatReply *reply = new ClusterHeartbeatReply();
-            reply->setDestination(clusterHeadId.c_str());
-            populateWSM(reply);
-            sendDown(reply);
+            clusterTable.fromString(appMessage->getClusterTable());
+            cmHeartbeatRcvs++;
 
-            // schedule timeout
-            if (clusterHeartbeatTimeout->isScheduled()) {
-                cancelEvent(clusterHeartbeatTimeout);
-            }
-
-            scheduleAt(simTime() + clusterHeartbeatTimeout->getTimeout(),
-                    clusterHeartbeatTimeout);
+            sendHeartbeatReply();
         }
     } else if (ClusterHeartbeatReply * appMessage =
             dynamic_cast<ClusterHeartbeatReply*>(msg)) {
-        if (std::strcmp(appMessage->getDestination(), nodeName) == 0) {
+        if (std::strcmp(appMessage->getDestination(), nodeName) == 0)
+        {
+            chHeartbeatRcvs++;
+
             if (clusterHeartbeatReplyTimeout->isScheduled()) {
                 cancelEvent(clusterHeartbeatReplyTimeout);
             }
 
             Logger::info("received a Cluster Heartbeat Reply", nodeName);
-            Logger::info("-- its for me!", nodeName);
+            auto entry = NeighborEntry(appMessage->getNodeMobility());
+            clusterTable.addRow(entry, appMessage->getOrigin());
+
+            // add node to cluster list if not already present
+            if (std::find(clusterNodes.begin(), clusterNodes.end(), appMessage->getOrigin()) == clusterNodes.end())
+            {
+                clusterNodes.push_back(appMessage->getOrigin());
+            }
         }
     } else if (ClusterJoin * appMessage = dynamic_cast<ClusterJoin*>(msg)) {
         Logger::info("received a Cluster Join Message", nodeName);
@@ -313,7 +350,7 @@ void VehicleApplication::handleElection(const char *winnerId) {
 
     if (std::strcmp(nodeName, winnerId) == 0) {
         Logger::info("-- I am cluster head!", nodeName);
-        setDisplayColor("#9C27B0");
+        setDisplayColor(Color::CLUSTER_HEAD);
         getParentModule()->setDisplayName((string(winnerId) + "'s CH").c_str());
         clusterHead = true;
         clusterHeadId = winnerId;
@@ -326,7 +363,7 @@ void VehicleApplication::handleElection(const char *winnerId) {
         Logger::info(
                 "-- joining " + string(winnerId)
                         + "'s cluster as cluster member", nodeName);
-        setDisplayColor("#FF5722");
+        setDisplayColor(Color::CLUSTER_MEMBER);
         getParentModule()->setDisplayName((string(winnerId) + "'s CM").c_str());
         clusterMember = true;
         clusterHeadId = winnerId;
@@ -341,6 +378,10 @@ void VehicleApplication::handleElection(const char *winnerId) {
     }
 
     // schedule cluster health timer
+    if (clusterHealthTimer->isScheduled())
+    {
+        cancelEvent(clusterHealthTimer);
+    }
     scheduleAt(simTime() + clusterHealthTimer->getTime(), clusterHealthTimer);
 }
 
@@ -362,13 +403,15 @@ void VehicleApplication::loadModelUpdate(ModelUpdate *appMessage) {
     if (std::strcmp(appMessage->getOrigin(), "rsu") == 0) {
         Logger::info("-- model from rsu. loading...", nodeName);
 
-        auto [pStateDict, vStateDict] = agent.getStateDictsFromJson(
+        auto stateDicts = agent.getStateDictsFromJson(
                 appMessage->getPStateDict(), appMessage->getVStateDict());
-        agent.loadStateDicts(pStateDict, vStateDict);
+
+        agent.loadStateDicts(stateDicts.first, stateDicts.second);
     }
 }
 
-void VehicleApplication::addSelfToNeighborTable() {
+NeighborEntry VehicleApplication::selfToNeighborEntry()
+{
     Coord position = mobility->getPositionAt(simTime());
     Coord direction = mobility->getCurrentDirection();
     double angle = traciVehicle->getAngle();
@@ -380,29 +423,28 @@ void VehicleApplication::addSelfToNeighborTable() {
     double yVelocity = speed * sin(angleRads);
     double velocity = sqrt((xVelocity * xVelocity) + (yVelocity * yVelocity));
 
-    NeighborEntry entry;
+    NeighborEntry entry = NeighborEntry(
+        clusterTable.getSize(), speed, velocity,
+        xVelocity, yVelocity,
+        traciVehicle->getAcceleration(), traciVehicle->getDeccel(),
+        position.x, position.y, direction.x, direction.y,
+        simTime().dbl()
+    );
 
-    entry.carsInRange = clusterTable.getSize();
-    entry.speed = speed;
-    entry.velocity = velocity;
-    entry.xVelocity = xVelocity;
-    entry.yVelocity = yVelocity;
-    entry.acceleration = traciVehicle->getAcceleration();
-    entry.deceleration = traciVehicle->getDeccel();
-    entry.xPosition = position.x;
-    entry.yPosition = position.y;
-    entry.xDirection = direction.x;
-    entry.yDirection = direction.y;
-    entry.timestamp = simTime().dbl();
+    return entry;
+}
 
+void VehicleApplication::addSelfToNeighborTable()
+{
     // add entry to neighbor table
     Logger::info("-- adding message to neighbor table", nodeName);
+    auto entry = selfToNeighborEntry();
     clusterTable.addRow(entry, nodeName);
 }
 
 void VehicleApplication::leaveCluster() {
     // leave cluster
-    setDisplayColor("#FFC107");
+    setDisplayColor(Color::MODEL_RCV);
     getParentModule()->setDisplayName("");
     clusterHead = false;
     clusterMember = false;
@@ -419,6 +461,10 @@ void VehicleApplication::leaveCluster() {
     if(clusterHeartbeatTimer->isScheduled())
     {
         cancelEvent(clusterHeartbeatTimer);
+    }
+    if(clusterHeartbeatDuration->isScheduled())
+    {
+        cancelEvent(clusterHeartbeatDuration);
     }
     if(clusterHeartbeatTimeout->isScheduled())
     {
@@ -447,16 +493,16 @@ void VehicleApplication::leaveElection()
     electionParentId = "";
     parent = "";
     electingLeader = false;
-    setDisplayColor("#FFC107");
+    setDisplayColor(Color::MODEL_RCV);
     getParentModule()->setDisplayName("");
     receivedElectionAck = false;
 }
 
 void VehicleApplication::sendModelUpdateMsg() {
-    auto [pStateDictJson, vStateDictJson] = agent.getStateDictsAsJson();
+    auto jsonStateDicts = agent.getStateDictsAsJson();
 
-    auto pNet = agent.PyObjectToChar(pStateDictJson);
-    auto vNet = agent.PyObjectToChar(vStateDictJson);
+    auto pNet = agent.PyObjectToChar(jsonStateDicts.first);
+    auto vNet = agent.PyObjectToChar(jsonStateDicts.second);
 
     BaseApplicationLayer::sendModelUpdateMessage(pNet, vNet, "vehicle");
 }
@@ -484,39 +530,17 @@ void VehicleApplication::sendNeighborBeacon() {
 void VehicleApplication::sendElectionMsg() {
     Logger::info("holding cluster election...", nodeName);
     getParentModule()->setDisplayName("electing CH src..");
-    setDisplayColor("#25e407");
+    setDisplayColor(Color::ELECTION_SRC);
 
     electingLeader = true;
     electionId = nodeName;
 
-    Coord position = curPosition;
-    Coord direction = mobility->getCurrentDirection();
-    double angle = traciVehicle->getAngle();
-    double angleRads = angle * (M_PI / 180.0);
-
-
-    int carsInRange = neighborList.getSize();
-    double speed = mobility->getSpeed();
-    double xVelocity = speed * cos(angleRads);
-    double yVelocity = speed * sin(angleRads);
-    double acceleration = traciVehicle->getAcceleration();
-    double deceleration = traciVehicle->getDeccel();
-    double xPosition = position.x;
-    double yPosition = position.y;
-    double xDirection = direction.x;
-    double yDirection = direction.y;
-
-    ElectionHolder holder = ElectionHolder(
-            carsInRange, speed, xVelocity,
-            yVelocity, acceleration, deceleration,
-            xPosition, yPosition, xDirection,yDirection
-    );
 
     Election *electionMessage = new Election();
     populateWSM(electionMessage);
 
     electionMessage->setOrigin(nodeName);
-    electionMessage->setElectionHolder(holder.toString().c_str());
+    electionMessage->setNodeMobility(selfToNeighborEntry().toString().c_str());
 
     sendDown(electionMessage);
     if(electionDuration->isScheduled())
@@ -527,51 +551,23 @@ void VehicleApplication::sendElectionMsg() {
 }
 
 void VehicleApplication::sendElectionAck(Election *msg) {
+    electingLeader = true;
     electionParentId = msg->getOrigin();
-    setDisplayColor("#2196F3");
+    setDisplayColor(Color::ELECTION_PARTICIPANT);
     getParentModule()->setDisplayName(
             string("electing CH. src: " + electionParentId).c_str());
-    Logger::info("participating in " + electionParentId, nodeName);
+    Logger::info("participating in " + electionParentId + "'s election.", nodeName);
 
-    electingLeader = true;
-
-    // get mobility data
-    double acceleration = traciVehicle->getAcceleration();
-    double deceleration = traciVehicle->getDeccel();
-    double speed = mobility->getSpeed();
-    Coord position = curPosition;
-    Coord direction = mobility->getCurrentDirection();
-    double angle = traciVehicle->getAngle();
-
-    // calculate velocities
-    double angleRads = angle * (M_PI / 180.0);
-    double xVelocity = speed * cos(angleRads);
-    double yVelocity = speed * sin(angleRads);
-    double velocity = sqrt((xVelocity * xVelocity) + (yVelocity * yVelocity));
+    NeighborEntry entry = selfToNeighborEntry();
 
     Ack *ackMessage = new Ack();
     populateWSM(ackMessage);
 
     ackMessage->setDestination(electionParentId.c_str());
-    ackMessage->setCarsInRange(clusterTable.getSize());
-
-    ackMessage->setAcceleration(acceleration);
-    ackMessage->setDeceleration(deceleration);
-
-    ackMessage->setSpeed(speed);
-    ackMessage->setVelocity(velocity);
-    ackMessage->setXVelocity(xVelocity);
-    ackMessage->setYVelocity(yVelocity);
-
-    ackMessage->setXPosition(position.x);
-    ackMessage->setYPosition(position.y);
-    ackMessage->setXDirection(direction.x);
-    ackMessage->setYDirection(direction.y);
-
+    ackMessage->setNodeMobility(entry.toString().c_str());
     ackMessage->setOrigin(nodeName);
 
     sendDown(ackMessage);
-    Logger::info("-- sent election ack!", nodeName);
 
     if (ackTimeout->isScheduled()) {
         cancelEvent(ackTimeout);
@@ -580,20 +576,93 @@ void VehicleApplication::sendElectionAck(Election *msg) {
 }
 
 void VehicleApplication::sendLeaderMsg(const char *leaderElected) {
+    addSelfToNeighborTable();
+
     Leader *leaderMessage = new Leader();
     populateWSM(leaderMessage);
-    leaderMessage->setOrigin(nodeName);
 
+    leaderMessage->setOrigin(nodeName);
     leaderMessage->setClusterHeadId(leaderElected);
+    leaderMessage->setClusterTable(clusterTable.toString().c_str());
+
     sendDelayedDown(leaderMessage, uniform(0.01, 0.2));
 }
+
+
+void VehicleApplication::sendHeartbeatReply()
+{
+    ClusterHeartbeatReply *reply = new ClusterHeartbeatReply();
+    populateWSM(reply);
+
+    reply->setDestination(clusterHeadId.c_str());
+    reply->setOrigin(nodeName);
+    auto entry = selfToNeighborEntry();
+    reply->setNodeMobility(entry.toString().c_str());
+
+    sendDown(reply);
+
+    // schedule timeout
+    if (clusterHeartbeatTimeout->isScheduled()) {
+        cancelEvent(clusterHeartbeatTimeout);
+    }
+
+    scheduleAt(simTime() + clusterHeartbeatTimeout->getTimeout(),
+            clusterHeartbeatTimeout);
+
+    cmHeartbeatSnds++;
+}
+
+
+double VehicleApplication::scoreCluster()
+{
+    // score cluster
+    auto self = selfToNeighborEntry();
+    clusterTable.calculateMetadata();
+
+    double score =
+            carsInRangeWeight * (clusterTable.avgCarsInRange - self.carsInRange)
+            + xVelocityWeight * (clusterTable.avgXVelocity - self.xVelocity)
+            + yVelocityWeight * (clusterTable.avgYVelocity - self.yVelocity)
+            + velocityWeight * (clusterTable.avgVelocity - self.velocity)
+            + speedWeight * (clusterTable.avgSpeed - self.speed)
+            + accelerationWeight * (clusterTable.avgAcceleration - self.acceleration)
+            + decelerationWeight * (clusterTable.avgDeceleration - self.deceleration)
+            + xPositionWeight * (clusterTable.avgXPosition - self.xPosition)
+            + yPositionWeight * (clusterTable.avgYPosition - self.yPosition)
+            + timestampWeight * (clusterTable.avgTimestamp - self.timestamp)
+            + xDirectionWeight * (clusterTable.avgXDirection - self.xDirection)
+            + yDirectionWeight * (clusterTable.avgYDirection - self.yDirection);
+    return score;
+}
+
+double VehicleApplication::scoreElectionHolder(NeighborEntry electionHolder, NeighborEntry self)
+{
+    double score =
+            electionSpeedWeight * (electionHolder.speed - self.speed)
+            + electionXVelocityWeight * (electionHolder.speed - self.speed)
+            + electionYVelocityWeight * (electionHolder.speed - self.speed)
+            + electionAccelerationWeight * (electionHolder.speed - self.speed)
+            + electionDecelerationWeight * (electionHolder.speed - self.speed)
+            + electionXPositionWeight * (electionHolder.speed - self.speed)
+            + electionYPositionWeight * (electionHolder.speed - self.speed)
+            + electionXDirectionWeight * (electionHolder.speed - self.speed)
+            + electionYDirectionWeight * (electionHolder.speed - self.speed)
+            + electionReceivedElectionAckWeight * (receivedElectionAck)
+            + electionCHWeight * (clusterHead)
+            + electionCMWeight * (clusterMember)
+            + electionConnectivityWeight * (calculateConnectivityPercentage());
+
+
+    return score;
+}
+
 
 double VehicleApplication::calculateConnectivityPercentage() {
     int totalNeighbors = neighborList.getSize();
 
     if (totalNeighbors == 0)
     {
-        return 0;
+        return 0;//
     }
 
     int matchingNeighbors = 0;
@@ -630,7 +699,7 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             handleLearn();
         }
         step();
-    } else if (msg == startElection) {
+    } else if (msg == startElection) {//
         bool inCluster = clusterHead || clusterMember;
 
         if (!inCluster && !electingLeader) {
@@ -646,13 +715,11 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
         clusterTable.calculateMetadata();
         clusterTable.scoreNeighbors();
 
-        auto bestCandidateNeighbor =
-                clusterTable.getBestScoringNeighbor().c_str();
-
-        handleElection(bestCandidateNeighbor);
+        const std::string& bestNeighbor = clusterTable.getBestScoringNeighbor();
+        handleElection(bestNeighbor.c_str());
 
         Logger::info("-- sending leader message..", nodeName);
-        sendLeaderMsg(bestCandidateNeighbor);
+        sendLeaderMsg(bestNeighbor.c_str());
     }
     else if (msg == electionTimeout) {
         Logger::info("Election timeout..", nodeName);
@@ -683,12 +750,13 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             // set up heartbeat
             ClusterHeartbeat *clusterHeartbeat = new ClusterHeartbeat();
             populateWSM(clusterHeartbeat);
+
             clusterHeartbeat->setClusterId(nodeName);
+            clusterHeartbeat->setClusterTable(clusterTable.toString().c_str());
 
             sendDown(clusterHeartbeat);
-            // schedule timer to send next heartbeat
-            scheduleAt(simTime() + clusterHeartbeatTimer->getTime(),
-                    clusterHeartbeatTimer);
+
+            chHeartbeatSnds += 1 * clusterTable.getSize();
 
             if (clusterHeartbeatReplyTimeout->isScheduled()) {
                 cancelEvent(clusterHeartbeatReplyTimeout);
@@ -696,6 +764,13 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             // schedule timeout for heartbeat replies
             scheduleAt(simTime() + clusterHeartbeatReplyTimeout->getTimeout(),
                     clusterHeartbeatReplyTimeout);
+
+            if (clusterHeartbeatDuration->isScheduled()) {
+                cancelEvent(clusterHeartbeatDuration);
+            }
+            // schedule timeout for heartbeat duration
+            scheduleAt(simTime() + clusterHeartbeatDuration->getTime(),
+                    clusterHeartbeatDuration);
         }
     }
     else if (msg == clusterHealthTimer)
@@ -707,11 +782,11 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
         double connectivity = calculateConnectivityPercentage();
 
         Logger::info(std::to_string(connectivity), nodeName);
-        Logger::info(std::to_string(clusterReelectionThreshold), nodeName);
+        Logger::info(std::to_string(connectivityThreshold), nodeName);
 
 
         // if connectivity < threshold
-        if (connectivity < clusterReelectionThreshold)
+        if (connectivity < connectivityThreshold)
         {
             Logger::info("-- connectivity is below threshold; holding reelection..",
                     nodeName);
@@ -721,6 +796,40 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
                 scheduleAt(simTime() + startElection->getTime(), startElection);
             }
         }
+    }
+    else if (msg == clusterHeartbeatDuration) {
+        Logger::info("Cluster heartbeat Duration.",
+                nodeName);
+
+        if (clusterHeartbeatReplyTimeout->isScheduled()) {
+            cancelEvent(clusterHeartbeatReplyTimeout);
+        }
+
+
+        // if no responses
+        if (clusterNodes.size() == 0)
+        {
+            Logger::info("No responses, leaving cluster.",
+                    nodeName);
+            leaveCluster();
+        }
+        else
+        {
+            // push self on clusterNodes and prune cluster table
+            if (std::find(clusterNodes.begin(), clusterNodes.end(), nodeName) == clusterNodes.end()) {
+                clusterNodes.push_back(nodeName);
+                clusterTable.pruneTable(clusterNodes);
+            }
+        }
+
+        clusterNodes.clear();
+
+        // schedule timer to send next heartbeat
+        if (clusterHeartbeatTimer->isScheduled()) {
+            cancelEvent(clusterHeartbeatTimer);
+        }
+        scheduleAt(simTime() + 0.1,
+                clusterHeartbeatTimer);
     }
     // if CH did not receive heartbeat replies..
     else if (msg == clusterHeartbeatReplyTimeout) {
@@ -744,13 +853,22 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             scheduleAt(simTime() + startElection->getTime(), startElection);
         }
     }
+    // timeClustered for reward calculation
+    else if (msg == timeClusteredTimer) {
+        if (clusterHead || clusterMember)
+        {
+            timeClustered += 1;
+        }
 
+        scheduleAt(simTime() + timeClusteredTimer->getTime(), timeClusteredTimer);
+    }
     else {
         Logger::error(
                 string("unknown message type: ") + msg->getClassAndFullName(),
                 nodeName);
     }
 }
+
 
 void VehicleApplication::step() {
     Logger::info("Stepping in the environment...", nodeName);
@@ -772,7 +890,9 @@ void VehicleApplication::step() {
 
     /*
      * Action values include: weights for neighbor score parameters,
-     * cluster reelection threshold
+     * election holder score, cluster join score
+     * connectivity threshold, election score threshold, and
+     * cluster score threshold (40 parameters total)
      */
     auto actionValues = agent.toDoublesList(curAction);
 
@@ -780,17 +900,99 @@ void VehicleApplication::step() {
             actionValues[3], actionValues[4], actionValues[5], actionValues[6],
             actionValues[7], actionValues[8], actionValues[9], actionValues[10],
             actionValues[11]);
-    clusterReelectionThreshold = actionValues[12];
+
+    electionSpeedWeight = actionValues[12];
+    electionXVelocityWeight = actionValues[13];
+    electionYVelocityWeight = actionValues[14];
+    electionAccelerationWeight = actionValues[15];
+    electionDecelerationWeight = actionValues[16];
+    electionXPositionWeight = actionValues[17];
+    electionYPositionWeight = actionValues[18];
+    electionXDirectionWeight = actionValues[19];
+    electionYDirectionWeight = actionValues[20];
+    electionReceivedElectionAckWeight = actionValues[21];
+    electionCHWeight = actionValues[22];
+    electionCMWeight = actionValues[23];
+    electionConnectivityWeight = actionValues[24];
+
+    carsInRangeWeight = actionValues[25];
+    xVelocityWeight = actionValues[26];
+    yVelocityWeight = actionValues[27];
+    velocityWeight = actionValues[28];
+    speedWeight = actionValues[29];
+    accelerationWeight = actionValues[30];
+    decelerationWeight = actionValues[31];
+    xPositionWeight = actionValues[32];
+    yPositionWeight = actionValues[33];
+    timestampWeight = actionValues[34];
+    xDirectionWeight = actionValues[35];
+    yDirectionWeight = actionValues[36];
+
+
+    connectivityThreshold = actionValues[37];
+    electionScoreThreshold = actionValues[38];
+    clusterScoreThreshold = actionValues[39];
 }
 
 void VehicleApplication::observe() {
     Logger::info("Storing transition to the buffer..", nodeName);
 
     // calculate reward
-    curReward = agent.toPyFloat(1);
+    // max 25 connectivity
+    double connectivity = calculateConnectivityPercentage() * 25;
+
+    // max 15 clusterTime
+    double clusterTime = timeClustered;
+
+    // set to 1 if 0
+    if (chHeartbeatSnds == 0)
+    {
+        chHeartbeatSnds = 1;
+    }
+
+    if (cmHeartbeatSnds == 0)
+    {
+        cmHeartbeatSnds = 1;
+    }
+
+    // max ~30
+    double chHeartbeatPercent = (chHeartbeatRcvs / chHeartbeatSnds ) * chHeartbeatSnds
+            * 10;
+    // max ~30
+    double cmHeartbeatPercent = (cmHeartbeatRcvs / cmHeartbeatSnds) * cmHeartbeatSnds
+            * 10;
+
+    // max possible reward: 85
+    double reward = connectivity + clusterTime +
+            chHeartbeatPercent + cmHeartbeatPercent;
+
+    // log reward
+    std::string output = "REWARD LOG:\n";
+    output += "Connectivity\t" + std::to_string(connectivity) + "\n";
+    output += "Cluster Time\t" + std::to_string(clusterTime) + "\n";
+    output += "CH Heartbeat %\t"
+            + std::to_string(chHeartbeatRcvs) + "/"
+            + std::to_string(chHeartbeatSnds) + " = "
+            + std::to_string(chHeartbeatPercent)
+            + "%\n";
+    output += "CM Heartbeat %\t"
+            + std::to_string(cmHeartbeatRcvs) + "/"
+            + std::to_string(cmHeartbeatSnds) + " = "
+            + std::to_string(cmHeartbeatPercent)
+            + "%\n";
+    output += "Total Reward\t" + std::to_string(reward) + "\n";
+    Logger::info(output, nodeName);
+
+    curReward = agent.toPyFloat(reward);
 
     agent.bufferStoreTransition(curObservation, curAction, curReward, curValue,
             curLogp);
+
+    timeClustered = 0;
+    chHeartbeatSnds = 0;
+    chHeartbeatRcvs = 0;
+    cmHeartbeatSnds = 0;
+    cmHeartbeatRcvs = 0;
 }
 
 void VehicleApplication::learn() {

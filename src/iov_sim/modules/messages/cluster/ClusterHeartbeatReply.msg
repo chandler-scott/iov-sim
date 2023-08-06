@@ -26,4 +26,5 @@ namespace iov_sim;
 
 packet ClusterHeartbeatReply extends ClusterBaseMessage {
     string destination;
+    string nodeMobility;
 }

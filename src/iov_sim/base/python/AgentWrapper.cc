@@ -22,7 +22,6 @@
 
 #include "iov_sim/base/python/AgentWrapper.h"
 #include <iostream>
-#include <Python.h>
 
 AgentWrapper::AgentWrapper() : BaseWrapper()
 { }
@@ -38,8 +37,6 @@ void AgentWrapper::initializeAgent()
     // Access the Aggregator class from the Python module
     PyObject *pModule = wrapper.ppoModule;
     PyObject *pClass = PyObject_GetAttrString(pModule, "Agent");
-
-    Logger::info(std::to_string(obs_size), "A");
 
     PyObject *obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject *actDim = wrapper.callZerosBoxSpace(act_size);

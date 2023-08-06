@@ -43,7 +43,6 @@
 #include "iov_sim/modules/messages/model/ModelUpdate_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterHeartbeat_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterHeartbeatReply_m.h"
-#include "iov_sim/modules/messages/cluster/ClusterData_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterJoin_m.h"
 #include "iov_sim/modules/messages/election/Ack_m.h"
 #include "iov_sim/modules/messages/election/AckTimeout_m.h"
@@ -53,6 +52,7 @@
 #include "iov_sim/modules/messages/election/Probe_m.h"
 #include "iov_sim/modules/messages/election/Reply_m.h"
 #include "iov_sim/modules/messages/neighbor/NeighborBeacon_m.h"
+#include "iov_sim/base/util/Color.h"
 
 
 
@@ -94,7 +94,7 @@ public:
     };
 
 protected:
-    void setDisplayColor(const char* color);
+    void setDisplayColor(const Color& color);
 
     void sendModelUpdateMessage(const char* destination, const char* pNet, const char* vNet, const char* origin = "rsu");
 

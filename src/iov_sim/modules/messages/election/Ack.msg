@@ -26,15 +26,5 @@ namespace iov_sim;
 
 packet Ack extends ElectionBaseMessage {
     string sender = "";
-    int carsInRange = 0;
-    double speed = 0;
-    double velocity = 0;
-    double xVelocity = 0;
-    double yVelocity = 0;
-    double deceleration = 0;
-    double acceleration = 0;
-    double xPosition = 0;
-    double yPosition = 0;
-    double xDirection = 0;
-    double yDirection = 0;
+	string nodeMobility;
 }

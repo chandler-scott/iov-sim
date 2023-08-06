@@ -26,4 +26,5 @@ namespace iov_sim;
 
 packet Leader extends ElectionBaseMessage {
     string clusterHeadId;
+    string clusterTable;
 }

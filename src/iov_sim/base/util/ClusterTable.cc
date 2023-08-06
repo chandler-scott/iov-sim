@@ -13,6 +13,13 @@ ClusterTable::ClusterTable(double defaultTimeout) : timeout(defaultTimeout)
     setWeights();
 }
 
+ClusterTable::ClusterTable(std::string initString, double defaultTimeout)
+    : timeout(defaultTimeout)
+{
+    setWeights();
+    fromString(initString);
+}
+
 // Set weights for scoring neighbors
 void ClusterTable::setWeights(double inRangeWeight, double xVelWeight,
         double yVelWeight, double velWeight, double speedWeight, double accelWeight,
@@ -47,6 +54,20 @@ void ClusterTable::pruneTable(double currentTime) {
         } else {
             ++it;
         }
+    }
+}
+
+void ClusterTable::pruneTable(const std::vector<std::string>& clusterNodes) {
+    auto it = table.begin();
+     while (it != table.end()) {
+         const std::string& nodeId = it->first;
+         // Check if nodeId is not present in clusterNodes
+         if (std::find(clusterNodes.begin(), clusterNodes.end(), nodeId) == clusterNodes.end()) {
+             // nodeId not found in clusterNodes, remove the entry from the table
+             it = table.erase(it);
+         } else {
+             ++it;
+         }
     }
 }
 
@@ -115,6 +136,90 @@ void ClusterTable::scoreNeighbors() {
                 xDirectionWeight * (avgXDirection - entry.second.xDirection) +
                 yDirectionWeight * (avgYDirection - entry.second.yDirection) +
                 timeWeight * (avgTimestamp - entry.second.timestamp);
+    }
+}
+
+// Convert the ClusterTable object to a string representation
+std::string ClusterTable::toString() const
+{
+    std::string result;
+
+    // Serialize the table entries
+    for (const auto& entry : table)
+    {
+        result += entry.first + ":";
+        result += std::to_string(entry.second.carsInRange) + ",";
+        result += std::to_string(entry.second.speed) + ",";
+        result += std::to_string(entry.second.velocity) + ",";
+        result += std::to_string(entry.second.xVelocity) + ",";
+        result += std::to_string(entry.second.yVelocity) + ",";
+        result += std::to_string(entry.second.acceleration) + ",";
+        result += std::to_string(entry.second.deceleration) + ",";
+        result += std::to_string(entry.second.xPosition) + ",";
+        result += std::to_string(entry.second.yPosition) + ",";
+        result += std::to_string(entry.second.xDirection) + ",";
+        result += std::to_string(entry.second.yDirection) + ",";
+        result += std::to_string(entry.second.timestamp) + ",";
+        result += "\n";
+
+    }
+
+    return result;
+}
+
+// Convert the string representation to a ClusterTable object
+void ClusterTable::fromString(const std::string& str)
+{
+    table.clear();
+    score.clear();
+
+    // Split the input string into entries
+    std::vector<std::string> entries;
+    std::istringstream ss(str);
+    std::string entry;
+    while (std::getline(ss, entry, '\n'))
+    {
+        entries.push_back(entry);
+    }
+
+    for (const auto& entryStr : entries)
+    {
+        // Split the entry into its components
+        std::istringstream entryStream(entryStr);
+        std::string nodeId;
+        std::getline(entryStream, nodeId, ':');
+
+        NeighborEntry neighborEntry;
+
+        // Deserialize the properties and set them in the NeighborEntry
+        std::string property;
+        std::getline(entryStream, property, ',');
+        neighborEntry.carsInRange = std::stoi(property); // Convert to int
+        std::getline(entryStream, property, ',');
+        neighborEntry.speed = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.velocity = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.xVelocity = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.yVelocity = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.acceleration = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.deceleration = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.xPosition = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.yPosition = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.xDirection = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.yDirection = std::stod(property);
+        std::getline(entryStream, property, ',');
+        neighborEntry.timestamp = std::stod(property);
+
+        // Add the NeighborEntry to the table
+        table[nodeId] = neighborEntry;
     }
 }
 

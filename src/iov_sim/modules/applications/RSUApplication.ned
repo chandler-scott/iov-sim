@@ -32,5 +32,6 @@ simple RSUApplication extends DemoBaseApplLayer
     string policySave = default("fed_p");
     string valueLoad = default("fed_v");
     string valueSave = default("fed_v");
-    
+    bool loadModel = default(true);
+    bool saveModel = default(true);
 }

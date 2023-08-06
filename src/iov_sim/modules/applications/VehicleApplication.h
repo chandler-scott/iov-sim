@@ -28,7 +28,7 @@
 #include "iov_sim/base/util/ClusterTable.h"
 #include "iov_sim/base/util/NeighborList.h"
 #include "iov_sim/base/util/NeighborEntry.h"
-#include "iov_sim/base/util/ElectionHolder.h"
+
 
 #include <cmath>
 #include <algorithm> // Added for std::find
@@ -43,7 +43,6 @@
  *  Cluster head: #9C27B0 (Purple)
  *  Cluster member: #FF5722 (Orange)
  * */
-
 
 
 using namespace veins;
@@ -79,10 +78,15 @@ protected:
     void sendElectionMsg();
     void sendElectionAck(Election* msg);
     void sendLeaderMsg(const char* leaderElected);
+    void sendHeartbeatReply();
 
+
+    double scoreCluster();
+    double scoreElectionHolder(NeighborEntry electionHolder, NeighborEntry self);
     double calculateConnectivityPercentage();
 
     void loadModelUpdate(ModelUpdate* appMessage);
+    NeighborEntry selfToNeighborEntry();
     void addSelfToNeighborTable();
 
     void leaveCluster();
@@ -96,8 +100,6 @@ protected:
     void step();
     void observe();
     void learn();
-
-
 
 private:
     AgentWrapper agent;
@@ -124,10 +126,14 @@ private:
     Timer *neighborBeaconTimer = nullptr;
     /* @brief Timer for node to send cluster heartbeat */
     Timer *clusterHeartbeatTimer = nullptr;
+    /* @brief Timer for cluster heartbeat duration */
+    Timer *clusterHeartbeatDuration = nullptr;
     /* @brief Timer for node to check cluster connectivity */
     Timer *clusterHealthTimer = nullptr;
     /* @brief Timer for node to observe environment state */
     Timer *pruneNeighborListTimer = nullptr;
+    /* @brief Timer for node to check time clustered for reward function*/
+    Timer *timeClusteredTimer = nullptr;
 
 
     // AI params
@@ -144,6 +150,7 @@ private:
 
     ClusterTable clusterTable;
     NeighborList neighborList;
+    vector<std::string> clusterNodes;
     int clusterBeaconDelay;
     double neighborTableTimeout;
     const char* parent;
@@ -161,6 +168,31 @@ private:
     bool receivedElectionLeader;
 
 
+    /* REWARD PARAMS */
+    double timeClustered = 0;
+    double chHeartbeatSnds = 0;
+    double chHeartbeatRcvs = 0;
+    double cmHeartbeatSnds = 0;
+    double cmHeartbeatRcvs = 0;
+
+
+
+    /* CLUSTER SCORE WEIGHTS */
+    double carsInRangeWeight;
+    double xVelocityWeight;
+    double yVelocityWeight;
+    double velocityWeight;
+    double speedWeight;
+    double accelerationWeight;
+    double decelerationWeight;
+    double xPositionWeight;
+    double yPositionWeight;
+    double timestampWeight;
+    double xDirectionWeight;
+    double yDirectionWeight;
+
+
+
     // timeout for nodes to buy into election
     double clusterElectionTimeout;
 
@@ -169,7 +201,28 @@ private:
     double clusterHeadTimeout;
 
     // threshold for cluster head to call for new election
-    double clusterReelectionThreshold;
+    double connectivityThreshold;
+    // threshold for node to join election
+    double electionScoreThreshold;
+    // threshold for cluster score to join a cluster
+    double clusterScoreThreshold;
+
+
+    /* Weights for election holder score */
+    double electionSpeedWeight = 0;
+    double electionXVelocityWeight = 0;
+    double electionYVelocityWeight = 0;
+    double electionAccelerationWeight = 0;
+    double electionDecelerationWeight = 0;
+    double electionXPositionWeight = 0;
+    double electionYPositionWeight = 0;
+    double electionXDirectionWeight = 0;
+    double electionYDirectionWeight = 0;
+    double electionReceivedElectionAckWeight = 0;
+    double electionCHWeight = 0;
+    double electionCMWeight = 0;
+    double electionConnectivityWeight = 0;
+
 
     std::string clusterHeadId;
     bool clusterHead;

@@ -21,8 +21,6 @@
 //
 
 #include "iov_sim/base/python/AggregatorWrapper.h"
-
-#include <numpy/arrayobject.h> // Include the NumPy header for C API
 #include <iostream>
 
 using namespace std;

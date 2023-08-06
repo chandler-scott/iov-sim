@@ -1,18 +1,22 @@
 /*
- * ClusterTable.h
+ * COLOR.h
  *
- *  Created on: Jul 24, 2023
+ *  Created on: Aug 3, 2023
  *      Author: chandler
  */
 
-#ifndef IOV_SIM_BASE_UTIL_NEIGHBORTABLE_H_
-#define IOV_SIM_BASE_UTIL_NEIGHBORTABLE_H_
+#ifndef IOV_SIM_BASE_UTIL_CLUSTERTABLE_H_
+#define IOV_SIM_BASE_UTIL_CLUSTERTABLE_H_
 
 #include <iostream>
 #include <unordered_map>
 #include <string>
 #include <limits>
 #include <vector>
+#include <sstream>
+#include <algorithm>
+
+
 
 #include "iov_sim/base/util/NeighborEntry.h"
 
@@ -30,6 +34,9 @@ public:
     // Constructor
     explicit ClusterTable(double defaultTimeout = 30.0);
 
+    explicit ClusterTable(std::string initString, double defaultTimeout = 30.0);
+
+
     // Set weights for scoring neighbors
     void setWeights(double xVelWeight = 1, double yVelWeight = 1, double velWeight = 1,
                        double speedWeight = 1, double accelWeight = 1, double decelWeight = 1,
@@ -41,6 +48,7 @@ public:
 
     // Prune rows from the table based on the given currentTime
     void pruneTable(double currentTime);
+    void pruneTable(const std::vector<std::string>& clusterNodes);
 
     // calculate averages
     void calculateMetadata();
@@ -53,6 +61,8 @@ public:
 
     std::vector<std::string> getAllNeighbors() const;
 
+    std::string toString() const;
+    void fromString(const std::string& str);
 
     std::vector<double> toList();
 
@@ -71,7 +81,6 @@ public:
     // Print the table
     void printTable();
 
-private:
     double avgCarsInRange;
     double avgXVelocity;
     double avgYVelocity;
@@ -84,10 +93,10 @@ private:
     double avgTimestamp;
     double avgXDirection;
     double avgYDirection;
-
     // Degree of centricity
     double centricity;
 
+private:
     double carsInRangeWeight;
     double xVelocityWeight;
     double yVelocityWeight;
@@ -101,8 +110,6 @@ private:
     double xDirectionWeight;
     double yDirectionWeight;
     double centricityWeight;
-
-
 };
 
-#endif /* IOV_SIM_BASE_UTIL_NEIGHBORTABLE_H_ */
+#endif /* IOV_SIM_BASE_UTIL_CLSUTERTABLE_H_ */

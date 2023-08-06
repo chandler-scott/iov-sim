@@ -36,8 +36,8 @@ OBJS = \
     $O/iov_sim/base/python/PythonLifecycle.o \
     $O/iov_sim/base/python/PythonWrapper.o \
     $O/iov_sim/base/util/ClusterTable.o \
-    $O/iov_sim/base/util/ElectionHolder.o \
     $O/iov_sim/base/util/Logger.o \
+    $O/iov_sim/base/util/NeighborEntry.o \
     $O/iov_sim/base/util/NeighborList.o \
     $O/iov_sim/modules/applications/RSUApplication.o \
     $O/iov_sim/modules/applications/VehicleApplication.o \
@@ -45,7 +45,6 @@ OBJS = \
     $O/iov_sim/base/messages/Timeout_m.o \
     $O/iov_sim/base/messages/Timer_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterBaseMessage_m.o \
-    $O/iov_sim/modules/messages/cluster/ClusterData_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterHeartbeat_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterHeartbeatReply_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterJoin_m.o \
@@ -69,7 +68,6 @@ MSGFILES = \
     iov_sim/base/messages/Timeout.msg \
     iov_sim/base/messages/Timer.msg \
     iov_sim/modules/messages/cluster/ClusterBaseMessage.msg \
-    iov_sim/modules/messages/cluster/ClusterData.msg \
     iov_sim/modules/messages/cluster/ClusterHeartbeat.msg \
     iov_sim/modules/messages/cluster/ClusterHeartbeatReply.msg \
     iov_sim/modules/messages/cluster/ClusterJoin.msg \

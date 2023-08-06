@@ -25,5 +25,5 @@ import iov_sim.modules.messages.election.ElectionBaseMessage;
 namespace iov_sim;
 
 packet Election extends ElectionBaseMessage {
-    string electionHolder;
+    string nodeMobility;
 }

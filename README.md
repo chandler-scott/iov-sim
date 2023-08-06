@@ -2,8 +2,16 @@
 
 Implementing federated deep reinforcement learning to enable cluster based communication in IoV.
 
-## Notes ##
-If you change the dimensions of a neural network for the vehicle application, you must change the dimensions of the RSU to match, or vice versa.
+
+## Proximal Policy Optimization Details ## 
+### Observation ### 
+The agent observes averages for each cluster table value and node connectivity every 15 seconds and then selects the optimal action.
+
+### Reward ###
+The reward is comprised of the connectivity, time spent in a cluster, cluster head successful heartbeat percentage, and cluster member heartbeat percentage. Maximum score at time of writing is 45.
+
+### Action ###
+This simulation outputs 40 parameter values (ranging from -1 to 1) to set the values for neighbor score weights, election holder score weights, cluster join score weights, connectivity threshold for reelection, election score threshold for joining an election, and cluster score threshold for joining an existing cluster
 
 
 ## Supported program versions ##

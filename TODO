@@ -1,18 +1,9 @@
-Election
- - some mechanism to decide whether to join election
- - leader msg -> send cluster table
-   - on leader msg rcv -> get and init cluster table
+ Reward (1 day)
+ - optimize reward function
+   - heartbeat % (CH can score much higher)
+   - election reward (reard based on how many successful elections)
+   - reawrd based on # of clusters
  
- Cluster
- -  prune from cluster table when no heartbeat reply received
- -  with heartbeat, send up-to-date cluster table (or just new joiners)
- -  "join cluster" functionality
- 
- Learning
- - reward
- - action:
-   - join election weights (score election holders)
- 
- Aggregation
+ Aggregation (2 days)
   - CM -> CH
   - CH -> RSU

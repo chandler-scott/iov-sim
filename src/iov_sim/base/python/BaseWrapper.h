@@ -25,8 +25,8 @@ public:
 
     void loadStateDicts(PyObject *pClass, PyObject *pStateDict, PyObject *vStateDict);
 
-    virtual std::pair<PyObject *, PyObject *> getStateDictsAsJson(PyObject *pClass);
-    virtual std::pair<PyObject *, PyObject *> getStateDictsFromJson(PyObject *pClass, PyObject *pBytes, PyObject *vBytes);
+    std::pair<PyObject *, PyObject *> getStateDictsAsJson(PyObject *pClass);
+    std::pair<PyObject *, PyObject *> getStateDictsFromJson(PyObject *pClass, PyObject *pBytes, PyObject *vBytes);
 
 
     const char *PyObjectToChar(PyObject *obj);
@@ -38,7 +38,7 @@ protected:
 
     // neural network parameters
     int obs_size = 13;
-    int act_size = 13;
+    int act_size = 40;
     double lower_bound = -1.0;
     double upper_bound = 1.0;
 };

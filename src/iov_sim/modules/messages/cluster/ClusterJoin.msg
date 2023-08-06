@@ -25,5 +25,4 @@ import iov_sim.modules.messages.cluster.ClusterBaseMessage;
 namespace iov_sim;
 
 packet ClusterJoin extends ClusterBaseMessage {
-    string origin;
 }

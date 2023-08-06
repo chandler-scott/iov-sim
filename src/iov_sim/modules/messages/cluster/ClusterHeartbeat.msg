@@ -27,4 +27,5 @@ namespace iov_sim;
 packet ClusterHeartbeat extends ClusterBaseMessage {
     double chXPosition;
     double chYPosition;
+    string clusterTable;
 }
