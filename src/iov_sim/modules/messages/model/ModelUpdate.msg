@@ -25,6 +25,5 @@ import iov_sim.modules.messages.model.ModelBaseMessage;
 namespace iov_sim;
 
 packet ModelUpdate extends ModelBaseMessage {
-    string pStateDict;
-    string vStateDict;
+
 }

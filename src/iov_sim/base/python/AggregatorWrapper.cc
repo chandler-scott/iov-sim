@@ -65,6 +65,38 @@ AggregatorWrapper::AggregatorWrapper() : BaseWrapper()
     }
 }
 
+std::pair<PyObject*, PyObject*> AggregatorWrapper::aggregateModels(PyObject* pNets, PyObject* vNets)
+{
+    if (pAggregator)
+            {
+                PyObject *args = PyTuple_Pack(2, pNets, vNets);
+                PyObject *pFunc = PyObject_GetAttrString(pAggregator, "aggregate");
+
+
+                PyObject *result = PyObject_CallObject(pFunc, args);
+                if (result == nullptr)
+                {
+                    PyErr_Print();
+                }
+                else
+                {
+                    if (PyTuple_Check(result) && PyTuple_Size(result) == 2)
+                    {
+                        PyObject *firstElement = PyTuple_GetItem(result, 0);
+                        PyObject *secondElement = PyTuple_GetItem(result, 1);
+
+                        return std::make_pair(firstElement, secondElement);
+                    }
+                }
+            }
+            else
+            {
+                PyErr_Print();
+            }
+    return std::make_pair(nullptr, nullptr);
+
+}
+
 std::pair<PyObject*, PyObject*> AggregatorWrapper::getStateDictsAsJson()
 {
     if (pAggregator)
@@ -134,8 +166,6 @@ void AggregatorWrapper::saveStateDict(const std::string& policySave, const std::
 void AggregatorWrapper::loadStateDict(const std::string& policyLoad, const std::string& valueLoad)
 {
     if (pAggregator) {
-
-        // Convert C++ strings to Python objects (PyObjects)
         PyObject* pLoadArgObj = PyUnicode_FromString(policyLoad.c_str());
         PyObject* vLoadArgObj = PyUnicode_FromString(valueLoad.c_str());
 

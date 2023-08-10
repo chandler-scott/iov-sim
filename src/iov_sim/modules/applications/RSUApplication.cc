@@ -48,14 +48,12 @@ void RSUApplication::initialize(int stage)
         }
     }
     else if (stage == 1) {
-        modelRequestMessage = new ModelRequest("Model Request");
+        modelAggTimer = new Timer("Model Aggregation Timer");
+        modelAggTimer->setTime(120);
+        modelAggWindow = new Timer("Model Aggregation Window");
+        modelAggWindow->setTime(5);
 
-        populateWSM(modelRequestMessage);
-
-        modelRequestMessage->setData("model request");
-        modelRequestMessage->setOrigin("rsu");
-
-        // sendDelayedDown(modelRequestMessage->dup(), 10 + uniform(0.01, 0.2));
+        scheduleAt(simTime() + modelAggTimer->getTime(), modelAggTimer);
     }
 }
 
@@ -68,7 +66,18 @@ void RSUApplication::finish()
         aggregator.saveStateDict(policySave, valueSave);
     }
 
-    delete modelRequestMessage;
+    if (modelAggTimer->isScheduled())
+    {
+        cancelEvent(modelAggTimer);
+    }
+
+    if (modelAggWindow->isScheduled())
+    {
+        cancelEvent(modelAggWindow);
+    }
+
+    delete modelAggTimer;
+    delete modelAggWindow;
 }
 
 void RSUApplication::onModelMsg(BaseMessage* msg)
@@ -77,15 +86,49 @@ void RSUApplication::onModelMsg(BaseMessage* msg)
         // RSU has received an initialize message from a vehicle -> they need an
         // updated model. Respond with ModelUpdateMessage (message containing
         // up-to-date AI model)
-        Logger::info("received a Model Request Message", nodeName);
-
-        findHost()->getDisplayString().setTagArg("i", 1, "green");
-        auto origin = requestMsg->getOrigin();
-
-        if (std::strcmp(origin, "rsu") != 0)
+        if (std::strcmp(requestMsg->getOrigin(), "rsu") != 0
+                && std::strcmp(requestMsg->getDestination(), "rsu") == 0)
         {
+            Logger::info(string("received a Model Request Message from ") + requestMsg->getOrigin(),
+                    nodeName);
+
+            findHost()->getDisplayString().setTagArg("i", 1, "green");
+
             Logger::info("-- request from vehicle. sending...", nodeName);
-            sendModelUpdateMessage(origin);
+            Logger::info("-- sending model request message!", nodeName);
+
+            // get state_dicts as json-formatted PyObject string
+            auto jsonStateDicts = aggregator.getStateDictsAsJson();
+
+            // convert PyObject to const char*
+            auto pNet = aggregator.PyObjectToChar(jsonStateDicts.first);
+            auto vNet = aggregator.PyObjectToChar(jsonStateDicts.second);
+
+            ModelInit *msg = new ModelInit();
+            populateWSM(msg);
+
+
+            msg->setData("requesting model");
+            msg->setOrigin("rsu");
+            msg->setDestination(requestMsg->getOrigin());
+            msg->setPStateDict(pNet);
+            msg->setVStateDict(vNet);
+
+            sendDown(msg);
+        }
+    }
+    else if (ModelUpdate* updateMsg = dynamic_cast<ModelUpdate*>(msg)) {
+        if (std::strcmp(updateMsg->getDestination(), "rsu") == 0)
+        {
+            Logger::info("received a Model Update Message", nodeName);
+
+            findHost()->getDisplayString().setTagArg("i", 1, "purple");
+
+            auto stateDicts = aggregator.getStateDictsFromJson(
+                    updateMsg->getPStateDict(), updateMsg->getVStateDict());
+
+            pStateDicts.push_back(stateDicts.first);
+            vStateDicts.push_back(stateDicts.second);
         }
     }
    else { }
@@ -104,3 +147,69 @@ void RSUApplication::sendModelUpdateMessage(const char* destination)
     BaseApplicationLayer::sendModelUpdateMessage(destination, pNet, vNet);
     Logger::info("-- up-to-date model sent!", nodeName);
 }
+
+void RSUApplication::handleSelfMsg(cMessage *msg) {
+    if (msg == modelAggTimer) {
+        Logger::info("Sending model aggregation request!", nodeName);
+
+        ModelRequest *msg = new ModelRequest();
+        populateWSM(msg);
+
+        msg->setData("requesting model");
+        msg->setOrigin("rsu");
+
+        sendDown(msg);
+        scheduleAt(simTime() + modelAggWindow->getTime(), modelAggWindow);
+
+    }  else if (msg == modelAggWindow) {
+        Logger::info("End of model agg rcv window; aggregating...",
+                nodeName);
+        // convert vector to python list
+        if (pStateDicts.size() == 0)
+        {
+            Logger::info("No models received.. Starting agg timer back up",
+                    nodeName);
+            findHost()->getDisplayString().setTagArg("i", 1, "");
+            scheduleAt(simTime() + modelAggTimer->getTime(), modelAggTimer);
+            return;
+        }
+
+        PyObject* pList = PyList_New(pStateDicts.size());
+        PyObject* vList = PyList_New(vStateDicts.size());
+
+        for (size_t i = 0; i < pStateDicts.size(); ++i) {
+            PyList_SET_ITEM(pList, i, pStateDicts[i]);
+        }
+        for (size_t i = 0; i < vStateDicts.size(); ++i) {
+            PyList_SET_ITEM(vList, i, vStateDicts[i]);
+        }
+
+        // aggregate list of rcv'd models and load
+        auto models = aggregator.aggregateModels(pList, vList);
+        aggregator.loadStateDicts(aggregator.getAggregatorClass(),
+                models.first, models.second);
+
+        Logger::info("Aggregation successful. Disseminating newly updated model.",
+                nodeName);
+
+        // get state_dicts as json-formatted PyObject string
+        auto jsonStateDicts = aggregator.getStateDictsAsJson();
+
+        // convert PyObject to const char*
+        auto pNet = aggregator.PyObjectToChar(jsonStateDicts.first);
+        auto vNet = aggregator.PyObjectToChar(jsonStateDicts.second);
+
+        BaseApplicationLayer::sendModelUpdateMessage("all", pNet, vNet);
+
+        pStateDicts.clear();
+        vStateDicts.clear();
+
+        findHost()->getDisplayString().setTagArg("i", 1, "");
+        scheduleAt(simTime() + modelAggTimer->getTime(), modelAggTimer);
+    } else {
+        Logger::error(
+                string("unknown message type: ") + msg->getClassAndFullName(),
+                nodeName);
+    }
+}
+

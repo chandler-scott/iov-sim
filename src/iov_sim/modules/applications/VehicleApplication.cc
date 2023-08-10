@@ -28,7 +28,7 @@ using namespace iov_sim;
 Define_Module(iov_sim::VehicleApplication);
 
 VehicleApplication::VehicleApplication() :
-        agent(), clusterTable(), neighborList() {
+        agent(), aggregator(), clusterTable(), neighborList() {
 }
 
 void VehicleApplication::initialize(int stage) {
@@ -62,6 +62,8 @@ void VehicleApplication::initialize(int stage) {
         electionParentId = "";
         leaderId = nullptr;
         hasSentElectionAck = false;
+        hasLearned = false;
+
     } else if (stage == 1) {
         // Initializing members that require initialized other modules goes here
         Logger::info("-- initializing message types...", nodeName);
@@ -96,6 +98,8 @@ void VehicleApplication::initialize(int stage) {
         pruneNeighborListTimer->setTime(3);
         timeClusteredTimer = new Timer("Record Time Clustered Timer");
         timeClusteredTimer->setTime(1);
+        modelUpdateWindow = new Timer("Model Update Timer");
+        modelUpdateWindow->setTime(3);
 
         sendModelRequestMsg();
         // schedule neighber beacon msg
@@ -139,6 +143,9 @@ void VehicleApplication::finish() {
     if (electionDuration->isScheduled()) {
         cancelEvent(electionDuration);
     }
+    if (modelUpdateWindow->isScheduled()) {
+        cancelEvent(modelUpdateWindow);
+    }
 
     delete ackTimeout;
     delete startElection;
@@ -149,24 +156,17 @@ void VehicleApplication::finish() {
     delete clusterHeartbeatDuration;
     delete clusterHeartbeatTimeout;
     delete clusterHeartbeatReplyTimeout;
+    delete modelUpdateWindow;
 
     BaseApplicationLayer::finish();
     // statistics recording goes here
 }
 
 void VehicleApplication::onModelMsg(BaseMessage *msg) {
-    if (ModelRequest *requestMsg = dynamic_cast<ModelRequest*>(msg)) {
-        if (std::strcmp(requestMsg->getOrigin(), "rsu") == 0) {
-            Logger::info("received an rsu-originated Model Request Message",
-                    nodeName);
-            sendModelUpdateMsg();
-            Logger::info("-- sending local up-to-date model to rsu...",
-                    nodeName);
-        }
-    } else if (ModelUpdate *appMessage = dynamic_cast<ModelUpdate*>(msg)) {
+    if (ModelInit *appMessage = dynamic_cast<ModelInit*>(msg)) {
         if (std::strcmp(appMessage->getDestination(), nodeName) == 0
                 && !receivedModel) {
-            Logger::info("received a Model Update Message; loading model..",
+            Logger::info("received a Model Init Message; loading model..",
                     nodeName);
             if (modelRequestTimeout->isScheduled()) {
                 cancelEvent(modelRequestTimeout);
@@ -189,7 +189,6 @@ void VehicleApplication::onModelMsg(BaseMessage *msg) {
             // handle observation
             numObservations = 0;
 
-            auto time = simTime() + timeClusteredTimer->getTime();
             scheduleAt(simTime() + observeEnvironmentTimer->getTime(),
                     observeEnvironmentTimer);
 
@@ -197,12 +196,70 @@ void VehicleApplication::onModelMsg(BaseMessage *msg) {
                     timeClusteredTimer);
         }
     }
+    else if (ModelRequest *requestMsg = dynamic_cast<ModelRequest*>(msg)) {
+        if (clusterHead && std::strcmp(requestMsg->getOrigin(), "rsu") == 0) {
+            Logger::info("CH received an rsu-originated Model Request Message",
+                    nodeName);
+            // start timer to receive models
+            scheduleAt(simTime() + modelUpdateWindow->getTime(),
+                    modelUpdateWindow);
+            // forward model request to CMs
+            sendModelRequestMsg("");
+        } else if (clusterMember && hasLearned
+                && std::strcmp(requestMsg->getOrigin(), clusterHeadId.c_str())
+                        == 0) {
+            Logger::info("CM received a CH-originated Model Request Message",
+                    nodeName);
+            auto jsonStateDicts = agent.getStateDictsAsJson();
+
+            auto pNet = agent.PyObjectToChar(jsonStateDicts.first);
+            auto vNet = agent.PyObjectToChar(jsonStateDicts.second);
+
+            BaseApplicationLayer::sendModelUpdateMessage(clusterHeadId.c_str(),
+                    pNet, vNet, nodeName);
+            hasLearned = false;
+        }
+        else if (!(clusterHead || clusterMember) && hasLearned
+                && std::strcmp(requestMsg->getOrigin(), "rsu") == 0)
+        {
+            Logger::info("Not in cluster.. rcv'd model update from rsu",
+                    nodeName);
+            auto jsonStateDicts = agent.getStateDictsAsJson();
+
+            auto pNet = agent.PyObjectToChar(jsonStateDicts.first);
+            auto vNet = agent.PyObjectToChar(jsonStateDicts.second);
+
+            BaseApplicationLayer::sendModelUpdateMessage("rsu",
+                    pNet, vNet, nodeName);
+        }
+    } else if (ModelUpdate *appMessage = dynamic_cast<ModelUpdate*>(msg)) {
+        if (std::strcmp(appMessage->getDestination(), nodeName) == 0) {
+            Logger::info("CH received a Model Update from a CM.",
+                    nodeName);
+            // add model to list
+            auto stateDicts = agent.getStateDictsFromJson(
+                    appMessage->getPStateDict(), appMessage->getVStateDict());
+
+            pStateDicts.push_back(stateDicts.first);
+            vStateDicts.push_back(stateDicts.second);
+        }
+        else if (std::strcmp(appMessage->getOrigin(), "rsu") == 0) {
+            Logger::info("Received a Model Update from RSU.",
+                    nodeName);
+            setDisplayColor(Color::MODEL_RCV);
+            // add model to list
+            auto stateDicts = agent.getStateDictsFromJson(
+                    appMessage->getPStateDict(), appMessage->getVStateDict());
+
+            pStateDicts.push_back(stateDicts.first);
+            vStateDicts.push_back(stateDicts.second);
+        }
+    }
 }
 
 void VehicleApplication::onElectionMsg(BaseMessage *msg) {
     if (Election *requestMsg = dynamic_cast<Election*>(msg)) {
-        if (!receivedModel)
-        {
+        if (!receivedModel) {
             return;
         }
         auto electionHolder = NeighborEntry(requestMsg->getNodeMobility());
@@ -211,8 +268,7 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
         // compare electionHolder to self
         double score = scoreElectionHolder(electionHolder, self);
 
-        if (score >= electionScoreThreshold)
-        {
+        if (score >= electionScoreThreshold) {
             Logger::info("Participating in election!", nodeName);
             leaveElection();
             leaveCluster();
@@ -221,12 +277,10 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
         }
     } else if (Ack *appMessage = dynamic_cast<Ack*>(msg)) {
         if (std::strcmp(appMessage->getDestination(), nodeName) == 0
-                && electionDuration->isScheduled())
-        {
+                && electionDuration->isScheduled()) {
             Logger::info("received an Election Ack Message", nodeName);
 
-            if (electionTimeout->isScheduled())
-            {
+            if (electionTimeout->isScheduled()) {
                 cancelEvent(electionTimeout);
             }
 
@@ -263,41 +317,27 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
     }
 }
 
-
-
 void VehicleApplication::onClusterMsg(BaseMessage *msg) {
-    if (ClusterHeartbeat *appMessage = dynamic_cast<ClusterHeartbeat*>(msg))
-    {
+    if (ClusterHeartbeat *appMessage = dynamic_cast<ClusterHeartbeat*>(msg)) {
 
         string chId = appMessage->getClusterId();
 
-        Logger::info("received a Cluster Heartbeat", nodeName);
-        Logger::info(clusterHeadId, nodeName);
-        Logger::info(appMessage->getOrigin(), nodeName);
-        Logger::info(to_string(chId.compare(clusterHeadId)), nodeName);
-
-
-        if (receivedModel && chId.compare(clusterHeadId))
-        {
-            Logger::info("Here!", nodeName);
+        if (receivedModel && chId.compare(clusterHeadId)) {
             clusterTable.fromString(appMessage->getClusterTable());
 
-            if (clusterScoreThreshold < scoreCluster())
-            {
+            if (clusterScoreThreshold < scoreCluster()) {
                 // join cluster
                 clusterMember = true;
                 clusterHeadId = chId;
                 sendHeartbeatReply();
                 cmHeartbeatRcvs++;
-            }
-            else
-            {
+            } else {
                 clusterTable.resetTable();
             }
-        }
-        else if (std::strcmp(appMessage->getClusterId(), clusterHeadId.c_str()) == 0)
-        {
-            Logger::info("received a Cluster Heartbeat from " + clusterHeadId, nodeName);
+        } else if (std::strcmp(appMessage->getClusterId(),
+                clusterHeadId.c_str()) == 0) {
+            Logger::info("received a Cluster Heartbeat from " + clusterHeadId,
+                    nodeName);
             Logger::info("-- from my CH, replying..", nodeName);
 
             clusterTable.fromString(appMessage->getClusterTable());
@@ -307,8 +347,7 @@ void VehicleApplication::onClusterMsg(BaseMessage *msg) {
         }
     } else if (ClusterHeartbeatReply * appMessage =
             dynamic_cast<ClusterHeartbeatReply*>(msg)) {
-        if (std::strcmp(appMessage->getDestination(), nodeName) == 0)
-        {
+        if (std::strcmp(appMessage->getDestination(), nodeName) == 0) {
             chHeartbeatRcvs++;
 
             if (clusterHeartbeatReplyTimeout->isScheduled()) {
@@ -320,8 +359,8 @@ void VehicleApplication::onClusterMsg(BaseMessage *msg) {
             clusterTable.addRow(entry, appMessage->getOrigin());
 
             // add node to cluster list if not already present
-            if (std::find(clusterNodes.begin(), clusterNodes.end(), appMessage->getOrigin()) == clusterNodes.end())
-            {
+            if (std::find(clusterNodes.begin(), clusterNodes.end(),
+                    appMessage->getOrigin()) == clusterNodes.end()) {
                 clusterNodes.push_back(appMessage->getOrigin());
             }
         }
@@ -338,7 +377,6 @@ void VehicleApplication::onNeighborMsg(BaseMessage *msg) {
         neighborList.addNeighbor(appMessage->getOrigin(), simTime().dbl());
     } else {
     }
-
 }
 
 void VehicleApplication::handleElection(const char *winnerId) {
@@ -369,8 +407,7 @@ void VehicleApplication::handleElection(const char *winnerId) {
         clusterHeadId = winnerId;
 
         // schedule timeout
-        if (clusterHeartbeatTimeout->isScheduled())
-        {
+        if (clusterHeartbeatTimeout->isScheduled()) {
             cancelEvent(clusterHeartbeatTimeout);
         }
         scheduleAt(simTime() + clusterHeartbeatTimeout->getTimeout(),
@@ -378,8 +415,7 @@ void VehicleApplication::handleElection(const char *winnerId) {
     }
 
     // schedule cluster health timer
-    if (clusterHealthTimer->isScheduled())
-    {
+    if (clusterHealthTimer->isScheduled()) {
         cancelEvent(clusterHealthTimer);
     }
     scheduleAt(simTime() + clusterHealthTimer->getTime(), clusterHealthTimer);
@@ -399,7 +435,7 @@ void VehicleApplication::handleLearn() {
             observeEnvironmentTimer);
 }
 
-void VehicleApplication::loadModelUpdate(ModelUpdate *appMessage) {
+void VehicleApplication::loadModelUpdate(ModelBaseMessage *appMessage) {
     if (std::strcmp(appMessage->getOrigin(), "rsu") == 0) {
         Logger::info("-- model from rsu. loading...", nodeName);
 
@@ -410,8 +446,7 @@ void VehicleApplication::loadModelUpdate(ModelUpdate *appMessage) {
     }
 }
 
-NeighborEntry VehicleApplication::selfToNeighborEntry()
-{
+NeighborEntry VehicleApplication::selfToNeighborEntry() {
     Coord position = mobility->getPositionAt(simTime());
     Coord direction = mobility->getCurrentDirection();
     double angle = traciVehicle->getAngle();
@@ -423,19 +458,15 @@ NeighborEntry VehicleApplication::selfToNeighborEntry()
     double yVelocity = speed * sin(angleRads);
     double velocity = sqrt((xVelocity * xVelocity) + (yVelocity * yVelocity));
 
-    NeighborEntry entry = NeighborEntry(
-        clusterTable.getSize(), speed, velocity,
-        xVelocity, yVelocity,
-        traciVehicle->getAcceleration(), traciVehicle->getDeccel(),
-        position.x, position.y, direction.x, direction.y,
-        simTime().dbl()
-    );
+    NeighborEntry entry = NeighborEntry(clusterTable.getSize(), speed, velocity,
+            xVelocity, yVelocity, traciVehicle->getAcceleration(),
+            traciVehicle->getDeccel(), position.x, position.y, direction.x,
+            direction.y, simTime().dbl());
 
     return entry;
 }
 
-void VehicleApplication::addSelfToNeighborTable()
-{
+void VehicleApplication::addSelfToNeighborTable() {
     // add entry to neighbor table
     Logger::info("-- adding message to neighbor table", nodeName);
     auto entry = selfToNeighborEntry();
@@ -454,30 +485,24 @@ void VehicleApplication::leaveCluster() {
     clusterTable.resetTable();
 
     // cancel cluster-based timers and timeouts
-    if(clusterHealthTimer->isScheduled())
-    {
+    if (clusterHealthTimer->isScheduled()) {
         cancelEvent(clusterHealthTimer);
     }
-    if(clusterHeartbeatTimer->isScheduled())
-    {
+    if (clusterHeartbeatTimer->isScheduled()) {
         cancelEvent(clusterHeartbeatTimer);
     }
-    if(clusterHeartbeatDuration->isScheduled())
-    {
+    if (clusterHeartbeatDuration->isScheduled()) {
         cancelEvent(clusterHeartbeatDuration);
     }
-    if(clusterHeartbeatTimeout->isScheduled())
-    {
+    if (clusterHeartbeatTimeout->isScheduled()) {
         cancelEvent(clusterHeartbeatTimeout);
     }
-    if(clusterHeartbeatReplyTimeout->isScheduled())
-    {
+    if (clusterHeartbeatReplyTimeout->isScheduled()) {
         cancelEvent(clusterHeartbeatReplyTimeout);
     }
 }
 
-void VehicleApplication::leaveElection()
-{
+void VehicleApplication::leaveElection() {
     // cancel any election timers we may have
     if (electionDuration->isScheduled()) {
         cancelEvent(electionDuration);
@@ -504,15 +529,17 @@ void VehicleApplication::sendModelUpdateMsg() {
     auto pNet = agent.PyObjectToChar(jsonStateDicts.first);
     auto vNet = agent.PyObjectToChar(jsonStateDicts.second);
 
-    BaseApplicationLayer::sendModelUpdateMessage(pNet, vNet, "vehicle");
+    BaseApplicationLayer::sendModelUpdateMessage(clusterHeadId.c_str(), pNet,
+            vNet, nodeName);
 }
 
-void VehicleApplication::sendModelRequestMsg() {
+void VehicleApplication::sendModelRequestMsg(char* destination) {
     Logger::info("-- sending model request message!", nodeName);
     ModelRequest *msg = new ModelRequest();
     populateWSM(msg);
     msg->setData("requesting model");
     msg->setOrigin(nodeName);
+    msg->setDestination(destination);
     sendDown(msg);
 }
 
@@ -535,7 +562,6 @@ void VehicleApplication::sendElectionMsg() {
     electingLeader = true;
     electionId = nodeName;
 
-
     Election *electionMessage = new Election();
     populateWSM(electionMessage);
 
@@ -543,8 +569,7 @@ void VehicleApplication::sendElectionMsg() {
     electionMessage->setNodeMobility(selfToNeighborEntry().toString().c_str());
 
     sendDown(electionMessage);
-    if(electionDuration->isScheduled())
-    {
+    if (electionDuration->isScheduled()) {
         cancelEvent(electionDuration);
     }
     scheduleAt(simTime() + electionDuration->getTime(), electionDuration);
@@ -556,7 +581,8 @@ void VehicleApplication::sendElectionAck(Election *msg) {
     setDisplayColor(Color::ELECTION_PARTICIPANT);
     getParentModule()->setDisplayName(
             string("electing CH. src: " + electionParentId).c_str());
-    Logger::info("participating in " + electionParentId + "'s election.", nodeName);
+    Logger::info("participating in " + electionParentId + "'s election.",
+            nodeName);
 
     NeighborEntry entry = selfToNeighborEntry();
 
@@ -588,9 +614,7 @@ void VehicleApplication::sendLeaderMsg(const char *leaderElected) {
     sendDelayedDown(leaderMessage, uniform(0.01, 0.2));
 }
 
-
-void VehicleApplication::sendHeartbeatReply()
-{
+void VehicleApplication::sendHeartbeatReply() {
     ClusterHeartbeatReply *reply = new ClusterHeartbeatReply();
     populateWSM(reply);
 
@@ -612,21 +636,21 @@ void VehicleApplication::sendHeartbeatReply()
     cmHeartbeatSnds++;
 }
 
-
-double VehicleApplication::scoreCluster()
-{
+double VehicleApplication::scoreCluster() {
     // score cluster
     auto self = selfToNeighborEntry();
     clusterTable.calculateMetadata();
 
-    double score =
-            carsInRangeWeight * (clusterTable.avgCarsInRange - self.carsInRange)
+    double score = carsInRangeWeight
+            * (clusterTable.avgCarsInRange - self.carsInRange)
             + xVelocityWeight * (clusterTable.avgXVelocity - self.xVelocity)
             + yVelocityWeight * (clusterTable.avgYVelocity - self.yVelocity)
             + velocityWeight * (clusterTable.avgVelocity - self.velocity)
             + speedWeight * (clusterTable.avgSpeed - self.speed)
-            + accelerationWeight * (clusterTable.avgAcceleration - self.acceleration)
-            + decelerationWeight * (clusterTable.avgDeceleration - self.deceleration)
+            + accelerationWeight
+                    * (clusterTable.avgAcceleration - self.acceleration)
+            + decelerationWeight
+                    * (clusterTable.avgDeceleration - self.deceleration)
             + xPositionWeight * (clusterTable.avgXPosition - self.xPosition)
             + yPositionWeight * (clusterTable.avgYPosition - self.yPosition)
             + timestampWeight * (clusterTable.avgTimestamp - self.timestamp)
@@ -635,10 +659,9 @@ double VehicleApplication::scoreCluster()
     return score;
 }
 
-double VehicleApplication::scoreElectionHolder(NeighborEntry electionHolder, NeighborEntry self)
-{
-    double score =
-            electionSpeedWeight * (electionHolder.speed - self.speed)
+double VehicleApplication::scoreElectionHolder(NeighborEntry electionHolder,
+        NeighborEntry self) {
+    double score = electionSpeedWeight * (electionHolder.speed - self.speed)
             + electionXVelocityWeight * (electionHolder.speed - self.speed)
             + electionYVelocityWeight * (electionHolder.speed - self.speed)
             + electionAccelerationWeight * (electionHolder.speed - self.speed)
@@ -652,26 +675,25 @@ double VehicleApplication::scoreElectionHolder(NeighborEntry electionHolder, Nei
             + electionCMWeight * (clusterMember)
             + electionConnectivityWeight * (calculateConnectivityPercentage());
 
-
     return score;
 }
-
 
 double VehicleApplication::calculateConnectivityPercentage() {
     int totalNeighbors = neighborList.getSize();
 
-    if (totalNeighbors == 0)
-    {
-        return 0;//
+    if (totalNeighbors == 0) {
+        return 0; //
     }
 
     int matchingNeighbors = 0;
-    const std::vector<std::string>& clusterNeighbors = clusterTable.getAllNeighbors();
+    const std::vector<std::string> &clusterNeighbors =
+            clusterTable.getAllNeighbors();
 
     // Iterate over all neighbors in NeighborList
-    for (const auto& neighbor : neighborList.getAllNeighbors()) {
+    for (const auto &neighbor : neighborList.getAllNeighbors()) {
         // Check if the neighbor id is present in the ClusterTable
-        if (std::find(clusterNeighbors.begin(), clusterNeighbors.end(), neighbor) != clusterNeighbors.end()
+        if (std::find(clusterNeighbors.begin(), clusterNeighbors.end(),
+                neighbor) != clusterNeighbors.end()
                 && std::strcmp(nodeName, neighbor.c_str()) != 0) {
             matchingNeighbors++;
         }
@@ -699,7 +721,7 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             handleLearn();
         }
         step();
-    } else if (msg == startElection) {//
+    } else if (msg == startElection) { //
         bool inCluster = clusterHead || clusterMember;
 
         if (!inCluster && !electingLeader) {
@@ -707,21 +729,19 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             scheduleAt(simTime() + electionTimeout->getTimeout(),
                     electionTimeout);
         }
-    }
-    else if (msg == electionDuration) {
+    } else if (msg == electionDuration) {
         Logger::info("Election duration.", nodeName);
 
         // handle election and decide winner
         clusterTable.calculateMetadata();
         clusterTable.scoreNeighbors();
 
-        const std::string& bestNeighbor = clusterTable.getBestScoringNeighbor();
+        const std::string &bestNeighbor = clusterTable.getBestScoringNeighbor();
         handleElection(bestNeighbor.c_str());
 
         Logger::info("-- sending leader message..", nodeName);
         sendLeaderMsg(bestNeighbor.c_str());
-    }
-    else if (msg == electionTimeout) {
+    } else if (msg == electionTimeout) {
         Logger::info("Election timeout..", nodeName);
 
         if (!receivedElectionAck) {
@@ -757,6 +777,7 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             sendDown(clusterHeartbeat);
 
             chHeartbeatSnds += 1 * clusterTable.getSize();
+            heartbeats++;
 
             if (clusterHeartbeatReplyTimeout->isScheduled()) {
                 cancelEvent(clusterHeartbeatReplyTimeout);
@@ -772,11 +793,10 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
             scheduleAt(simTime() + clusterHeartbeatDuration->getTime(),
                     clusterHeartbeatDuration);
         }
-    }
-    else if (msg == clusterHealthTimer)
-    {
+    } else if (msg == clusterHealthTimer) {
         Logger::info("Cluster health timer..", nodeName);
-        scheduleAt(simTime() + clusterHealthTimer->getTime(), clusterHealthTimer);
+        scheduleAt(simTime() + clusterHealthTimer->getTime(),
+                clusterHealthTimer);
 
         // check cluster/neighbor connectivity
         double connectivity = calculateConnectivityPercentage();
@@ -784,11 +804,10 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
         Logger::info(std::to_string(connectivity), nodeName);
         Logger::info(std::to_string(connectivityThreshold), nodeName);
 
-
         // if connectivity < threshold
-        if (connectivity < connectivityThreshold)
-        {
-            Logger::info("-- connectivity is below threshold; holding reelection..",
+        if (connectivity < connectivityThreshold) {
+            Logger::info(
+                    "-- connectivity is below threshold; holding reelection..",
                     nodeName);
             leaveCluster();
             // start election
@@ -796,27 +815,21 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
                 scheduleAt(simTime() + startElection->getTime(), startElection);
             }
         }
-    }
-    else if (msg == clusterHeartbeatDuration) {
-        Logger::info("Cluster heartbeat Duration.",
-                nodeName);
+    } else if (msg == clusterHeartbeatDuration) {
+        Logger::info("Cluster heartbeat Duration.", nodeName);
 
         if (clusterHeartbeatReplyTimeout->isScheduled()) {
             cancelEvent(clusterHeartbeatReplyTimeout);
         }
 
-
         // if no responses
-        if (clusterNodes.size() == 0)
-        {
-            Logger::info("No responses, leaving cluster.",
-                    nodeName);
+        if (clusterNodes.size() == 0) {
+            Logger::info("No responses, leaving cluster.", nodeName);
             leaveCluster();
-        }
-        else
-        {
+        } else {
             // push self on clusterNodes and prune cluster table
-            if (std::find(clusterNodes.begin(), clusterNodes.end(), nodeName) == clusterNodes.end()) {
+            if (std::find(clusterNodes.begin(), clusterNodes.end(), nodeName)
+                    == clusterNodes.end()) {
                 clusterNodes.push_back(nodeName);
                 clusterTable.pruneTable(clusterNodes);
             }
@@ -828,8 +841,7 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
         if (clusterHeartbeatTimer->isScheduled()) {
             cancelEvent(clusterHeartbeatTimer);
         }
-        scheduleAt(simTime() + 0.1,
-                clusterHeartbeatTimer);
+        scheduleAt(simTime() + 0.1, clusterHeartbeatTimer);
     }
     // if CH did not receive heartbeat replies..
     else if (msg == clusterHeartbeatReplyTimeout) {
@@ -855,20 +867,53 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
     }
     // timeClustered for reward calculation
     else if (msg == timeClusteredTimer) {
-        if (clusterHead || clusterMember)
-        {
+        if (clusterHead || clusterMember) {
             timeClustered += 1;
         }
 
-        scheduleAt(simTime() + timeClusteredTimer->getTime(), timeClusteredTimer);
-    }
-    else {
+        scheduleAt(simTime() + timeClusteredTimer->getTime(),
+                timeClusteredTimer);
+    } else if (msg == modelUpdateWindow) {
+        Logger::info("End of model update rcv window; aggregating...",
+                nodeName);
+        // add self to list
+        auto stateDicts = agent.getStateDicts();
+
+        pStateDicts.push_back(stateDicts.first);
+        vStateDicts.push_back(stateDicts.second);
+
+        // convert vector to python list
+        PyObject* pList = PyList_New(pStateDicts.size());
+        PyObject* vList = PyList_New(vStateDicts.size());
+
+        for (size_t i = 0; i < pStateDicts.size(); ++i) {
+            PyList_SET_ITEM(pList, i, pStateDicts[i]);
+        }
+        for (size_t i = 0; i < vStateDicts.size(); ++i) {
+            PyList_SET_ITEM(vList, i, vStateDicts[i]);
+        }
+
+        // aggregate list of rcv'd models and load
+        auto models = aggregator.aggregateModels(pList, vList);
+        agent.loadStateDicts(models.first, models.second);
+
+        // fwd to rsu
+        auto jsonStateDicts = agent.getStateDictsAsJson();
+
+        auto pNet = agent.PyObjectToChar(jsonStateDicts.first);
+        auto vNet = agent.PyObjectToChar(jsonStateDicts.second);
+
+        BaseApplicationLayer::sendModelUpdateMessage("rsu", pNet,
+                vNet, nodeName);
+
+        pStateDicts.clear();
+        vStateDicts.clear();
+    } else {
         Logger::error(
                 string("unknown message type: ") + msg->getClassAndFullName(),
                 nodeName);
     }
 }
-
 
 void VehicleApplication::step() {
     Logger::info("Stepping in the environment...", nodeName);
@@ -928,7 +973,6 @@ void VehicleApplication::step() {
     xDirectionWeight = actionValues[35];
     yDirectionWeight = actionValues[36];
 
-
     connectivityThreshold = actionValues[37];
     electionScoreThreshold = actionValues[38];
     clusterScoreThreshold = actionValues[39];
@@ -945,41 +989,35 @@ void VehicleApplication::observe() {
     double clusterTime = timeClustered;
 
     // set to 1 if 0
-    if (chHeartbeatSnds == 0)
-    {
+    if (chHeartbeatSnds == 0) {
         chHeartbeatSnds = 1;
     }
 
-    if (cmHeartbeatSnds == 0)
-    {
+    if (cmHeartbeatSnds == 0) {
         cmHeartbeatSnds = 1;
     }
 
     // max ~30
-    double chHeartbeatPercent = (chHeartbeatRcvs / chHeartbeatSnds ) * chHeartbeatSnds
+    double chHeartbeatPercent = (chHeartbeatRcvs / chHeartbeatSnds) * heartbeats
             * 10;
     // max ~30
-    double cmHeartbeatPercent = (cmHeartbeatRcvs / cmHeartbeatSnds) * cmHeartbeatSnds
-            * 10;
+    double cmHeartbeatPercent = (cmHeartbeatRcvs / cmHeartbeatSnds)
+            * cmHeartbeatSnds * 10;
 
     // max possible reward: 85
-    double reward = connectivity + clusterTime +
-            chHeartbeatPercent + cmHeartbeatPercent;
+    double reward = connectivity + clusterTime + chHeartbeatPercent
+            + cmHeartbeatPercent;
 
     // log reward
     std::string output = "REWARD LOG:\n";
     output += "Connectivity\t" + std::to_string(connectivity) + "\n";
     output += "Cluster Time\t" + std::to_string(clusterTime) + "\n";
-    output += "CH Heartbeat %\t"
-            + std::to_string(chHeartbeatRcvs) + "/"
+    output += "CH Heartbeat %\t" + std::to_string(chHeartbeatRcvs) + "/"
             + std::to_string(chHeartbeatSnds) + " = "
-            + std::to_string(chHeartbeatPercent)
-            + "%\n";
-    output += "CM Heartbeat %\t"
-            + std::to_string(cmHeartbeatRcvs) + "/"
+            + std::to_string(chHeartbeatPercent) + "%\n";
+    output += "CM Heartbeat %\t" + std::to_string(cmHeartbeatRcvs) + "/"
             + std::to_string(cmHeartbeatSnds) + " = "
-            + std::to_string(cmHeartbeatPercent)
-            + "%\n";
+            + std::to_string(cmHeartbeatPercent) + "%\n";
     output += "Total Reward\t" + std::to_string(reward) + "\n";
     Logger::info(output, nodeName);
 
@@ -993,6 +1031,7 @@ void VehicleApplication::observe() {
     chHeartbeatRcvs = 0;
     cmHeartbeatSnds = 0;
     cmHeartbeatRcvs = 0;
+    heartbeats = 0;
 }
 
 void VehicleApplication::learn() {
@@ -1000,4 +1039,5 @@ void VehicleApplication::learn() {
     auto v = agent.toPyFloat(0);
     agent.bufferFinishPath(v);
     agent.learn();
+    hasLearned = true;
 }

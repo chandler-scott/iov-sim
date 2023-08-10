@@ -25,24 +25,14 @@
 #include "iov_sim/iov_sim.h"
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
 #include "iov_sim/base/python/AgentWrapper.h"
+#include "iov_sim/base/python/AggregatorWrapper.h"
 #include "iov_sim/base/util/ClusterTable.h"
 #include "iov_sim/base/util/NeighborList.h"
 #include "iov_sim/base/util/NeighborEntry.h"
-
+#include "iov_sim/modules/messages/model/ModelInit_m.h"
 
 #include <cmath>
-#include <algorithm> // Added for std::find
-
-/* *
- *
- *  COLOR SCHEME
- *  received model: #FFC107 (Amber)
- *  CH election start source: #25e407 (Light Green)
- *  CH election retry source: #1c4c15 (Dark Green)
- *  CH election participant: #2196F3 (Blue)
- *  Cluster head: #9C27B0 (Purple)
- *  Cluster member: #FF5722 (Orange)
- * */
+#include <algorithm>
 
 
 using namespace veins;
@@ -53,10 +43,8 @@ namespace iov_sim {
 class IOV_SIM_API VehicleApplication : public iov_sim::BaseApplicationLayer {
 public:
     VehicleApplication();
-
     void initialize(int stage) override;
     void finish() override;
-
 
 
 protected:
@@ -72,7 +60,7 @@ protected:
 
 
     void sendModelUpdateMsg();
-    void sendModelRequestMsg();
+    void sendModelRequestMsg(char* destination = "rsu");
     void sendNeighborBeacon();
 
     void sendElectionMsg();
@@ -85,7 +73,7 @@ protected:
     double scoreElectionHolder(NeighborEntry electionHolder, NeighborEntry self);
     double calculateConnectivityPercentage();
 
-    void loadModelUpdate(ModelUpdate* appMessage);
+    void loadModelUpdate(ModelBaseMessage* appMessage);
     NeighborEntry selfToNeighborEntry();
     void addSelfToNeighborTable();
 
@@ -103,6 +91,8 @@ protected:
 
 private:
     AgentWrapper agent;
+    AggregatorWrapper aggregator;
+
 
     /* @brief Timeout for node to receive reply for Ack message */
     Timeout *ackTimeout = nullptr;
@@ -134,7 +124,11 @@ private:
     Timer *pruneNeighborListTimer = nullptr;
     /* @brief Timer for node to check time clustered for reward function*/
     Timer *timeClusteredTimer = nullptr;
+    /* @brief Timer for window to rcv model update */
+    Timer *modelUpdateWindow = nullptr;
 
+    vector<PyObject*> pStateDicts;
+    vector<PyObject*> vStateDicts;
 
     // AI params
     PyObject* curObservation;
@@ -147,6 +141,10 @@ private:
     // model request parameters
     bool receivedModel;
     double requestModelTimeout;
+
+    /* Model Params */
+    bool hasLearned;
+
 
     ClusterTable clusterTable;
     NeighborList neighborList;
@@ -174,7 +172,7 @@ private:
     double chHeartbeatRcvs = 0;
     double cmHeartbeatSnds = 0;
     double cmHeartbeatRcvs = 0;
-
+    double heartbeats = 0;
 
 
     /* CLUSTER SCORE WEIGHTS */

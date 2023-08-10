@@ -109,6 +109,44 @@ void AgentWrapper::loadStateDicts(PyObject *pStateDict, PyObject *vStateDict)
     }
 }
 
+std::pair<PyObject *, PyObject *> AgentWrapper::getStateDicts()
+{
+    if (pAgent)
+        {
+            PyObject *args = PyTuple_Pack(0);
+            PyObject *pFunc = PyObject_GetAttrString(pAgent, "state_dicts");
+
+
+            PyObject *result = PyObject_CallObject(pFunc, args);
+            if (result == nullptr)
+            {
+                PyErr_Print();
+            }
+            else
+            {
+                // Assuming the result is a tuple with two elements
+                if (PyTuple_Check(result) && PyTuple_Size(result) == 2)
+                {
+                    PyObject *firstElement = PyTuple_GetItem(result, 0);
+                    PyObject *secondElement = PyTuple_GetItem(result, 1);
+
+                    return std::make_pair(firstElement, secondElement);
+                }
+                else
+                {
+                    Logger::error("3 Unexpected return value from Python function.", "BaseWrapper");
+                }
+                Py_DECREF(result);
+            }
+        }
+        else
+        {
+            PyErr_Print();
+        }
+    return std::make_pair(nullptr, nullptr);
+}
+
+
 std::pair<PyObject *, PyObject *> AgentWrapper::getStateDictsAsJson()
 {
     if (pAgent)

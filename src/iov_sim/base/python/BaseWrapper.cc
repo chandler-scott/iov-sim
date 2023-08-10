@@ -40,15 +40,25 @@ void BaseWrapper::loadStateDicts(PyObject *pClass, PyObject *pStateDict, PyObjec
         PyObject *args = PyTuple_Pack(2, pStateDict, vStateDict);
 
         PyObject *pFunc = PyObject_GetAttrString(pClass, "load_state_dicts");
-        PyObject *result = PyObject_CallObject(pFunc, args);
-        if (result == nullptr)
+        if (pFunc)
         {
-            PyErr_Print();
+            PyObject *result = PyObject_CallObject(pFunc, args);
+            if (result == nullptr)
+            {
+                PyErr_Print();
+            }
+            else
+            {
+                Py_DECREF(result);
+            }
+            Py_DECREF(pFunc); // Release the reference to the function
         }
         else
         {
-            Py_DECREF(result);
+            PyErr_Print();
         }
+
+        Py_XDECREF(args); // Release the reference to the arguments tuple
     }
     else
     {

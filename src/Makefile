@@ -57,6 +57,7 @@ OBJS = \
     $O/iov_sim/modules/messages/election/Probe_m.o \
     $O/iov_sim/modules/messages/election/Reply_m.o \
     $O/iov_sim/modules/messages/model/ModelBaseMessage_m.o \
+    $O/iov_sim/modules/messages/model/ModelInit_m.o \
     $O/iov_sim/modules/messages/model/ModelRequest_m.o \
     $O/iov_sim/modules/messages/model/ModelUpdate_m.o \
     $O/iov_sim/modules/messages/neighbor/NeighborBaseMessage_m.o \
@@ -80,6 +81,7 @@ MSGFILES = \
     iov_sim/modules/messages/election/Probe.msg \
     iov_sim/modules/messages/election/Reply.msg \
     iov_sim/modules/messages/model/ModelBaseMessage.msg \
+    iov_sim/modules/messages/model/ModelInit.msg \
     iov_sim/modules/messages/model/ModelRequest.msg \
     iov_sim/modules/messages/model/ModelUpdate.msg \
     iov_sim/modules/messages/neighbor/NeighborBaseMessage.msg \

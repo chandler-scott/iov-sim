@@ -21,10 +21,10 @@
 //
 
 #pragma once
-
 #include "iov_sim/iov_sim.h"
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
 #include "iov_sim/base/python/AggregatorWrapper.h"
+#include "iov_sim/modules/messages/model/ModelInit_m.h"
 
 using namespace veins;
 namespace iov_sim {
@@ -41,6 +41,7 @@ protected:
     void onModelMsg(BaseMessage* msg) override;
 
     void sendModelUpdateMessage(const char*);
+    void handleSelfMsg(cMessage* msg) override;
 
 private:
     AggregatorWrapper aggregator;
@@ -49,8 +50,13 @@ private:
     std::string policySave;
     std::string valueSave;
 
-    ModelRequest *modelRequestMessage = nullptr;
+    /* @brief Timer for window to rcv model update */
+    Timer *modelAggTimer = nullptr;
+    Timer *modelAggWindow = nullptr;
 
+
+    vector<PyObject*> pStateDicts;
+    vector<PyObject*> vStateDicts;
 };
 
 } // namespace iov_sim

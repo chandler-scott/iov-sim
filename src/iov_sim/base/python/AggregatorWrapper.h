@@ -21,11 +21,18 @@ public:
     AggregatorWrapper();
     ~AggregatorWrapper();
     
+    std::pair<PyObject*, PyObject*> aggregateModels(PyObject* pNets, PyObject* vNets);
+
     std::pair<PyObject*, PyObject*> getStateDictsAsJson();
     std::pair<PyObject *, PyObject *> getStateDictsFromJson(const char* pJson, const char* vJson);
 
     void saveStateDict(const std::string& policySave, const std::string& valueSave);
     void loadStateDict(const std::string& policyLoad, const std::string& valueLoad);
+
+    inline PyObject* getAggregatorClass()
+    {
+        return pAggregator;
+    }
 
 private:
     PyObject* pAggregator;

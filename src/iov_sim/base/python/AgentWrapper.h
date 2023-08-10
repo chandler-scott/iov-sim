@@ -34,7 +34,7 @@ public:
     PyObject* toPyFloat(double value);
     std::vector<double> toDoublesList(PyObject* pyObject);
 
-
+    std::pair<PyObject *, PyObject *> getStateDicts();
     std::pair<PyObject *, PyObject *> getStateDictsAsJson();
     std::pair<PyObject *, PyObject *> getStateDictsFromJson(const char* pJson, const char* vJson);
 
