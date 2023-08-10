@@ -5,7 +5,7 @@
     <copy file="sumo_bbox.sumo.xml.gz" />
     
     <copy file="sumo.view.xml" />
-    <copy file="sumo.routes_more.xml" />   
+    <copy file="sumo.routes.xml" />   
     
     <copy file="sumo.sumocfg" type="config" />
     

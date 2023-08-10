@@ -1,9 +1,4 @@
- Reward (1 day)
- - optimize reward function
-   - heartbeat % (CH can score much higher)
-   - election reward (reard based on how many successful elections)
-   - reawrd based on # of clusters
- 
- Aggregation (2 days)
-  - CM -> CH
-  - CH -> RSU
+- stats
+- optimize reward, actions
+- more specific Model messages
+- Optimize RSUs

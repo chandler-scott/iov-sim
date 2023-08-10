@@ -7,7 +7,7 @@
 
     <input>
         <net-file value="sumo.net.xml.gz"/>
-        <route-files value="sumo.routes_more.xml"/>
+        <route-files value="sumo.routes.xml"/>
         <additional-files value="sumo.poly.xml"/>
     </input>
 
