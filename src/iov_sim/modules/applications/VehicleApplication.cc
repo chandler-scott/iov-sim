@@ -174,6 +174,7 @@ void VehicleApplication::finish() {
     double avgPacketDelay = 0;
     double avgClusterLifetime = 0;
     double percentOfTimeInCluster = 0;
+    double timeAlive = simTime().dbl() - initTime;
 
     if (sentPackets != 0)
     {
@@ -186,7 +187,7 @@ void VehicleApplication::finish() {
     if (totalClusters != 0)
     {
         avgClusterLifetime = (totalClusterLifetime/(double)totalClusters);
-        percentOfTimeInCluster = totalClusterLifetime/(simTime().dbl() - initTime) * 100;
+        percentOfTimeInCluster = (totalClusterLifetime/timeAlive) * 100;
     }
 
     auto sentPacketsOut = "Sent Packets:\t\t\t" + to_string(sentPackets);
@@ -204,6 +205,14 @@ void VehicleApplication::finish() {
     Logger::info(totalClusterLifetimeOut, nodeName);
     Logger::info(avgClusterLifetimeOut, nodeName);
     Logger::info(percentTimeInClusterOut, nodeName);
+
+    recordScalar("sentPackets", sentPackets);
+    recordScalar("rcvdPackets", rcvdPackets);
+    recordScalar("avgPacketDelivery", avgPacketDelivery);
+    recordScalar("avgPacketDelay", avgPacketDelay);
+    recordScalar("avgClusterLifetime", avgClusterLifetime);
+    recordScalar("lifetimeSpentInCluster", percentOfTimeInCluster);
+    recordScalar("timeAlive", timeAlive);
 }
 
 void VehicleApplication::onModelMsg(BaseMessage *msg) {
