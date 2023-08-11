@@ -145,7 +145,6 @@ void AggregatorWrapper::saveStateDict(const std::string& policySave, const std::
         PyObject* args = PyTuple_Pack(2, pSaveArgObj, vSaveArgObj);
 
         // Use the state_dict() method to get the state dictionaries of the neural networks
-        Logger::info("saving model...", "AggregatorWrapper");
         PyObject* pFunc = PyObject_GetAttrString(pAggregator, "save_aggregate");
         PyObject* result = PyObject_CallObject(pFunc, args);
 
@@ -179,7 +178,6 @@ void AggregatorWrapper::loadStateDict(const std::string& policyLoad, const std::
         PyObject* args = PyTuple_Pack(2, pLoadArgObj, vLoadArgObj);
 
         // Use the state_dict() method to get the state dictionaries of the neural networks
-        Logger::info("loading model...", "AggregatorWrapper");
         PyObject* pFunc = PyObject_GetAttrString(pAggregator, "load");
 
         PyObject* result = PyObject_CallObject(pFunc, args);

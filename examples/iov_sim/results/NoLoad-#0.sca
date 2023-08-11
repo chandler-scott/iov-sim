@@ -1,0 +1,1520 @@
+version 3
+run NoLoad-0-20230806-01:20:29-29099
+attr configname NoLoad
+attr datetime 20230806-01:20:29
+attr datetimef 20230806-012029
+attr experiment NoLoad
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network Scenario
+attr processid 29099
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config image-path ../../images:../../../veins/images
+config **.appl.loadModel false
+config cmdenv-express-mode true
+config cmdenv-autoflush true
+config cmdenv-status-frequency 1s
+config **.cmdenv-log-level info
+config image-path ../../images
+config network Scenario
+config debug-on-errors true
+config print-undisposed true
+config sim-time-limit 600s
+config **.scalar-recording true
+config **.vector-recording true
+config *.playgroundSizeX 12500m
+config *.playgroundSizeY 7500m
+config *.playgroundSizeZ 50m
+config *.annotations.draw true
+config *.obstacles.obstacles "xmldoc(\"config.xml\", \"//AnalogueModel[@type='SimpleObstacleShadowing']/obstacles\")"
+config *.manager.updateInterval 1s
+config *.manager.host "\"localhost\""
+config *.manager.port 9999
+config *.manager.autoShutdown true
+config *.manager.launchConfig "xmldoc(\"sumo.launchd.xml\")"
+config *.rsu[*].applType "\"RSUApplication\""
+config *.rsu[0].appl.policySave "\"fed_p_0\""
+config *.rsu[0].appl.valueSave "\"fed_v_0\""
+config *.rsu[*].appl.headerLength "80 bit"
+config *.rsu[*].appl.sendBeacons false
+config *.rsu[*].appl.dataOnSch false
+config *.rsu[*].appl.beaconInterval 1s
+config *.rsu[*].appl.beaconUserPriority 7
+config *.rsu[*].appl.dataUserPriority 5
+config *.rsu[*].nic.phy80211p.antennaOffsetZ "0 m"
+config *.connectionManager.sendDirect true
+config *.connectionManager.maxInterfDist 2600m
+config *.connectionManager.drawMaxIntfDist false
+config *.**.nic.mac1609_4.useServiceChannel false
+config *.**.nic.mac1609_4.txPower 20mW
+config *.**.nic.mac1609_4.bitrate 6Mbps
+config *.**.nic.phy80211p.minPowerLevel -110dBm
+config *.**.nic.phy80211p.useNoiseFloor false
+config *.**.nic.phy80211p.noiseFloor -98dBm
+config *.**.nic.phy80211p.decider "xmldoc(\"config.xml\")"
+config *.**.nic.phy80211p.analogueModels "xmldoc(\"config.xml\")"
+config *.**.nic.phy80211p.usePropagationDelay true
+config *.**.nic.phy80211p.antenna "xmldoc(\"antenna.xml\", \"/root/Antenna[@id='monopole']\")"
+config *.node[*].nic.phy80211p.antennaOffsetY "0 m"
+config *.node[*].nic.phy80211p.antennaOffsetZ "1.895 m"
+config *.node[*].applType "\"VehicleApplication\""
+config *.node[*].appl.headerLength "80 bit"
+config *.node[*].appl.sendBeacons false
+config *.node[*].appl.dataOnSch false
+config *.node[*].appl.beaconInterval 1s
+config *.node[*].veinsmobility.x 0
+config *.node[*].veinsmobility.y 0
+config *.node[*].veinsmobility.z 0
+config *.node[*].veinsmobility.setHostSpeed false
+config *.node[*0].veinsmobility.accidentCount 1
+config *.node[*0].veinsmobility.accidentStart 73s
+config *.node[*0].veinsmobility.accidentDuration 50s
+
+par Scenario.obstacles typename "\"org.car2x.veins.modules.obstacle.ObstacleControl\""
+par Scenario.obstacles obstacles "<obstacles>...</obstacles> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:40"
+par Scenario.obstacles gridCellSize 250
+par Scenario.annotations typename "\"org.car2x.veins.modules.world.annotations.AnnotationManager\""
+par Scenario.annotations draw true
+par Scenario.annotations annotations "<annotations/> at content:1"
+par Scenario.connectionManager typename "\"org.car2x.veins.base.connectionManager.ConnectionManager\""
+par Scenario.connectionManager sendDirect true
+par Scenario.connectionManager maxInterfDist 2600m
+attr unit m
+par Scenario.connectionManager drawMaxIntfDist false
+par Scenario.world typename "\"org.car2x.veins.base.modules.BaseWorldUtility\""
+par Scenario.world playgroundSizeX 12500m
+attr unit m
+par Scenario.world playgroundSizeY 7500m
+attr unit m
+par Scenario.world playgroundSizeZ 50m
+attr unit m
+par Scenario.world useTorus false
+par Scenario.world use2D false
+par Scenario.manager typename "\"org.car2x.veins.modules.mobility.traci.TraCIScenarioManagerLaunchd\""
+par Scenario.manager connectAt 0s
+attr unit s
+par Scenario.manager firstStepAt -1s
+attr unit s
+par Scenario.manager updateInterval 1s
+attr unit s
+par Scenario.manager moduleType "\"org.car2x.veins.nodes.Car\""
+par Scenario.manager moduleName "\"node\""
+par Scenario.manager moduleDisplayString "\"*='i=veins/node/car;is=vs'\""
+par Scenario.manager trafficLightModuleType "\"\""
+par Scenario.manager trafficLightModuleName "\"tls\""
+par Scenario.manager trafficLightFilter "\"\""
+par Scenario.manager trafficLightModuleDisplayString "\"i=misc/node2;is=vs;r=0,,#707070,1\""
+par Scenario.manager host "\"localhost\""
+par Scenario.manager port 9999
+par Scenario.manager seed -1
+par Scenario.manager autoShutdown true
+par Scenario.manager margin 25
+par Scenario.manager roiRoads "\"\""
+par Scenario.manager roiRects "\"\""
+par Scenario.manager penetrationRate 1
+par Scenario.manager ignoreGuiCommands false
+par Scenario.manager launchConfig "<launch>...</launch> at /home/chandler/src/iov_sim/examples/iov_sim//sumo.launchd.xml:2"
+scalar Scenario.manager roiArea 0
+par Scenario.roadsCanvasVisualizer typename "\"org.car2x.veins.visualizer.roads.RoadsCanvasVisualizer\""
+par Scenario.roadsCanvasVisualizer enabled true
+par Scenario.roadsCanvasVisualizer lineZIndex -1
+par Scenario.roadsCanvasVisualizer lineColor "\"firebrick4\""
+par Scenario.roadsCanvasVisualizer lineWidth 1
+par Scenario.roadsCanvasVisualizer lineWidthZoom false
+par Scenario.rsu[0].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[0].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[0].appl sendBeacons false
+par Scenario.rsu[0].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[0].appl beaconUserPriority 7
+par Scenario.rsu[0].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[0].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[0].appl dataOnSch false
+par Scenario.rsu[0].appl dataUserPriority 5
+par Scenario.rsu[0].appl avoidBeaconSynchronization true
+par Scenario.rsu[0].appl sendWSA false
+par Scenario.rsu[0].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[0].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[0].appl appName "\"RSU Application\""
+par Scenario.rsu[0].appl policyLoad "\"fed_p\""
+par Scenario.rsu[0].appl policySave "\"fed_p_0\""
+par Scenario.rsu[0].appl valueLoad "\"fed_v\""
+par Scenario.rsu[0].appl valueSave "\"fed_v_0\""
+par Scenario.rsu[0].appl loadModel false
+par Scenario.rsu[0].appl saveModel true
+scalar Scenario.rsu[0].appl generatedWSMs 0
+scalar Scenario.rsu[0].appl receivedWSMs 0
+scalar Scenario.rsu[0].appl generatedBSMs 0
+scalar Scenario.rsu[0].appl receivedBSMs 0
+scalar Scenario.rsu[0].appl generatedWSAs 0
+scalar Scenario.rsu[0].appl receivedWSAs 0
+par Scenario.rsu[0].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[0].nic.phy80211p recordStats false
+par Scenario.rsu[0].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[0].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[0].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[0].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[0].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[0].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[0].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[0].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[0].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[0].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[0].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[0].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[0].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[0].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[0].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[0].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[0].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[0].nic.phy80211p initialRadioState 0
+par Scenario.rsu[0].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[0].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[0].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[0].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[0].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[0].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[0].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[0].nic.phy80211p busyTime -nan
+par Scenario.rsu[0].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[0].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[0].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[0].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[0].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[0].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[0].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[0].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[0].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[0].nic.mac1609_4 queueSize 0
+par Scenario.rsu[0].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[0].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[0].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[0].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[0].nic.mac1609_4 useAcks false
+par Scenario.rsu[0].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[0].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[0].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[0].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[0].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[0].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[0].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[0].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[0].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[0].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[0].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[0].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[0].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[0].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[0].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[0].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[0].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[0].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[0].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[0].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[0].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[0].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[0].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[0].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[0].mobility notAffectedByHostState true
+par Scenario.rsu[0].mobility x 4000
+par Scenario.rsu[0].mobility y 2500
+par Scenario.rsu[0].mobility z 3
+par Scenario.rsu[0].mobility xOrientation 1
+par Scenario.rsu[0].mobility yOrientation 0
+par Scenario.rsu[0].mobility zOrientation 0
+par Scenario.rsu[0] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[0] applType "\"RSUApplication\""
+par Scenario.rsu[0] nicType "\"Nic80211p\""
+par Scenario.rsu[1].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[1].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[1].appl sendBeacons false
+par Scenario.rsu[1].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[1].appl beaconUserPriority 7
+par Scenario.rsu[1].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[1].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[1].appl dataOnSch false
+par Scenario.rsu[1].appl dataUserPriority 5
+par Scenario.rsu[1].appl avoidBeaconSynchronization true
+par Scenario.rsu[1].appl sendWSA false
+par Scenario.rsu[1].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[1].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[1].appl appName "\"RSU Application\""
+par Scenario.rsu[1].appl policyLoad "\"fed_p\""
+par Scenario.rsu[1].appl policySave "\"fed_p\""
+par Scenario.rsu[1].appl valueLoad "\"fed_v\""
+par Scenario.rsu[1].appl valueSave "\"fed_v\""
+par Scenario.rsu[1].appl loadModel false
+par Scenario.rsu[1].appl saveModel true
+scalar Scenario.rsu[1].appl generatedWSMs 0
+scalar Scenario.rsu[1].appl receivedWSMs 0
+scalar Scenario.rsu[1].appl generatedBSMs 0
+scalar Scenario.rsu[1].appl receivedBSMs 0
+scalar Scenario.rsu[1].appl generatedWSAs 0
+scalar Scenario.rsu[1].appl receivedWSAs 0
+par Scenario.rsu[1].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[1].nic.phy80211p recordStats false
+par Scenario.rsu[1].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[1].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[1].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[1].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[1].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[1].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[1].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[1].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[1].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[1].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[1].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[1].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[1].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[1].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[1].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[1].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[1].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[1].nic.phy80211p initialRadioState 0
+par Scenario.rsu[1].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[1].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[1].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[1].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[1].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[1].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[1].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[1].nic.phy80211p busyTime -nan
+par Scenario.rsu[1].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[1].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[1].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[1].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[1].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[1].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[1].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[1].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[1].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[1].nic.mac1609_4 queueSize 0
+par Scenario.rsu[1].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[1].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[1].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[1].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[1].nic.mac1609_4 useAcks false
+par Scenario.rsu[1].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[1].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[1].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[1].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[1].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[1].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[1].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[1].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[1].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[1].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[1].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[1].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[1].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[1].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[1].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[1].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[1].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[1].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[1].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[1].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[1].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[1].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[1].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[1].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[1].mobility notAffectedByHostState true
+par Scenario.rsu[1].mobility x 6750
+par Scenario.rsu[1].mobility y 1500
+par Scenario.rsu[1].mobility z 3
+par Scenario.rsu[1].mobility xOrientation 1
+par Scenario.rsu[1].mobility yOrientation 0
+par Scenario.rsu[1].mobility zOrientation 0
+par Scenario.rsu[1] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[1] applType "\"RSUApplication\""
+par Scenario.rsu[1] nicType "\"Nic80211p\""
+par Scenario.rsu[2].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[2].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[2].appl sendBeacons false
+par Scenario.rsu[2].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[2].appl beaconUserPriority 7
+par Scenario.rsu[2].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[2].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[2].appl dataOnSch false
+par Scenario.rsu[2].appl dataUserPriority 5
+par Scenario.rsu[2].appl avoidBeaconSynchronization true
+par Scenario.rsu[2].appl sendWSA false
+par Scenario.rsu[2].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[2].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[2].appl appName "\"RSU Application\""
+par Scenario.rsu[2].appl policyLoad "\"fed_p\""
+par Scenario.rsu[2].appl policySave "\"fed_p\""
+par Scenario.rsu[2].appl valueLoad "\"fed_v\""
+par Scenario.rsu[2].appl valueSave "\"fed_v\""
+par Scenario.rsu[2].appl loadModel false
+par Scenario.rsu[2].appl saveModel true
+scalar Scenario.rsu[2].appl generatedWSMs 0
+scalar Scenario.rsu[2].appl receivedWSMs 0
+scalar Scenario.rsu[2].appl generatedBSMs 0
+scalar Scenario.rsu[2].appl receivedBSMs 0
+scalar Scenario.rsu[2].appl generatedWSAs 0
+scalar Scenario.rsu[2].appl receivedWSAs 0
+par Scenario.rsu[2].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[2].nic.phy80211p recordStats false
+par Scenario.rsu[2].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[2].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[2].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[2].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[2].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[2].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[2].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[2].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[2].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[2].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[2].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[2].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[2].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[2].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[2].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[2].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[2].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[2].nic.phy80211p initialRadioState 0
+par Scenario.rsu[2].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[2].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[2].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[2].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[2].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[2].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[2].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[2].nic.phy80211p busyTime -nan
+par Scenario.rsu[2].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[2].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[2].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[2].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[2].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[2].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[2].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[2].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[2].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[2].nic.mac1609_4 queueSize 0
+par Scenario.rsu[2].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[2].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[2].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[2].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[2].nic.mac1609_4 useAcks false
+par Scenario.rsu[2].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[2].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[2].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[2].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[2].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[2].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[2].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[2].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[2].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[2].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[2].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[2].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[2].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[2].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[2].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[2].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[2].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[2].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[2].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[2].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[2].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[2].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[2].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[2].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[2].mobility notAffectedByHostState true
+par Scenario.rsu[2].mobility x 9000
+par Scenario.rsu[2].mobility y 2500
+par Scenario.rsu[2].mobility z 3
+par Scenario.rsu[2].mobility xOrientation 1
+par Scenario.rsu[2].mobility yOrientation 0
+par Scenario.rsu[2].mobility zOrientation 0
+par Scenario.rsu[2] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[2] applType "\"RSUApplication\""
+par Scenario.rsu[2] nicType "\"Nic80211p\""
+par Scenario.rsu[3].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[3].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[3].appl sendBeacons false
+par Scenario.rsu[3].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[3].appl beaconUserPriority 7
+par Scenario.rsu[3].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[3].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[3].appl dataOnSch false
+par Scenario.rsu[3].appl dataUserPriority 5
+par Scenario.rsu[3].appl avoidBeaconSynchronization true
+par Scenario.rsu[3].appl sendWSA false
+par Scenario.rsu[3].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[3].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[3].appl appName "\"RSU Application\""
+par Scenario.rsu[3].appl policyLoad "\"fed_p\""
+par Scenario.rsu[3].appl policySave "\"fed_p\""
+par Scenario.rsu[3].appl valueLoad "\"fed_v\""
+par Scenario.rsu[3].appl valueSave "\"fed_v\""
+par Scenario.rsu[3].appl loadModel false
+par Scenario.rsu[3].appl saveModel true
+scalar Scenario.rsu[3].appl generatedWSMs 0
+scalar Scenario.rsu[3].appl receivedWSMs 0
+scalar Scenario.rsu[3].appl generatedBSMs 0
+scalar Scenario.rsu[3].appl receivedBSMs 0
+scalar Scenario.rsu[3].appl generatedWSAs 0
+scalar Scenario.rsu[3].appl receivedWSAs 0
+par Scenario.rsu[3].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[3].nic.phy80211p recordStats false
+par Scenario.rsu[3].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[3].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[3].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[3].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[3].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[3].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[3].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[3].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[3].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[3].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[3].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[3].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[3].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[3].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[3].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[3].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[3].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[3].nic.phy80211p initialRadioState 0
+par Scenario.rsu[3].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[3].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[3].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[3].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[3].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[3].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[3].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[3].nic.phy80211p busyTime -nan
+par Scenario.rsu[3].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[3].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[3].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[3].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[3].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[3].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[3].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[3].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[3].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[3].nic.mac1609_4 queueSize 0
+par Scenario.rsu[3].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[3].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[3].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[3].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[3].nic.mac1609_4 useAcks false
+par Scenario.rsu[3].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[3].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[3].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[3].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[3].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[3].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[3].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[3].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[3].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[3].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[3].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[3].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[3].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[3].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[3].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[3].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[3].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[3].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[3].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[3].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[3].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[3].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[3].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[3].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[3].mobility notAffectedByHostState true
+par Scenario.rsu[3].mobility x 3500
+par Scenario.rsu[3].mobility y 4000
+par Scenario.rsu[3].mobility z 3
+par Scenario.rsu[3].mobility xOrientation 1
+par Scenario.rsu[3].mobility yOrientation 0
+par Scenario.rsu[3].mobility zOrientation 0
+par Scenario.rsu[3] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[3] applType "\"RSUApplication\""
+par Scenario.rsu[3] nicType "\"Nic80211p\""
+par Scenario.rsu[4].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[4].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[4].appl sendBeacons false
+par Scenario.rsu[4].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[4].appl beaconUserPriority 7
+par Scenario.rsu[4].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[4].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[4].appl dataOnSch false
+par Scenario.rsu[4].appl dataUserPriority 5
+par Scenario.rsu[4].appl avoidBeaconSynchronization true
+par Scenario.rsu[4].appl sendWSA false
+par Scenario.rsu[4].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[4].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[4].appl appName "\"RSU Application\""
+par Scenario.rsu[4].appl policyLoad "\"fed_p\""
+par Scenario.rsu[4].appl policySave "\"fed_p\""
+par Scenario.rsu[4].appl valueLoad "\"fed_v\""
+par Scenario.rsu[4].appl valueSave "\"fed_v\""
+par Scenario.rsu[4].appl loadModel false
+par Scenario.rsu[4].appl saveModel true
+scalar Scenario.rsu[4].appl generatedWSMs 0
+scalar Scenario.rsu[4].appl receivedWSMs 0
+scalar Scenario.rsu[4].appl generatedBSMs 0
+scalar Scenario.rsu[4].appl receivedBSMs 0
+scalar Scenario.rsu[4].appl generatedWSAs 0
+scalar Scenario.rsu[4].appl receivedWSAs 0
+par Scenario.rsu[4].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[4].nic.phy80211p recordStats false
+par Scenario.rsu[4].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[4].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[4].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[4].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[4].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[4].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[4].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[4].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[4].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[4].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[4].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[4].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[4].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[4].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[4].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[4].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[4].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[4].nic.phy80211p initialRadioState 0
+par Scenario.rsu[4].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[4].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[4].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[4].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[4].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[4].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[4].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[4].nic.phy80211p busyTime -nan
+par Scenario.rsu[4].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[4].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[4].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[4].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[4].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[4].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[4].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[4].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[4].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[4].nic.mac1609_4 queueSize 0
+par Scenario.rsu[4].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[4].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[4].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[4].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[4].nic.mac1609_4 useAcks false
+par Scenario.rsu[4].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[4].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[4].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[4].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[4].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[4].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[4].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[4].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[4].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[4].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[4].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[4].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[4].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[4].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[4].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[4].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[4].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[4].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[4].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[4].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[4].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[4].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[4].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[4].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[4].mobility notAffectedByHostState true
+par Scenario.rsu[4].mobility x 5200
+par Scenario.rsu[4].mobility y 3350
+par Scenario.rsu[4].mobility z 3
+par Scenario.rsu[4].mobility xOrientation 1
+par Scenario.rsu[4].mobility yOrientation 0
+par Scenario.rsu[4].mobility zOrientation 0
+par Scenario.rsu[4] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[4] applType "\"RSUApplication\""
+par Scenario.rsu[4] nicType "\"Nic80211p\""
+par Scenario.rsu[5].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[5].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[5].appl sendBeacons false
+par Scenario.rsu[5].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[5].appl beaconUserPriority 7
+par Scenario.rsu[5].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[5].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[5].appl dataOnSch false
+par Scenario.rsu[5].appl dataUserPriority 5
+par Scenario.rsu[5].appl avoidBeaconSynchronization true
+par Scenario.rsu[5].appl sendWSA false
+par Scenario.rsu[5].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[5].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[5].appl appName "\"RSU Application\""
+par Scenario.rsu[5].appl policyLoad "\"fed_p\""
+par Scenario.rsu[5].appl policySave "\"fed_p\""
+par Scenario.rsu[5].appl valueLoad "\"fed_v\""
+par Scenario.rsu[5].appl valueSave "\"fed_v\""
+par Scenario.rsu[5].appl loadModel false
+par Scenario.rsu[5].appl saveModel true
+scalar Scenario.rsu[5].appl generatedWSMs 0
+scalar Scenario.rsu[5].appl receivedWSMs 0
+scalar Scenario.rsu[5].appl generatedBSMs 0
+scalar Scenario.rsu[5].appl receivedBSMs 0
+scalar Scenario.rsu[5].appl generatedWSAs 0
+scalar Scenario.rsu[5].appl receivedWSAs 0
+par Scenario.rsu[5].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[5].nic.phy80211p recordStats false
+par Scenario.rsu[5].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[5].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[5].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[5].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[5].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[5].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[5].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[5].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[5].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[5].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[5].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[5].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[5].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[5].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[5].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[5].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[5].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[5].nic.phy80211p initialRadioState 0
+par Scenario.rsu[5].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[5].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[5].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[5].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[5].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[5].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[5].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[5].nic.phy80211p busyTime -nan
+par Scenario.rsu[5].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[5].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[5].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[5].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[5].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[5].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[5].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[5].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[5].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[5].nic.mac1609_4 queueSize 0
+par Scenario.rsu[5].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[5].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[5].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[5].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[5].nic.mac1609_4 useAcks false
+par Scenario.rsu[5].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[5].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[5].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[5].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[5].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[5].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[5].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[5].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[5].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[5].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[5].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[5].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[5].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[5].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[5].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[5].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[5].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[5].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[5].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[5].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[5].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[5].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[5].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[5].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[5].mobility notAffectedByHostState true
+par Scenario.rsu[5].mobility x 7600
+par Scenario.rsu[5].mobility y 3850
+par Scenario.rsu[5].mobility z 3
+par Scenario.rsu[5].mobility xOrientation 1
+par Scenario.rsu[5].mobility yOrientation 0
+par Scenario.rsu[5].mobility zOrientation 0
+par Scenario.rsu[5] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[5] applType "\"RSUApplication\""
+par Scenario.rsu[5] nicType "\"Nic80211p\""
+par Scenario.rsu[6].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[6].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[6].appl sendBeacons false
+par Scenario.rsu[6].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[6].appl beaconUserPriority 7
+par Scenario.rsu[6].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[6].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[6].appl dataOnSch false
+par Scenario.rsu[6].appl dataUserPriority 5
+par Scenario.rsu[6].appl avoidBeaconSynchronization true
+par Scenario.rsu[6].appl sendWSA false
+par Scenario.rsu[6].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[6].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[6].appl appName "\"RSU Application\""
+par Scenario.rsu[6].appl policyLoad "\"fed_p\""
+par Scenario.rsu[6].appl policySave "\"fed_p\""
+par Scenario.rsu[6].appl valueLoad "\"fed_v\""
+par Scenario.rsu[6].appl valueSave "\"fed_v\""
+par Scenario.rsu[6].appl loadModel false
+par Scenario.rsu[6].appl saveModel true
+scalar Scenario.rsu[6].appl generatedWSMs 0
+scalar Scenario.rsu[6].appl receivedWSMs 0
+scalar Scenario.rsu[6].appl generatedBSMs 0
+scalar Scenario.rsu[6].appl receivedBSMs 0
+scalar Scenario.rsu[6].appl generatedWSAs 0
+scalar Scenario.rsu[6].appl receivedWSAs 0
+par Scenario.rsu[6].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[6].nic.phy80211p recordStats false
+par Scenario.rsu[6].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[6].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[6].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[6].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[6].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[6].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[6].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[6].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[6].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[6].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[6].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[6].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[6].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[6].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[6].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[6].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[6].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[6].nic.phy80211p initialRadioState 0
+par Scenario.rsu[6].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[6].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[6].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[6].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[6].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[6].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[6].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[6].nic.phy80211p busyTime -nan
+par Scenario.rsu[6].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[6].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[6].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[6].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[6].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[6].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[6].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[6].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[6].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[6].nic.mac1609_4 queueSize 0
+par Scenario.rsu[6].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[6].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[6].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[6].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[6].nic.mac1609_4 useAcks false
+par Scenario.rsu[6].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[6].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[6].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[6].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[6].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[6].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[6].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[6].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[6].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[6].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[6].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[6].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[6].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[6].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[6].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[6].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[6].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[6].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[6].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[6].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[6].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[6].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[6].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[6].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[6].mobility notAffectedByHostState true
+par Scenario.rsu[6].mobility x 10000
+par Scenario.rsu[6].mobility y 3750
+par Scenario.rsu[6].mobility z 3
+par Scenario.rsu[6].mobility xOrientation 1
+par Scenario.rsu[6].mobility yOrientation 0
+par Scenario.rsu[6].mobility zOrientation 0
+par Scenario.rsu[6] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[6] applType "\"RSUApplication\""
+par Scenario.rsu[6] nicType "\"Nic80211p\""
+par Scenario.rsu[7].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[7].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[7].appl sendBeacons false
+par Scenario.rsu[7].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[7].appl beaconUserPriority 7
+par Scenario.rsu[7].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[7].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[7].appl dataOnSch false
+par Scenario.rsu[7].appl dataUserPriority 5
+par Scenario.rsu[7].appl avoidBeaconSynchronization true
+par Scenario.rsu[7].appl sendWSA false
+par Scenario.rsu[7].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[7].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[7].appl appName "\"RSU Application\""
+par Scenario.rsu[7].appl policyLoad "\"fed_p\""
+par Scenario.rsu[7].appl policySave "\"fed_p\""
+par Scenario.rsu[7].appl valueLoad "\"fed_v\""
+par Scenario.rsu[7].appl valueSave "\"fed_v\""
+par Scenario.rsu[7].appl loadModel false
+par Scenario.rsu[7].appl saveModel true
+scalar Scenario.rsu[7].appl generatedWSMs 0
+scalar Scenario.rsu[7].appl receivedWSMs 0
+scalar Scenario.rsu[7].appl generatedBSMs 0
+scalar Scenario.rsu[7].appl receivedBSMs 0
+scalar Scenario.rsu[7].appl generatedWSAs 0
+scalar Scenario.rsu[7].appl receivedWSAs 0
+par Scenario.rsu[7].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[7].nic.phy80211p recordStats false
+par Scenario.rsu[7].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[7].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[7].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[7].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[7].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[7].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[7].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[7].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[7].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[7].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[7].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[7].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[7].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[7].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[7].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[7].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[7].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[7].nic.phy80211p initialRadioState 0
+par Scenario.rsu[7].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[7].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[7].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[7].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[7].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[7].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[7].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[7].nic.phy80211p busyTime -nan
+par Scenario.rsu[7].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[7].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[7].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[7].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[7].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[7].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[7].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[7].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[7].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[7].nic.mac1609_4 queueSize 0
+par Scenario.rsu[7].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[7].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[7].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[7].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[7].nic.mac1609_4 useAcks false
+par Scenario.rsu[7].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[7].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[7].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[7].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[7].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[7].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[7].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[7].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[7].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[7].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[7].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[7].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[7].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[7].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[7].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[7].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[7].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[7].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[7].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[7].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[7].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[7].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[7].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[7].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[7].mobility notAffectedByHostState true
+par Scenario.rsu[7].mobility x 2750
+par Scenario.rsu[7].mobility y 6000
+par Scenario.rsu[7].mobility z 3
+par Scenario.rsu[7].mobility xOrientation 1
+par Scenario.rsu[7].mobility yOrientation 0
+par Scenario.rsu[7].mobility zOrientation 0
+par Scenario.rsu[7] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[7] applType "\"RSUApplication\""
+par Scenario.rsu[7] nicType "\"Nic80211p\""
+par Scenario.rsu[8].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[8].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[8].appl sendBeacons false
+par Scenario.rsu[8].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[8].appl beaconUserPriority 7
+par Scenario.rsu[8].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[8].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[8].appl dataOnSch false
+par Scenario.rsu[8].appl dataUserPriority 5
+par Scenario.rsu[8].appl avoidBeaconSynchronization true
+par Scenario.rsu[8].appl sendWSA false
+par Scenario.rsu[8].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[8].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[8].appl appName "\"RSU Application\""
+par Scenario.rsu[8].appl policyLoad "\"fed_p\""
+par Scenario.rsu[8].appl policySave "\"fed_p\""
+par Scenario.rsu[8].appl valueLoad "\"fed_v\""
+par Scenario.rsu[8].appl valueSave "\"fed_v\""
+par Scenario.rsu[8].appl loadModel false
+par Scenario.rsu[8].appl saveModel true
+scalar Scenario.rsu[8].appl generatedWSMs 0
+scalar Scenario.rsu[8].appl receivedWSMs 0
+scalar Scenario.rsu[8].appl generatedBSMs 0
+scalar Scenario.rsu[8].appl receivedBSMs 0
+scalar Scenario.rsu[8].appl generatedWSAs 0
+scalar Scenario.rsu[8].appl receivedWSAs 0
+par Scenario.rsu[8].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[8].nic.phy80211p recordStats false
+par Scenario.rsu[8].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[8].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[8].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[8].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[8].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[8].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[8].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[8].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[8].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[8].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[8].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[8].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[8].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[8].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[8].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[8].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[8].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[8].nic.phy80211p initialRadioState 0
+par Scenario.rsu[8].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[8].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[8].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[8].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[8].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[8].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[8].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[8].nic.phy80211p busyTime -nan
+par Scenario.rsu[8].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[8].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[8].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[8].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[8].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[8].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[8].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[8].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[8].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[8].nic.mac1609_4 queueSize 0
+par Scenario.rsu[8].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[8].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[8].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[8].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[8].nic.mac1609_4 useAcks false
+par Scenario.rsu[8].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[8].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[8].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[8].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[8].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[8].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[8].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[8].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[8].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[8].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[8].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[8].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[8].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[8].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[8].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[8].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[8].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[8].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[8].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[8].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[8].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[8].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[8].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[8].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[8].mobility notAffectedByHostState true
+par Scenario.rsu[8].mobility x 5750
+par Scenario.rsu[8].mobility y 5750
+par Scenario.rsu[8].mobility z 3
+par Scenario.rsu[8].mobility xOrientation 1
+par Scenario.rsu[8].mobility yOrientation 0
+par Scenario.rsu[8].mobility zOrientation 0
+par Scenario.rsu[8] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[8] applType "\"RSUApplication\""
+par Scenario.rsu[8] nicType "\"Nic80211p\""
+par Scenario.rsu[9].appl typename "\"org.car2x.veins.subprojects.iov_sim.modules.applications.RSUApplication\""
+par Scenario.rsu[9].appl headerLength 80bit
+attr unit bit
+par Scenario.rsu[9].appl sendBeacons false
+par Scenario.rsu[9].appl beaconLengthBits 256bit
+attr unit bit
+par Scenario.rsu[9].appl beaconUserPriority 7
+par Scenario.rsu[9].appl beaconInterval 1s
+attr unit s
+par Scenario.rsu[9].appl dataLengthBits 1024bit
+attr unit bit
+par Scenario.rsu[9].appl dataOnSch false
+par Scenario.rsu[9].appl dataUserPriority 5
+par Scenario.rsu[9].appl avoidBeaconSynchronization true
+par Scenario.rsu[9].appl sendWSA false
+par Scenario.rsu[9].appl wsaLengthBits 250bit
+attr unit bit
+par Scenario.rsu[9].appl wsaInterval 1s
+attr unit s
+par Scenario.rsu[9].appl appName "\"RSU Application\""
+par Scenario.rsu[9].appl policyLoad "\"fed_p\""
+par Scenario.rsu[9].appl policySave "\"fed_p\""
+par Scenario.rsu[9].appl valueLoad "\"fed_v\""
+par Scenario.rsu[9].appl valueSave "\"fed_v\""
+par Scenario.rsu[9].appl loadModel false
+par Scenario.rsu[9].appl saveModel true
+scalar Scenario.rsu[9].appl generatedWSMs 0
+scalar Scenario.rsu[9].appl receivedWSMs 0
+scalar Scenario.rsu[9].appl generatedBSMs 0
+scalar Scenario.rsu[9].appl receivedBSMs 0
+scalar Scenario.rsu[9].appl generatedWSAs 0
+scalar Scenario.rsu[9].appl receivedWSAs 0
+par Scenario.rsu[9].nic.phy80211p typename "\"org.car2x.veins.modules.phy.PhyLayer80211p\""
+par Scenario.rsu[9].nic.phy80211p recordStats false
+par Scenario.rsu[9].nic.phy80211p usePropagationDelay true
+par Scenario.rsu[9].nic.phy80211p noiseFloor -98dBm
+attr unit dBm
+par Scenario.rsu[9].nic.phy80211p useNoiseFloor false
+par Scenario.rsu[9].nic.phy80211p antenna "<Antenna type=\"SampledAntenna1D\" id=\"monopole\">...</Antenna> at /home/chandler/src/iov_sim/examples/iov_sim//antenna.xml:35"
+par Scenario.rsu[9].nic.phy80211p antennaOffsetX 0m
+attr unit m
+par Scenario.rsu[9].nic.phy80211p antennaOffsetY 0m
+attr unit m
+par Scenario.rsu[9].nic.phy80211p antennaOffsetZ 0m
+attr unit m
+par Scenario.rsu[9].nic.phy80211p antennaOffsetYaw 0rad
+attr unit rad
+par Scenario.rsu[9].nic.phy80211p analogueModels "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[9].nic.phy80211p decider "<root>...</root> at /home/chandler/src/iov_sim/examples/iov_sim//config.xml:34"
+par Scenario.rsu[9].nic.phy80211p minPowerLevel -110dBm
+attr unit dBm
+par Scenario.rsu[9].nic.phy80211p timeRXToTX 0s
+attr unit s
+par Scenario.rsu[9].nic.phy80211p timeRXToSleep 0s
+attr unit s
+par Scenario.rsu[9].nic.phy80211p timeTXToRX 0s
+attr unit s
+par Scenario.rsu[9].nic.phy80211p timeTXToSleep 0s
+attr unit s
+par Scenario.rsu[9].nic.phy80211p timeSleepToRX 0s
+attr unit s
+par Scenario.rsu[9].nic.phy80211p timeSleepToTX 0s
+attr unit s
+par Scenario.rsu[9].nic.phy80211p initialRadioState 0
+par Scenario.rsu[9].nic.phy80211p radioMinAtt 1
+par Scenario.rsu[9].nic.phy80211p radioMaxAtt 0
+par Scenario.rsu[9].nic.phy80211p nbRadioChannels 1
+par Scenario.rsu[9].nic.phy80211p initialRadioChannel 0
+par Scenario.rsu[9].nic.phy80211p ccaThreshold -65dBm
+attr unit dBm
+par Scenario.rsu[9].nic.phy80211p collectCollisionStatistics false
+par Scenario.rsu[9].nic.phy80211p allowTxDuringRx false
+scalar Scenario.rsu[9].nic.phy80211p busyTime -nan
+par Scenario.rsu[9].nic.mac1609_4 typename "\"org.car2x.veins.modules.mac.ieee80211p.Mac1609_4\""
+par Scenario.rsu[9].nic.mac1609_4 notAffectedByHostState false
+par Scenario.rsu[9].nic.mac1609_4 headerLength 0bit
+attr unit bit
+par Scenario.rsu[9].nic.mac1609_4 address "\"auto\""
+par Scenario.rsu[9].nic.mac1609_4 useServiceChannel false
+par Scenario.rsu[9].nic.mac1609_4 serviceChannel 1
+par Scenario.rsu[9].nic.mac1609_4 bitrate 6000000bps
+attr unit bps
+par Scenario.rsu[9].nic.mac1609_4 syncOffset 0.0003s
+attr unit s
+par Scenario.rsu[9].nic.mac1609_4 txPower 20mW
+attr unit mW
+par Scenario.rsu[9].nic.mac1609_4 queueSize 0
+par Scenario.rsu[9].nic.mac1609_4 dot11RTSThreshold 12000bit
+attr unit bit
+par Scenario.rsu[9].nic.mac1609_4 dot11ShortRetryLimit 7
+par Scenario.rsu[9].nic.mac1609_4 dot11LongRetryLimit 4
+par Scenario.rsu[9].nic.mac1609_4 ackLength 112bit
+attr unit bit
+par Scenario.rsu[9].nic.mac1609_4 useAcks false
+par Scenario.rsu[9].nic.mac1609_4 frameErrorRate 0
+par Scenario.rsu[9].nic.mac1609_4 ackErrorRate 0
+scalar Scenario.rsu[9].nic.mac1609_4 ReceivedUnicastPackets 0
+scalar Scenario.rsu[9].nic.mac1609_4 ReceivedBroadcasts 0
+scalar Scenario.rsu[9].nic.mac1609_4 SentPackets 0
+scalar Scenario.rsu[9].nic.mac1609_4 SentAcknowledgements 0
+scalar Scenario.rsu[9].nic.mac1609_4 RetriesExceeded 0
+scalar Scenario.rsu[9].nic.mac1609_4 SNIRLostPackets 0
+scalar Scenario.rsu[9].nic.mac1609_4 RXTXLostPackets 0
+scalar Scenario.rsu[9].nic.mac1609_4 TotalLostPackets 0
+scalar Scenario.rsu[9].nic.mac1609_4 DroppedPacketsInMac 0
+scalar Scenario.rsu[9].nic.mac1609_4 TooLittleTime 0
+scalar Scenario.rsu[9].nic.mac1609_4 TimesIntoBackoff 0
+scalar Scenario.rsu[9].nic.mac1609_4 SlotsBackoff 0
+scalar Scenario.rsu[9].nic.mac1609_4 NumInternalContention 0
+scalar Scenario.rsu[9].nic.mac1609_4 totalBusyTime 0
+scalar Scenario.rsu[9].nic.mac1609_4 retriesExceeded:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigRetriesExceeded
+scalar Scenario.rsu[9].nic.mac1609_4 sentAcks:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentAck
+scalar Scenario.rsu[9].nic.mac1609_4 sentPackets:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigSentPacket
+scalar Scenario.rsu[9].nic.mac1609_4 collisions:count 0
+attr recordingmode count
+attr source org_car2x_veins_modules_mac_sigCollision
+scalar Scenario.rsu[9].nic.mac1609_4 channelBusy:timeavg -nan
+attr recordingmode timeavg
+attr source org_car2x_veins_modules_mac_sigChannelBusy
+par Scenario.rsu[9].nic typename "\"org.car2x.veins.modules.nic.Nic80211p\""
+par Scenario.rsu[9].nic connectionManagerName "\"connectionManager\""
+par Scenario.rsu[9].mobility typename "\"org.car2x.veins.base.modules.BaseMobility\""
+par Scenario.rsu[9].mobility notAffectedByHostState true
+par Scenario.rsu[9].mobility x 9000
+par Scenario.rsu[9].mobility y 5500
+par Scenario.rsu[9].mobility z 3
+par Scenario.rsu[9].mobility xOrientation 1
+par Scenario.rsu[9].mobility yOrientation 0
+par Scenario.rsu[9].mobility zOrientation 0
+par Scenario.rsu[9] typename "\"org.car2x.veins.nodes.RSU\""
+par Scenario.rsu[9] applType "\"RSUApplication\""
+par Scenario.rsu[9] nicType "\"Nic80211p\""
+par Scenario.MySimulationModule typename "\"org.car2x.veins.subprojects.iov_sim.base.python.PythonLifecycle\""
+par Scenario typename "\"iov_sim.examples.iov_sim.Scenario\""
+par Scenario playgroundSizeX 12500m
+attr unit m
+par Scenario playgroundSizeY 7500m
+attr unit m
+par Scenario playgroundSizeZ 50m
+attr unit m
+par Scenario n 10
+

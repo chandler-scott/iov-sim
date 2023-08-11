@@ -30,6 +30,8 @@
 #include "iov_sim/base/util/NeighborList.h"
 #include "iov_sim/base/util/NeighborEntry.h"
 #include "iov_sim/modules/messages/model/ModelInit_m.h"
+#include "iov_sim/modules/messages/cluster/ClusterHeartbeatReplyAck_m.h"
+
 
 #include <cmath>
 #include <algorithm>
@@ -93,6 +95,15 @@ private:
     AgentWrapper agent;
     AggregatorWrapper aggregator;
 
+
+    /* STATS */
+    int sentPackets = 0;
+    int rcvdPackets = 0;
+    double totalPacketDelay = 0;
+    double initTime = 0;
+    double clusterInitTime = 0;
+    double totalClusterLifetime = 0;
+    int totalClusters = 0;
 
     /* @brief Timeout for node to receive reply for Ack message */
     Timeout *ackTimeout = nullptr;

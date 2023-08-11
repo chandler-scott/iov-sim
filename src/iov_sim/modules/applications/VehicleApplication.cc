@@ -68,6 +68,9 @@ void VehicleApplication::initialize(int stage) {
         // Initializing members that require initialized other modules goes here
         Logger::info("-- initializing message types...", nodeName);
 
+        initTime = simTime().dbl();
+        std::cout << simTime().dbl() << std::endl;
+
         modelRequestTimeout = new Timeout("Requesting model");
         modelRequestTimeout->setTimeout(2);
         ackTimeout = new Timeout("Ack Timeout");
@@ -160,6 +163,47 @@ void VehicleApplication::finish() {
 
     BaseApplicationLayer::finish();
     // statistics recording goes here
+
+    auto formatToNDecimalPlaces = [](double value, int decimalPlaces) {
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(decimalPlaces) << value;
+        return oss.str();
+    };
+
+    double avgPacketDelivery = 0;
+    double avgPacketDelay = 0;
+    double avgClusterLifetime = 0;
+    double percentOfTimeInCluster = 0;
+
+    if (sentPackets != 0)
+    {
+        avgPacketDelivery = ((double)rcvdPackets/(double)sentPackets) * 100;
+    }
+    if (rcvdPackets != 0)
+    {
+        avgPacketDelay = (totalPacketDelay/(double)rcvdPackets) * 1000;
+    }
+    if (totalClusters != 0)
+    {
+        avgClusterLifetime = (totalClusterLifetime/(double)totalClusters);
+        percentOfTimeInCluster = totalClusterLifetime/(simTime().dbl() - initTime) * 100;
+    }
+
+    auto sentPacketsOut = "Sent Packets:\t\t\t" + to_string(sentPackets);
+    auto rcvdPacketsOut = "Received Packets:\t\t" + to_string(rcvdPackets);
+    auto avgPacketDeliveryOut = "Avg Packet Delivery:\t\t" + formatToNDecimalPlaces(avgPacketDelivery, 2) + "%";
+    auto avgPacketDelayOut = "Avg Packet Delay:\t\t" + formatToNDecimalPlaces(avgPacketDelay, 3) + "ms";
+    auto totalClusterLifetimeOut = "Total Cluster Lifetime:\t\t" + to_string(totalClusterLifetime) + "s";
+    auto avgClusterLifetimeOut = "Avg Cluster Lifetime:\t\t" + formatToNDecimalPlaces(avgClusterLifetime, 2) + "s";
+    auto percentTimeInClusterOut = "Lifetime Spent in Cluster:\t" + formatToNDecimalPlaces(percentOfTimeInCluster, 2) + "%";
+
+    Logger::info(sentPacketsOut, nodeName);
+    Logger::info(rcvdPacketsOut, nodeName);
+    Logger::info(avgPacketDeliveryOut, nodeName);
+    Logger::info(avgPacketDelayOut, nodeName);
+    Logger::info(totalClusterLifetimeOut, nodeName);
+    Logger::info(avgClusterLifetimeOut, nodeName);
+    Logger::info(percentTimeInClusterOut, nodeName);
 }
 
 void VehicleApplication::onModelMsg(BaseMessage *msg) {
@@ -271,7 +315,6 @@ void VehicleApplication::onElectionMsg(BaseMessage *msg) {
         if (score >= electionScoreThreshold) {
             Logger::info("Participating in election!", nodeName);
             leaveElection();
-            leaveCluster();
 
             sendElectionAck(requestMsg);
         }
@@ -322,17 +365,15 @@ void VehicleApplication::onClusterMsg(BaseMessage *msg) {
 
         string chId = appMessage->getClusterId();
 
-        if (receivedModel && chId.compare(clusterHeadId)) {
+        if (receivedModel && chId == clusterHeadId) {
             clusterTable.fromString(appMessage->getClusterTable());
 
             if (clusterScoreThreshold < scoreCluster()) {
                 // join cluster
-                clusterMember = true;
-                clusterHeadId = chId;
                 sendHeartbeatReply();
                 cmHeartbeatRcvs++;
             } else {
-                clusterTable.resetTable();
+                leaveCluster();
             }
         } else if (std::strcmp(appMessage->getClusterId(),
                 clusterHeadId.c_str()) == 0) {
@@ -349,6 +390,8 @@ void VehicleApplication::onClusterMsg(BaseMessage *msg) {
             dynamic_cast<ClusterHeartbeatReply*>(msg)) {
         if (std::strcmp(appMessage->getDestination(), nodeName) == 0) {
             chHeartbeatRcvs++;
+            rcvdPackets++;
+            totalPacketDelay += simTime().dbl() - appMessage->getTimestamp();
 
             if (clusterHeartbeatReplyTimeout->isScheduled()) {
                 cancelEvent(clusterHeartbeatReplyTimeout);
@@ -363,6 +406,22 @@ void VehicleApplication::onClusterMsg(BaseMessage *msg) {
                     appMessage->getOrigin()) == clusterNodes.end()) {
                 clusterNodes.push_back(appMessage->getOrigin());
             }
+
+            // send ACK to CM
+            auto *ack = new ClusterHeartbeatReplyAck("Heartbeat reply ACK");
+            populateWSM(ack);
+
+            ack->setDestination(appMessage->getOrigin());
+            ack->setTimestamp(simTime().dbl());
+
+            sendDown(ack);
+        }
+    } else if (ClusterHeartbeatReplyAck * appMessage = dynamic_cast<ClusterHeartbeatReplyAck*>(msg)) {
+        if (std::strcmp(appMessage->getDestination(), nodeName) == 0)
+        {
+            Logger::info("rcv'd heartbeat reply ACK", nodeName);
+            rcvdPackets++;
+            totalPacketDelay += simTime().dbl() - appMessage->getTimestamp();
         }
     } else if (ClusterJoin * appMessage = dynamic_cast<ClusterJoin*>(msg)) {
         Logger::info("received a Cluster Join Message", nodeName);
@@ -385,6 +444,8 @@ void VehicleApplication::handleElection(const char *winnerId) {
     }
 
     leaveElection();
+    totalClusters++;
+    clusterInitTime = simTime().dbl();
 
     if (std::strcmp(nodeName, winnerId) == 0) {
         Logger::info("-- I am cluster head!", nodeName);
@@ -398,6 +459,7 @@ void VehicleApplication::handleElection(const char *winnerId) {
         scheduleAt(simTime() + clusterHeartbeatTimer->getTime(),
                 clusterHeartbeatTimer);
     } else {
+        // join cluster
         Logger::info(
                 "-- joining " + string(winnerId)
                         + "'s cluster as cluster member", nodeName);
@@ -483,6 +545,13 @@ void VehicleApplication::leaveCluster() {
     receivedElectionAck = false;
     electingLeader = false;
     clusterTable.resetTable();
+
+    totalClusterLifetime += simTime().dbl() - clusterInitTime;
+
+    auto log = to_string(simTime().dbl()) + "+" +
+            to_string(clusterInitTime) + "= " + to_string(totalClusterLifetime);
+
+    Logger::error(log, nodeName);
 
     // cancel cluster-based timers and timeouts
     if (clusterHealthTimer->isScheduled()) {
@@ -620,6 +689,7 @@ void VehicleApplication::sendHeartbeatReply() {
 
     reply->setDestination(clusterHeadId.c_str());
     reply->setOrigin(nodeName);
+    reply->setTimestamp(simTime().dbl());
     auto entry = selfToNeighborEntry();
     reply->setNodeMobility(entry.toString().c_str());
 
@@ -634,6 +704,7 @@ void VehicleApplication::sendHeartbeatReply() {
             clusterHeartbeatTimeout);
 
     cmHeartbeatSnds++;
+    sentPackets++;
 }
 
 double VehicleApplication::scoreCluster() {
@@ -773,10 +844,12 @@ void VehicleApplication::handleSelfMsg(cMessage *msg) {
 
             clusterHeartbeat->setClusterId(nodeName);
             clusterHeartbeat->setClusterTable(clusterTable.toString().c_str());
+            clusterHeartbeat->setTimestamp(simTime().dbl());
 
             sendDown(clusterHeartbeat);
 
             chHeartbeatSnds += 1 * clusterTable.getSize();
+            sentPackets += 1 * clusterTable.getSize();
             heartbeats++;
 
             if (clusterHeartbeatReplyTimeout->isScheduled()) {

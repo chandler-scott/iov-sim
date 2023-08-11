@@ -47,6 +47,7 @@ OBJS = \
     $O/iov_sim/modules/messages/cluster/ClusterBaseMessage_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterHeartbeat_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterHeartbeatReply_m.o \
+    $O/iov_sim/modules/messages/cluster/ClusterHeartbeatReplyAck_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterJoin_m.o \
     $O/iov_sim/modules/messages/election/Ack_m.o \
     $O/iov_sim/modules/messages/election/AckTimeout_m.o \
@@ -71,6 +72,7 @@ MSGFILES = \
     iov_sim/modules/messages/cluster/ClusterBaseMessage.msg \
     iov_sim/modules/messages/cluster/ClusterHeartbeat.msg \
     iov_sim/modules/messages/cluster/ClusterHeartbeatReply.msg \
+    iov_sim/modules/messages/cluster/ClusterHeartbeatReplyAck.msg \
     iov_sim/modules/messages/cluster/ClusterJoin.msg \
     iov_sim/modules/messages/election/Ack.msg \
     iov_sim/modules/messages/election/AckTimeout.msg \
