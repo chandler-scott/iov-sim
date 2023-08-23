@@ -42,6 +42,7 @@ OBJS = \
     $O/iov_sim/modules/applications/RSUApplication.o \
     $O/iov_sim/modules/applications/VehicleApplication.o \
     $O/iov_sim/base/messages/BaseMessage_m.o \
+    $O/iov_sim/base/messages/ModelInitTimer_m.o \
     $O/iov_sim/base/messages/Timeout_m.o \
     $O/iov_sim/base/messages/Timer_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterBaseMessage_m.o \
@@ -61,12 +62,14 @@ OBJS = \
     $O/iov_sim/modules/messages/model/ModelInit_m.o \
     $O/iov_sim/modules/messages/model/ModelRequest_m.o \
     $O/iov_sim/modules/messages/model/ModelUpdate_m.o \
+    $O/iov_sim/modules/messages/model/RSUCheckModelInit_m.o \
     $O/iov_sim/modules/messages/neighbor/NeighborBaseMessage_m.o \
     $O/iov_sim/modules/messages/neighbor/NeighborBeacon_m.o
 
 # Message files
 MSGFILES = \
     iov_sim/base/messages/BaseMessage.msg \
+    iov_sim/base/messages/ModelInitTimer.msg \
     iov_sim/base/messages/Timeout.msg \
     iov_sim/base/messages/Timer.msg \
     iov_sim/modules/messages/cluster/ClusterBaseMessage.msg \
@@ -86,6 +89,7 @@ MSGFILES = \
     iov_sim/modules/messages/model/ModelInit.msg \
     iov_sim/modules/messages/model/ModelRequest.msg \
     iov_sim/modules/messages/model/ModelUpdate.msg \
+    iov_sim/modules/messages/model/RSUCheckModelInit.msg \
     iov_sim/modules/messages/neighbor/NeighborBaseMessage.msg \
     iov_sim/modules/messages/neighbor/NeighborBeacon.msg
 

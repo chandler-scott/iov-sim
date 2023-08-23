@@ -25,6 +25,9 @@
 #include "iov_sim/base/applications/BaseApplicationLayer.h"
 #include "iov_sim/base/python/AggregatorWrapper.h"
 #include "iov_sim/modules/messages/model/ModelInit_m.h"
+#include "iov_sim/modules/messages/model/RSUCheckModelInit_m.h"
+#include "iov_sim/base/messages/ModelInitTimer_m.h"
+
 
 using namespace veins;
 namespace iov_sim {
@@ -40,7 +43,10 @@ public:
 protected:
     void onModelMsg(BaseMessage* msg) override;
 
-    void sendModelUpdateMessage(const char*);
+    void sendModelInitMessage(const char* destination);
+    void sendModelUpdateMessage(const char* destination);
+    void sendRSUCheckModelInitMessage(const char* requestingNode, double signalStrength);
+
     void handleSelfMsg(cMessage* msg) override;
 
 private:
@@ -49,6 +55,9 @@ private:
     std::string valueLoad;
     std::string policySave;
     std::string valueSave;
+
+    vector<std::pair<std::string, double>> requestingNodes;
+
 
     /* @brief Timer for window to rcv model update */
     Timer *modelAggTimer = nullptr;

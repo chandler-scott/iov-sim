@@ -17,7 +17,7 @@ private:
 public:
     // Constructors
     NeighborEntry();
-    NeighborEntry(int carsInRange, double speed, double velocity, double xVelocity, double yVelocity,
+    NeighborEntry(int carsInRange, double speed, double xVelocity, double yVelocity,
                   double acceleration, double deceleration, double xPosition, double yPosition,
                   double xDirection, double yDirection, double timestamp);
     explicit NeighborEntry(const std::string& str);
@@ -31,7 +31,7 @@ public:
     // Setter methods
     void setCarsInRange(int cars);
     void setSpeed(double spd);
-    void setVelocity(double vel);
+    void setSignalStrength(double signalStr);
     // Add other setters for the rest of the data members if needed.
 
     // ToString method: converts object to a string representation
@@ -41,9 +41,9 @@ public:
     static NeighborEntry fromString(const std::string& str);
 
     double timestamp;
+    double signalStrength;
     int carsInRange;
     double speed;
-    double velocity;
     double xVelocity;
     double yVelocity;
     double acceleration;

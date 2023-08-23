@@ -84,7 +84,7 @@ public:
     double avgCarsInRange;
     double avgXVelocity;
     double avgYVelocity;
-    double avgVelocity;
+    double avgSignalStrength;
     double avgSpeed;
     double avgAcceleration;
     double avgDeceleration;
@@ -100,7 +100,7 @@ private:
     double carsInRangeWeight;
     double xVelocityWeight;
     double yVelocityWeight;
-    double velocityWeight;
+    double signalStrengthWeight;
     double speedWeight;
     double accelerationWeight;
     double decelerationWeight;

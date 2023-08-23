@@ -32,7 +32,7 @@
 #include "iov_sim/modules/messages/model/ModelInit_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterHeartbeatReplyAck_m.h"
 
-
+#include <string>
 #include <cmath>
 #include <algorithm>
 
@@ -104,6 +104,15 @@ private:
     double clusterInitTime = 0;
     double totalClusterLifetime = 0;
     int totalClusters = 0;
+    int clustersLeftFromHealthCheck = 0;
+    int clustersLeftFromNoReply = 0;
+    double electionInitTime = 0;
+    double totalTimeInElection = 0;
+    int electionsInitiated = 0;
+    int electionsRefused = 0;
+    double totalConnectivity = 0;
+    int connectivityCount = 0;
+
 
     /* @brief Timeout for node to receive reply for Ack message */
     Timeout *ackTimeout = nullptr;
@@ -190,8 +199,8 @@ private:
     double carsInRangeWeight;
     double xVelocityWeight;
     double yVelocityWeight;
-    double velocityWeight;
     double speedWeight;
+    double signalStrengthWeight;
     double accelerationWeight;
     double decelerationWeight;
     double xPositionWeight;
@@ -199,6 +208,7 @@ private:
     double timestampWeight;
     double xDirectionWeight;
     double yDirectionWeight;
+
 
 
 
@@ -227,10 +237,10 @@ private:
     double electionYPositionWeight = 0;
     double electionXDirectionWeight = 0;
     double electionYDirectionWeight = 0;
-    double electionReceivedElectionAckWeight = 0;
     double electionCHWeight = 0;
     double electionCMWeight = 0;
     double electionConnectivityWeight = 0;
+    double electionSignalStrengthWeight = 0;
 
 
     std::string clusterHeadId;

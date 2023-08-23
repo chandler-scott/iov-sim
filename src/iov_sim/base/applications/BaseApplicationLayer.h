@@ -35,6 +35,8 @@
 #include "veins/modules/mac/ieee80211p/DemoBaseApplLayerToMac1609_4Interface.h"
 #include "veins/modules/mobility/traci/TraCIMobility.h"
 #include "veins/modules/mobility/traci/TraCICommandInterface.h"
+#include "veins/modules/phy/DeciderResult80211.h"
+#include "veins/base/phyLayer/PhyToMacControlInfo.h"
 #include "iov_sim/base/python/BaseWrapper.h"
 #include "iov_sim/base/util/Logger.h"
 #include "iov_sim/base/messages/Timeout_m.h"
@@ -96,7 +98,10 @@ public:
 protected:
     void setDisplayColor(const Color& color);
 
+    double getSignalStrength(BaseMessage* msg);
+
     void sendModelUpdateMessage(const char* destination, const char* pNet, const char* vNet, const char* origin = "rsu");
+
 
     /** @brief handle messages from below and calls the onWSM, onBSM, and onWSA functions accordingly */
     void handleLowerMsg(cMessage* msg) override;

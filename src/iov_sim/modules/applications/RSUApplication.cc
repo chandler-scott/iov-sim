@@ -28,11 +28,11 @@ using namespace iov_sim;
 
 Define_Module(iov_sim::RSUApplication);
 
-RSUApplication::RSUApplication()
-    : aggregator() { }
+RSUApplication::RSUApplication() :
+        aggregator() {
+}
 
-void RSUApplication::initialize(int stage)
-{
+void RSUApplication::initialize(int stage) {
     BaseApplicationLayer::initialize(stage);
 
     if (stage == 0) {
@@ -42,12 +42,14 @@ void RSUApplication::initialize(int stage)
         policySave = par("policySave").stringValue();
         valueSave = par("valueSave").stringValue();
 
-        if (par("loadModel").boolValue())
-        {
+
+        if (par("loadModel").boolValue()) {
+            policyLoad += string("_") + nodeName;
+            valueLoad += string("_") + nodeName;
+
             aggregator.loadStateDict(policyLoad, valueLoad);
         }
-    }
-    else if (stage == 1) {
+    } else if (stage == 1) {
         modelAggTimer = new Timer("Model Aggregation Timer");
         modelAggTimer->setTime(120);
         modelAggWindow = new Timer("Model Aggregation Window");
@@ -57,22 +59,21 @@ void RSUApplication::initialize(int stage)
     }
 }
 
-void RSUApplication::finish()
-{
+void RSUApplication::finish() {
     BaseApplicationLayer::finish();
 
-    if (par("saveModel").boolValue())
-    {
+    if (par("saveModel").boolValue()) {
+        policySave += string("_") + nodeName;;
+        valueSave += string("_") + nodeName;;
+
         aggregator.saveStateDict(policySave, valueSave);
     }
 
-    if (modelAggTimer->isScheduled())
-    {
+    if (modelAggTimer->isScheduled()) {
         cancelEvent(modelAggTimer);
     }
 
-    if (modelAggWindow->isScheduled())
-    {
+    if (modelAggWindow->isScheduled()) {
         cancelEvent(modelAggWindow);
     }
 
@@ -80,46 +81,57 @@ void RSUApplication::finish()
     delete modelAggWindow;
 }
 
-void RSUApplication::onModelMsg(BaseMessage* msg)
-{
-   if (ModelRequest* requestMsg = dynamic_cast<ModelRequest*>(msg)) {
+void RSUApplication::onModelMsg(BaseMessage *msg) {
+    if (ModelRequest *requestMsg = dynamic_cast<ModelRequest*>(msg)) {
         // RSU has received an initialize message from a vehicle -> they need an
         // updated model. Respond with ModelUpdateMessage (message containing
         // up-to-date AI model)
         if (std::strcmp(requestMsg->getOrigin(), "rsu") != 0
-                && std::strcmp(requestMsg->getDestination(), "rsu") == 0)
-        {
-            Logger::info(string("received a Model Request Message from ") + requestMsg->getOrigin(),
-                    nodeName);
+                && std::strcmp(requestMsg->getDestination(), "rsu") == 0) {
+            Logger::info(
+                    string("received a Model Request Message from ")
+                            + requestMsg->getOrigin(), nodeName);
 
             findHost()->getDisplayString().setTagArg("i", 1, "green");
 
-            Logger::info("-- request from vehicle. sending...", nodeName);
-            Logger::info("-- sending model request message!", nodeName);
+            Logger::info("-- request from vehicle. Checking with other RSUs...", nodeName);
 
-            // get state_dicts as json-formatted PyObject string
-            auto jsonStateDicts = aggregator.getStateDictsAsJson();
+            sendRSUCheckModelInitMessage(requestMsg->getOrigin(),
+                    getSignalStrength(msg));
 
-            // convert PyObject to const char*
-            auto pNet = aggregator.PyObjectToChar(jsonStateDicts.first);
-            auto vNet = aggregator.PyObjectToChar(jsonStateDicts.second);
+            // add to list
+            requestingNodes.emplace_back(requestMsg->getOrigin(),
+                    getSignalStrength(msg));
 
-            ModelInit *msg = new ModelInit();
-            populateWSM(msg);
+            auto checkModelInitTimer = new ModelInitTimer(
+                    "Check Model Init Timer");
+            checkModelInitTimer->setTime(2);
+            checkModelInitTimer->setRequestingNode(requestMsg->getOrigin());
 
-
-            msg->setData("requesting model");
-            msg->setOrigin("rsu");
-            msg->setDestination(requestMsg->getOrigin());
-            msg->setPStateDict(pNet);
-            msg->setVStateDict(vNet);
-
-            sendDown(msg);
+            scheduleAt(simTime() + checkModelInitTimer->getTime(),
+                    checkModelInitTimer->dup());
+            delete checkModelInitTimer;
         }
-    }
-    else if (ModelUpdate* updateMsg = dynamic_cast<ModelUpdate*>(msg)) {
-        if (std::strcmp(updateMsg->getDestination(), "rsu") == 0)
-        {
+    } else if (RSUCheckModelInit *checkMsg =
+            dynamic_cast<RSUCheckModelInit*>(msg)) {
+        // check if node is in list, if so, remove if signalStrength is better than ours
+        string requestingNode = checkMsg->getRequestingNode();
+        double signalStrength = checkMsg->getSignalStrength();
+
+        requestingNodes.erase(
+                std::remove_if(requestingNodes.begin(), requestingNodes.end(),
+                        [&requestingNode, &signalStrength](const auto &pair) {
+                            std::cout << "Removing " << requestingNode <<
+                                    " as my signal strength (" <<
+                                    pair.second << "dB) < (" <<
+                                    signalStrength << "dB).\n\n" <<
+                                    std::endl;
+                            return pair.first == requestingNode
+                                    && pair.second < signalStrength;
+                        }),
+                requestingNodes.end());
+    } else if (ModelUpdate *updateMsg = dynamic_cast<ModelUpdate*>(msg)) {
+        if (std::strcmp(updateMsg->getDestination(), "rsu") == 0) {
             Logger::info("received a Model Update Message", nodeName);
 
             findHost()->getDisplayString().setTagArg("i", 1, "purple");
@@ -130,12 +142,43 @@ void RSUApplication::onModelMsg(BaseMessage* msg)
             pStateDicts.push_back(stateDicts.first);
             vStateDicts.push_back(stateDicts.second);
         }
+    } else {
     }
-   else { }
 }
 
-void RSUApplication::sendModelUpdateMessage(const char* destination)
-{
+void RSUApplication::sendModelInitMessage(const char *destination) {
+    // get state_dicts as json-formatted PyObject string
+    auto jsonStateDicts = aggregator.getStateDictsAsJson();
+
+    // convert PyObject to const char*
+    auto pNet = aggregator.PyObjectToChar(jsonStateDicts.first);
+    auto vNet = aggregator.PyObjectToChar(jsonStateDicts.second);
+
+    ModelInit *msg = new ModelInit();
+    populateWSM(msg);
+
+    msg->setData("requesting model");
+    msg->setOrigin("rsu");
+    msg->setDestination(destination);
+    msg->setPStateDict(pNet);
+    msg->setVStateDict(vNet);
+
+    sendDown(msg);
+}
+
+void RSUApplication::sendRSUCheckModelInitMessage(const char *requestingNode,
+        double signalStrength) {
+    RSUCheckModelInit *msg = new RSUCheckModelInit();
+    populateWSM(msg);
+
+    msg->setData("Checking with RSUs");
+    msg->setRequestingNode(requestingNode);
+    msg->setSignalStrength(signalStrength);
+
+    sendDown(msg);
+}
+
+void RSUApplication::sendModelUpdateMessage(const char *destination) {
     // get state_dicts as json-formatted PyObject string
     auto jsonStateDicts = aggregator.getStateDictsAsJson();
 
@@ -149,7 +192,20 @@ void RSUApplication::sendModelUpdateMessage(const char* destination)
 }
 
 void RSUApplication::handleSelfMsg(cMessage *msg) {
-    if (msg == modelAggTimer) {
+    if (ModelInitTimer *updateMsg = dynamic_cast<ModelInitTimer*>(msg)) {
+        Logger::info("Model Init Timer", nodeName);
+        auto requestingNode = updateMsg->getRequestingNode();
+        auto it = std::find_if(requestingNodes.begin(), requestingNodes.end(),
+                               [&requestingNode](const auto& pair) {
+                                   return pair.first == requestingNode;
+                               });
+
+        // if the node is still in the list, send the model init
+        if (it != requestingNodes.end()) {
+            sendModelInitMessage(it->first.c_str());
+        }
+        delete updateMsg;
+    } else if (msg == modelAggTimer) {
         Logger::info("Sending model aggregation request!", nodeName);
 
         ModelRequest *msg = new ModelRequest();
@@ -161,12 +217,10 @@ void RSUApplication::handleSelfMsg(cMessage *msg) {
         sendDown(msg);
         scheduleAt(simTime() + modelAggWindow->getTime(), modelAggWindow);
 
-    }  else if (msg == modelAggWindow) {
-        Logger::info("End of model agg rcv window; aggregating...",
-                nodeName);
+    } else if (msg == modelAggWindow) {
+        Logger::info("End of model agg rcv window; aggregating...", nodeName);
         // convert vector to python list
-        if (pStateDicts.size() == 0)
-        {
+        if (pStateDicts.size() == 0) {
             Logger::info("No models received.. Starting agg timer back up",
                     nodeName);
             findHost()->getDisplayString().setTagArg("i", 1, "");
@@ -174,8 +228,8 @@ void RSUApplication::handleSelfMsg(cMessage *msg) {
             return;
         }
 
-        PyObject* pList = PyList_New(pStateDicts.size());
-        PyObject* vList = PyList_New(vStateDicts.size());
+        PyObject *pList = PyList_New(pStateDicts.size());
+        PyObject *vList = PyList_New(vStateDicts.size());
 
         for (size_t i = 0; i < pStateDicts.size(); ++i) {
             PyList_SET_ITEM(pList, i, pStateDicts[i]);
@@ -186,10 +240,11 @@ void RSUApplication::handleSelfMsg(cMessage *msg) {
 
         // aggregate list of rcv'd models and load
         auto models = aggregator.aggregateModels(pList, vList);
-        aggregator.loadStateDicts(aggregator.getAggregatorClass(),
-                models.first, models.second);
+        aggregator.loadStateDicts(aggregator.getAggregatorClass(), models.first,
+                models.second);
 
-        Logger::info("Aggregation successful. Disseminating newly updated model.",
+        Logger::info(
+                "Aggregation successful. Disseminating newly updated model.",
                 nodeName);
 
         // get state_dicts as json-formatted PyObject string

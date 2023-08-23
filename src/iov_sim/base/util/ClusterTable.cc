@@ -22,15 +22,15 @@ ClusterTable::ClusterTable(std::string initString, double defaultTimeout)
 
 // Set weights for scoring neighbors
 void ClusterTable::setWeights(double inRangeWeight, double xVelWeight,
-        double yVelWeight, double velWeight, double speedWeight, double accelWeight,
+        double yVelWeight, double signalStrWeight, double spdWeight, double accelWeight,
         double decelWeight, double xPosWeight, double yPosWeight, double timeWeight,
         double xDirectionWeight, double yDirectionWeight)
 {
     carsInRangeWeight = inRangeWeight;
     xVelocityWeight = xVelWeight;
     yVelocityWeight = yVelWeight;
-    velocityWeight = velWeight;
-    speedWeight = speedWeight;
+    signalStrengthWeight = signalStrWeight;
+    speedWeight = spdWeight;
     accelerationWeight = accelWeight;
     decelerationWeight = decelWeight;
     xPositionWeight = xPosWeight;
@@ -76,7 +76,7 @@ void ClusterTable::calculateMetadata() {
     double totalCarsInRange = 0.0;
     double totalXVelocity = 0.0;
     double totalYVelocity = 0.0;
-    double totalVelocity = 0.0;
+    double totalSignalStrength = 0.0;
     double totalSpeed = 0.0;
     double totalAcceleration = 0.0;
     double totalDeceleration = 0.0;
@@ -90,7 +90,7 @@ void ClusterTable::calculateMetadata() {
         totalCarsInRange += entry.second.carsInRange;
         totalXVelocity += entry.second.xVelocity;
         totalYVelocity += entry.second.yVelocity;
-        totalVelocity += entry.second.velocity;
+        totalSignalStrength += entry.second.signalStrength;
         totalSpeed += entry.second.speed;
         totalAcceleration += entry.second.acceleration;
         totalDeceleration += entry.second.deceleration;
@@ -106,7 +106,7 @@ void ClusterTable::calculateMetadata() {
     avgCarsInRange = totalCarsInRange / size;
     avgXVelocity = totalXVelocity / size;
     avgYVelocity = totalXVelocity / size;
-    avgVelocity = totalVelocity / size;
+    avgSignalStrength = totalSignalStrength / size;
     avgSpeed = totalSpeed / size;
     avgAcceleration = totalAcceleration / size;
     avgDeceleration = totalDeceleration / size;
@@ -127,7 +127,7 @@ void ClusterTable::scoreNeighbors() {
                 carsInRangeWeight * (avgCarsInRange - entry.second.carsInRange) +
                 xVelocityWeight * (avgXVelocity - entry.second.xVelocity) +
                 yVelocityWeight * (avgYVelocity - entry.second.yVelocity) +
-                velocityWeight * (avgVelocity - entry.second.velocity) +
+                signalStrengthWeight * (avgSignalStrength - entry.second.signalStrength) +
                 speedWeight * (avgSpeed - entry.second.speed) +
                 accelerationWeight * (avgAcceleration - entry.second.acceleration) +
                 decelerationWeight * (avgDeceleration - entry.second.deceleration) +
@@ -150,7 +150,7 @@ std::string ClusterTable::toString() const
         result += entry.first + ":";
         result += std::to_string(entry.second.carsInRange) + ",";
         result += std::to_string(entry.second.speed) + ",";
-        result += std::to_string(entry.second.velocity) + ",";
+        result += std::to_string(entry.second.signalStrength) + ",";
         result += std::to_string(entry.second.xVelocity) + ",";
         result += std::to_string(entry.second.yVelocity) + ",";
         result += std::to_string(entry.second.acceleration) + ",";
@@ -198,7 +198,7 @@ void ClusterTable::fromString(const std::string& str)
         std::getline(entryStream, property, ',');
         neighborEntry.speed = std::stod(property);
         std::getline(entryStream, property, ',');
-        neighborEntry.velocity = std::stod(property);
+        neighborEntry.signalStrength = std::stod(property);
         std::getline(entryStream, property, ',');
         neighborEntry.xVelocity = std::stod(property);
         std::getline(entryStream, property, ',');
@@ -229,7 +229,7 @@ std::vector<double> ClusterTable::toList() {
     values.push_back(avgCarsInRange);
     values.push_back(avgXVelocity);
     values.push_back(avgYVelocity);
-    values.push_back(avgVelocity);
+    values.push_back(avgSignalStrength);
     values.push_back(avgSpeed);
     values.push_back(avgAcceleration);
     values.push_back(avgDeceleration);
@@ -295,7 +295,7 @@ void ClusterTable::printAverages() {
     cout << "Average Cars in Range: " << avgCarsInRange << endl;
     cout << "Average X Velocity: " << avgXVelocity << endl;
     cout << "Average Y Velocity: " << avgYVelocity << endl;
-    cout << "Average Velocity: " << avgVelocity << endl;
+    cout << "Average Velocity: " << avgSignalStrength << endl;
     cout << "Average Speed: " << avgSpeed << endl;
     cout << "Average Acceleration: " << avgAcceleration << endl;
     cout << "Average Deceleration: " << avgDeceleration << endl;
@@ -311,7 +311,7 @@ void ClusterTable::printTable() {
     for (const auto& entry : table) {
         cout << "Name: " << entry.first << ", Speed: " << entry.second.speed
              << ", Cars in Range: " << entry.second.carsInRange
-             << ", Velocity: " << entry.second.velocity
+             << ", Velocity: " << entry.second.signalStrength
              << ", xVelocity: " << entry.second.xVelocity
              << ", yVelocity: " << entry.second.yVelocity
              << ", Acceleration: " << entry.second.acceleration

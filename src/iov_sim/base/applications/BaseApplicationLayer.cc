@@ -160,6 +160,12 @@ simtime_t BaseApplicationLayer::computeAsynchronousSendingTime(simtime_t interva
     return firstEvent;
 }
 
+double BaseApplicationLayer::getSignalStrength(BaseMessage* msg)
+{
+    return check_and_cast<DeciderResult80211*>(check_and_cast<PhyToMacControlInfo*>(
+                        msg->getControlInfo())->getDeciderResult())->getRecvPower_dBm();
+}
+
 void BaseApplicationLayer::populateWSM(BaseFrame1609_4* wsm, LAddress::L2Type rcvId, int serial)
 {
     wsm->setRecipientAddress(rcvId);
@@ -282,6 +288,7 @@ void BaseApplicationLayer::handleSelfMsg(cMessage* msg)
 
 void BaseApplicationLayer::finish()
 {
+    /*
     recordScalar("generatedWSMs", generatedWSMs);
     recordScalar("receivedWSMs", receivedWSMs);
 
@@ -290,6 +297,7 @@ void BaseApplicationLayer::finish()
 
     recordScalar("generatedWSAs", generatedWSAs);
     recordScalar("receivedWSAs", receivedWSAs);
+    */
 }
 
 BaseApplicationLayer::~BaseApplicationLayer()

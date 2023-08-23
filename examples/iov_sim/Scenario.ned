@@ -28,7 +28,7 @@ import org.car2x.veins.subprojects.iov_sim.base.python.PythonLifecycle;
 network Scenario extends org.car2x.veins.nodes.Scenario
 {
     parameters:
-        int n = default(10);
+        int n = default(12);
 		rsu[0].mobility.y = 2500;
 		rsu[2].mobility.y = 2500;
 			
@@ -54,15 +54,21 @@ network Scenario extends org.car2x.veins.nodes.Scenario
 		rsu[8].mobility.x = 5750;
 		rsu[9].mobility.y = 5500;
 		rsu[9].mobility.x = 9000;
-	
+		
+		rsu[10].mobility.y = 3450;
+		rsu[10].mobility.x = 6200;
+		rsu[11].mobility.y = 1350;
+		rsu[11].mobility.x = 3250;
 		rsu[*].mobility.z = 3;
         
         
     submodules:
         rsu[n]: RSU {
-            @display("i=veins/sign/yellowdiamond;is=vs");        
+            @display("i=veins/sign/yellowdiamond;is=vs"); 
         }
         MySimulationModule: PythonLifecycle {
             @display("p=100,100;i=block/green");
         }
+        
+
 }

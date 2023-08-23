@@ -37,7 +37,7 @@ protected:
     PythonWrapper &wrapper;
 
     // neural network parameters
-    int obs_size = 13;
+    int obs_size = 23;
     int act_size = 40;
     double lower_bound = -1.0;
     double upper_bound = 1.0;

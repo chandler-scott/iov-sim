@@ -31,9 +31,6 @@ AggregatorWrapper::AggregatorWrapper() : BaseWrapper()
     // Access the Aggregator class from the Python module
     PyObject* pModule = wrapper.ppoModule;
     PyObject* pClass = PyObject_GetAttrString(pModule, "Aggregator");
-    Logger::info("Initialized the Aggregator Wrapper Class!", "AggregatorWrapper");
-    Logger::info("-- now trying to init Aggregator class", "AggregatorWrapper");
-
 
     PyObject* obsDim = wrapper.callZerosBoxSpace(obs_size);
     PyObject* actDim = wrapper.callZerosBoxSpace(act_size);
