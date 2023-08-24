@@ -1,7 +1,2 @@
-- stats: avgClusterLifetime
-
-- optimize reward, actions
-  - reward: 
-     - add avgPacketDelivery, avgClusterLifetime
-- more specific Model messages
-- Optimize RSUs
+- rsu aggregation coordination
+- add analysis

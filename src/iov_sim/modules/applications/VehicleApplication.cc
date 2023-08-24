@@ -102,6 +102,8 @@ void VehicleApplication::initialize(int stage) {
         timeClusteredTimer->setTime(1);
         modelUpdateWindow = new Timer("Model Update Timer");
         modelUpdateWindow->setTime(3);
+        statisticsTimer = new Timer("Statistics Timer");
+        statisticsTimer->setTime(10);
 
         sendModelRequestMsg();
         // schedule neighber beacon msg
@@ -113,6 +115,12 @@ void VehicleApplication::initialize(int stage) {
         // schedule prune neighbor list
         scheduleAt(simTime() + pruneNeighborListTimer->getTime(),
                 pruneNeighborListTimer);
+        // schedule statistics timer
+        simtime_t currentTime = simTime(); // Get the current simulation time
+        simtime_t nextMultipleOf10 = ceil(currentTime / 10.0) * 10; // Calculate next multiple of 10
+
+        scheduleAt(nextMultipleOf10,
+                statisticsTimer);
     }
 }
 
@@ -151,6 +159,9 @@ void VehicleApplication::finish() {
     if (clusterHealthTimer->isScheduled()) {
         cancelEvent(clusterHealthTimer);
     }
+    if (statisticsTimer->isScheduled()) {
+        cancelEvent(statisticsTimer);
+    }
 
     delete ackTimeout;
     delete startElection;
@@ -163,6 +174,8 @@ void VehicleApplication::finish() {
     delete clusterHeartbeatReplyTimeout;
     delete modelUpdateWindow;
     delete clusterHealthTimer;
+    delete statisticsTimer;
+
 
     BaseApplicationLayer::finish();
     // statistics recording goes here
@@ -291,7 +304,7 @@ void VehicleApplication::onModelMsg(BaseMessage *msg) {
             scheduleAt(simTime() + modelUpdateWindow->getTime(),
                     modelUpdateWindow);
             // forward model request to CMs
-            sendModelRequestMsg("");
+            sendModelRequestMsg();
         } else if (clusterMember && hasLearned
                 && std::strcmp(requestMsg->getOrigin(), clusterHeadId.c_str())
                         == 0) {
@@ -834,7 +847,85 @@ double VehicleApplication::calculateConnectivityPercentage() {
 }
 
 void VehicleApplication::handleSelfMsg(cMessage *msg) {
-    if (msg == modelRequestTimeout) {
+    if (msg == statisticsTimer) {
+        double avgPacketDelivery = 0;
+        double avgPacketDelay = 0;
+        double avgClusterLifetime = 0;
+        double percentOfTimeInCluster = 0;
+        double percentOfTimeInElection = 0;
+        double timeAlive = simTime().dbl() - initTime;
+        double connectivityPercent = 0;
+        if (sentPackets != 0)
+        {
+            avgPacketDelivery = ((double)rcvdPackets/(double)sentPackets) * 100;
+        }
+        if (rcvdPackets != 0)
+        {
+            avgPacketDelay = (totalPacketDelay/(double)rcvdPackets) * 1000;
+        }
+        if (totalClusters != 0)
+        {
+            avgClusterLifetime = (totalClusterLifetime/(double)totalClusters);
+            percentOfTimeInCluster = (totalClusterLifetime/timeAlive) * 100;
+        }
+        if (totalTimeInElection != 0)
+        {
+            percentOfTimeInElection = (totalTimeInElection/timeAlive) * 100;
+        }
+        if (connectivityCount != 0)
+        {
+            connectivityPercent = totalConnectivity/(double)connectivityCount;
+        }
+
+        std::ostringstream recordStream;
+        recordStream << "simTime:" << simTime() << ","
+                << "sentPackets:" << sentPackets << ","
+                << "rcvdPackets:" << rcvdPackets << ","
+                << "avgPacketDelivery:" << avgPacketDelivery << ","
+                << "avgPacketDelay:" << avgPacketDelay << ","
+                << "avgClusterLifetime:" << avgClusterLifetime << ","
+                << "percentOfTimeInCluster:" << percentOfTimeInCluster << ","
+                << "timeAlive:" << timeAlive << ","
+                << "totalClusters:" << totalClusters << ",";
+
+        auto appendSimTime = [](const std::string &inputString) {
+            std::ostringstream oss;
+            oss << inputString << ":" << std::fixed << std::setprecision(2) << simTime();
+            return oss.str();
+        };
+
+        recordScalar(appendSimTime("sentPackets").c_str(), sentPackets);
+        recordScalar(appendSimTime("clusterHead").c_str(), clusterHead);
+        recordScalar(appendSimTime("rcvdPackets").c_str(), rcvdPackets);
+        recordScalar(appendSimTime("avgPacketDelivery").c_str(), avgPacketDelivery);
+        recordScalar(appendSimTime("avgPacketDelay").c_str(), avgPacketDelay);
+        recordScalar(appendSimTime("avgClusterLifetime").c_str(), avgClusterLifetime);
+        recordScalar(appendSimTime("percentLifetimeInCluster").c_str(), percentOfTimeInCluster);
+        recordScalar(appendSimTime("percentLifetimeInElection").c_str(), percentOfTimeInElection);
+        recordScalar(appendSimTime("timeAlive").c_str(), timeAlive);
+        recordScalar(appendSimTime("totalClusters").c_str(), totalClusters);
+        recordScalar(appendSimTime("clustersLeftNoReply").c_str(), clustersLeftFromNoReply);
+        recordScalar(appendSimTime("clustersLeftHealthCheck").c_str(), clustersLeftFromHealthCheck);
+        recordScalar(appendSimTime("electionsInitiated").c_str(), electionsInitiated);
+        recordScalar(appendSimTime("electionsRefused").c_str(), electionsRefused);
+        recordScalar(appendSimTime("connectivity").c_str(), connectivityPercent);
+
+        scheduleAt(simTime() + statisticsTimer->getTime(), statisticsTimer);
+        // scheduleAt(simTime() + statisticsTimer->getTime(), statisticsTimer);
+
+        // reset variables
+        totalSentPackets += sentPackets;
+        totalRcvdPackets += rcvdPackets;
+
+        sentPackets = 0;
+        rcvdPackets = 0;
+        totalPacketDelay = 0;
+        totalClusterLifetime = 0;
+        totalTimeInElection = 0;
+        totalClusters = 0;
+        timeAlive = 0;
+        initTime = simTime().dbl();
+    } else if (msg == modelRequestTimeout) {
         sendModelRequestMsg();
         scheduleAt(simTime() + requestModelTimeout, modelRequestTimeout);
     } else if (msg == neighborBeaconTimer) {

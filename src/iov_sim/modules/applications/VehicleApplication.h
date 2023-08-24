@@ -29,6 +29,7 @@
 #include "iov_sim/base/util/ClusterTable.h"
 #include "iov_sim/base/util/NeighborList.h"
 #include "iov_sim/base/util/NeighborEntry.h"
+#include "iov_sim/base/messages/StatisticsTimer_m.h"
 #include "iov_sim/modules/messages/model/ModelInit_m.h"
 #include "iov_sim/modules/messages/cluster/ClusterHeartbeatReplyAck_m.h"
 
@@ -95,10 +96,11 @@ private:
     AgentWrapper agent;
     AggregatorWrapper aggregator;
 
-
     /* STATS */
     int sentPackets = 0;
     int rcvdPackets = 0;
+    int totalSentPackets = 0;
+    int totalRcvdPackets = 0;
     double totalPacketDelay = 0;
     double initTime = 0;
     double clusterInitTime = 0;
@@ -146,6 +148,9 @@ private:
     Timer *timeClusteredTimer = nullptr;
     /* @brief Timer for window to rcv model update */
     Timer *modelUpdateWindow = nullptr;
+    /* @brief Timer for statistics output */
+    Timer *statisticsTimer = nullptr;
+
 
     vector<PyObject*> pStateDicts;
     vector<PyObject*> vStateDicts;

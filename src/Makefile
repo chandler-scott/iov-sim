@@ -43,6 +43,7 @@ OBJS = \
     $O/iov_sim/modules/applications/VehicleApplication.o \
     $O/iov_sim/base/messages/BaseMessage_m.o \
     $O/iov_sim/base/messages/ModelInitTimer_m.o \
+    $O/iov_sim/base/messages/StatisticsTimer_m.o \
     $O/iov_sim/base/messages/Timeout_m.o \
     $O/iov_sim/base/messages/Timer_m.o \
     $O/iov_sim/modules/messages/cluster/ClusterBaseMessage_m.o \
@@ -70,6 +71,7 @@ OBJS = \
 MSGFILES = \
     iov_sim/base/messages/BaseMessage.msg \
     iov_sim/base/messages/ModelInitTimer.msg \
+    iov_sim/base/messages/StatisticsTimer.msg \
     iov_sim/base/messages/Timeout.msg \
     iov_sim/base/messages/Timer.msg \
     iov_sim/modules/messages/cluster/ClusterBaseMessage.msg \
