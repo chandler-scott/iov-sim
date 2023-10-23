@@ -2,4 +2,5 @@
 <viewsettings>
     <scheme name="real world"/>
     <delay value="20"/>
+    <scale value="3"/>
 </viewsettings>
