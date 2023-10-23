@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    <basedir path="/home/chandler/src/iov_sim/examples/iov_sim/sumo/baseline" />
+
+    <copy file="baseline.net.xml.gz" />
+    <copy file="baseline.poly.xml" />
+    <copy file="baseline_bbox.sumo.xml.gz" />
+    
+    <copy file="baseline.view.xml" />
+    <copy file="baseline.routes.xml" />   
+    
+    <copy file="baseline.sumocfg" type="config" />
+    
+    
+</launch>

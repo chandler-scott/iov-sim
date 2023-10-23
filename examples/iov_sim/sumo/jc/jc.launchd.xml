@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    <basedir path="/home/chandler/src/iov_sim/examples/iov_sim/sumo/jc" />
+
+    <copy file="jc.net.xml.gz" />
+    <copy file="jc.poly.xml" />
+    <copy file="jc_bbox.sumo.xml.gz" />
+    
+    <copy file="jc.view.xml" />
+    <copy file="jc.routes.xml" />   
+    
+    <copy file="jc.sumocfg" type="config" />
+    
+    
+</launch>
